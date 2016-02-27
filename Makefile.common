@@ -1,4 +1,7 @@
-GTK_ID=sibosop.com
+GTK_ID=com.sibosop.artDisplay
 
-CPPFLAGS += `pkg-config --cflags gtk+-3.0` -DGTK_ID='"$(GTK_ID)"'
-LDFLAGS += `pkg-config --libs gtk+-3.0`
+COMMON_INC=$(AD_ROOT)/common/
+COMMON_LIB=$(COMMON_INC)/commonLib.a
+
+CPPFLAGS += `pkg-config --cflags gtk+-3.0` -DGTK_ID='"$(GTK_ID)"' -I $(COMMON_INC)
+LDFLAGS += `pkg-config --libs gtk+-3.0` $(COMMON_LIB)

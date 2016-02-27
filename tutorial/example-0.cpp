@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <basics.h>
 
 static void
 activate (GtkApplication* app,
@@ -18,6 +19,7 @@ main (int    argc,
 {
   GtkApplication *app;
   int status;
+  DEBUG(ALWAYS,"TEST DEBUG");
 
   app = gtk_application_new (GTK_ID, G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
