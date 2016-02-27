@@ -1,0 +1,4 @@
+GTK_ID=sibosop.com
+
+CPPFLAGS += `pkg-config --cflags gtk+-3.0` -DGTK_ID='"$(GTK_ID)"'
+LDFLAGS += `pkg-config --libs gtk+-3.0`
