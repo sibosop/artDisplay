@@ -1,7 +1,10 @@
 include $(AD_ROOT)/Makefile.common
+ROOT=example-
 
-TUTORIALS= \
-	example-0
+NUMBERS := 0 1 2 4
+TUTORIALS := $(addprefix $(ROOT),${NUMBERS})
+.PHONY: all 
+
 	
 DO_LINK=g++ -o $@ $< $(LDFLAGS) 
 	
@@ -9,7 +12,7 @@ DO_LINK=g++ -o $@ $< $(LDFLAGS)
 
 all: $(TUTORIALS)
 
-example-0: example-0.o
+${TUTORIALS}: $(ROOT)%: $(ROOT)%.o 
 	$(DO_LINK)
 	
 	
