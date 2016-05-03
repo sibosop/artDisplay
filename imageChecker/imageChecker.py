@@ -24,15 +24,16 @@ def displayImage(img):
   global currentImg
   if debug:
     print "display ",img
-  p = subprocess.Popen("feh -F "+img,shell=True)
+  p = subprocess.Popen("feh -Z -F "+img,shell=True)
   time.sleep(4)
   if currentProc is not None:
     if debug:
       print "kill ",currentProc
     kill(currentProc.pid)
-    os.unlink(currentImg)
+    
   currentProc = p
   currentImg=img
+  os.unlink(currentImg)
   return None
 
 def getImage():
@@ -68,15 +69,17 @@ if __name__ == '__main__':
   if cacheDir is None:
     print "Error: ID_CACHE not defined"
     exit(-1)
+    
 
   print "image cache dir:",cacheDir
   if not os.path.exists(cacheDir):
     print "Error: chacheDir",cacheDir,"does not exist"
     exit(-1)
-    
+  count=0
   while True:
     if debug:
-      print "checking for image"
+      count += 1
+      print "checking for image. count:",count
     img = getImage();
     if img is None:
       if debug:
