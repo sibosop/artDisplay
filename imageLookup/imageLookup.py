@@ -6,6 +6,7 @@ import requests
 import re
 import urllib2
 import time
+import serial
 
 
 
@@ -14,10 +15,19 @@ def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
   #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url)), "html.parser")
 
-
+def clear():
+  ser.write([0xfe,0x51]) 
+  
+def setRow(r):
+  val = 0 
+  if ( r == 1 ):
+    val = 0x40 
+  ser.write([0xfe,0x45,val])
+  
 
 if __name__ == '__main__':
   #print "hello world"
+  ser = serial.Serial('/dev/ttyUSB0', 9600)
   DIR = os.environ.get('ID_CACHE');
   if DIR is None:
     print "Error: ID_CACHE not defined"
@@ -39,7 +49,10 @@ if __name__ == '__main__':
       tests.append(lines[n])
 
     print tests[0],tests[1] #,tests[2]
-
+    clear()
+    ser.write(tests[0])
+    setRow(1)
+    ser.write(tests[1])
   
 
     image_type = "Action"

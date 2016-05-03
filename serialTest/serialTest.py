@@ -15,7 +15,7 @@ def setRow(r):
   
 if __name__ == '__main__':
   print "hello world"
-  ser = serial.Serial('/dev/tty.usbserial-AM01VG98', 9600)
+  ser = serial.Serial('/dev/ttyUSB0', 9600)
   while True:
     clear();
     setRow(0)
