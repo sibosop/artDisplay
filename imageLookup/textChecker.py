@@ -2,7 +2,7 @@
 import os
 import time
 import serial
-debug = True
+debug = False
 def clear():
   ser.write([0xfe,0x51]) 
   
@@ -32,7 +32,8 @@ def getText():
       continue
     flag = f[ext:]
     if flag == textExt:  
-      print "found text file",f
+      if debug:
+        print "found text file",f
       path = cacheDir + "/" + f
       lines = open(path).read().split('\n')
       if len(lines) > 1:
@@ -47,8 +48,8 @@ if __name__ == '__main__':
   if cacheDir is None:
     print "Error: ID_CACHE not defined"
     exit(-1)
-    
-  print "image cache dir:",cacheDir
+  if debug:  
+    print "image cache dir:",cacheDir
   if not os.path.exists(cacheDir):
     print "Error: chacheDir",cacheDir,"does not exist"
     exit(-1)

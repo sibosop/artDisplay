@@ -4,7 +4,7 @@ import subprocess
 import time
 import psutil
 
-debug = True
+debug = False
 cacheDir = None
 flagExt=".flg"
 currentProc = None
@@ -64,14 +64,14 @@ def getImage():
 
 
 if __name__ == '__main__':
-  print "hello world"
   cacheDir = os.environ.get('ID_CACHE');
   if cacheDir is None:
     print "Error: ID_CACHE not defined"
     exit(-1)
     
 
-  print "image cache dir:",cacheDir
+  if debug:
+    print "image cache dir:",cacheDir
   if not os.path.exists(cacheDir):
     print "Error: chacheDir",cacheDir,"does not exist"
     exit(-1)
