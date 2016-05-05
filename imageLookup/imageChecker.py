@@ -5,7 +5,7 @@ import time
 import psutil
 
 debug = False
-cacheDir = None
+cacheDir = "/home/pi/ImageCache"
 flagExt=".flg"
 currentProc = None
 currentImg = None
@@ -64,10 +64,10 @@ def getImage():
 
 
 if __name__ == '__main__':
-  cacheDir = os.environ.get('ID_CACHE');
-  if cacheDir is None:
-    print "Error: ID_CACHE not defined"
-    exit(-1)
+  #cacheDir = os.environ.get('ID_CACHE');
+  #if cacheDir is None:
+    #print "Error: ID_CACHE not defined"
+    #exit(-1)
     
 
   if debug:

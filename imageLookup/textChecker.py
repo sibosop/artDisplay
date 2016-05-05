@@ -2,6 +2,7 @@
 import os
 import time
 import serial
+import adGlobal
 debug = False
 def clear():
   ser.write([0xfe,0x51]) 
@@ -44,10 +45,7 @@ def getText():
   
 if __name__ == '__main__':
   ser = serial.Serial('/dev/ttyUSB0', 9600)
-  cacheDir = os.environ.get('ID_CACHE');
-  if cacheDir is None:
-    print "Error: ID_CACHE not defined"
-    exit(-1)
+  cacheDir=adGlobal.cacheDir
   if debug:  
     print "image cache dir:",cacheDir
   if not os.path.exists(cacheDir):
