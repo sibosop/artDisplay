@@ -3,12 +3,15 @@ import os
 import subprocess
 import time
 import psutil
+import adGlobal
+import syslog
 
 debug = False
-cacheDir = "/home/pi/ImageCache"
 flagExt=".flg"
 currentProc = None
 currentImg = None
+
+
 
 imageExts=['.jpg','.png','.jpeg']
 
@@ -62,20 +65,13 @@ def getImage():
           return look
   return None
 
-
-if __name__ == '__main__':
-  #cacheDir = os.environ.get('ID_CACHE');
-  #if cacheDir is None:
-    #print "Error: ID_CACHE not defined"
-    #exit(-1)
-    
-
+def imageChecker():
+  global cacheDir
+  cacheDir = adGlobal.getCacheDir()
   if debug:
     print "image cache dir:",cacheDir
-  if not os.path.exists(cacheDir):
-    print "Error: chacheDir",cacheDir,"does not exist"
-    exit(-1)
   count=0
+  syslog.syslog("image checker started successfully")
   while True:
     if debug:
       count += 1
@@ -91,4 +87,8 @@ if __name__ == '__main__':
     time.sleep(5)
   
     
+
+if __name__ == '__main__':
+  imageChecker()
+
   

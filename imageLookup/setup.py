@@ -2,7 +2,11 @@
 import subprocess
 import syslog
 import threading
-import  textChecker
+import textChecker
+import master
+import sys
+import imageLookup
+import imageChecker
 
 debug = True
 if __name__ == '__main__':
@@ -17,7 +21,20 @@ if __name__ == '__main__':
     tc = threading.Thread(target=textChecker.textChecker)
     tc.setDaemon(True)
     tc.start()
+    
+    im = master.isMaster()
+    ti = threading.Thread(target=imageLookup.imageLookup)
+    ti.setDaemon(True)
+    if im:
+      ti.start()  
+    tic = threading.Thread(target=imageChecker.imageChecker)
+    tic.setDaemon(True)
+    tic.start()
     while True:
-      tc.join(1)
+      tc.join(1)  
+      if im:
+        ti.join(1)
+      tic.join(1)
   except:
-    syslog.syslog("return from exception")
+    e = sys.exc_info()[0]
+    syslog.syslog("return from exception "+str(e))

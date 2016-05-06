@@ -5,7 +5,7 @@ import time
 import adGlobal
 import panel
 import syslog
-debug = True
+debug = False
 
 
       
@@ -37,8 +37,7 @@ def textChecker():
   if not panel.setUpPanel():
     syslog.syslog("exiting")
     return
-
-  if debug: print("getting global cache dir")
+    
   global cacheDir
   cacheDir=adGlobal.getCacheDir()
 
@@ -60,6 +59,4 @@ def textChecker():
     time.sleep(5)
     
 if __name__ == '__main__':
-  if debug:
-    print "textChecker"
   textChecker()
