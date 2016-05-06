@@ -1,5 +1,6 @@
 ._*
 *.o
 *.a
+*.pyc
 .DS_Store
 Action_*
