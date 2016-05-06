@@ -12,14 +12,12 @@ import subprocess
 
 debug=True
 
-
 def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
   #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url)), "html.parser")
 
 def imageLookup():
-  
-  DIR = adGlobal.cacheDir;
+  DIR = adGlobal.getCacheDir();
   
   wordFile = adGlobal.wordFile;
   maxImagesPerHost = 3
@@ -103,8 +101,6 @@ def imageLookup():
     else:
       print soup
     time.sleep(60)
-  
-  
 
 if __name__ == '__main__':
   imageLookup()

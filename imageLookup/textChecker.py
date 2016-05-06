@@ -1,23 +1,13 @@
 #!/usr/bin/env python
+
 import os
 import time
-import serial
 import adGlobal
+import panel
+import syslog
 debug = False
-def clear():
-  ser.write([0xfe,0x51]) 
-  
-def setRow(r):
-  val = 0 
-  if ( r == 1 ):
-    val = 0x40 
-  ser.write([0xfe,0x45,val])
 
-def printText(t):
-    clear()
-    ser.write(t[0])
-    setRow(1)
-    ser.write(t[1])
+
       
 textExt = ".lkp"
 def getText():
@@ -42,16 +32,18 @@ def getText():
         return lines
       
   return None
+
+def textChecker():
+  if not panel.setUpPanel():
+    syslog.syslog("exiting")
+    return
+    
+  global cacheDir
+  cacheDir=adGlobal.getCacheDir()
+
   
-if __name__ == '__main__':
-  ser = serial.Serial('/dev/ttyUSB0', 9600)
-  cacheDir=adGlobal.cacheDir
-  if debug:  
-    print "image cache dir:",cacheDir
-  if not os.path.exists(cacheDir):
-    print "Error: chacheDir",cacheDir,"does not exist"
-    exit(-1)
   count=0
+  syslog.syslog("text checker started successfully")
   while True:
     if debug:
       count += 1
@@ -63,5 +55,8 @@ if __name__ == '__main__':
     else:
       if debug:
         print "found test",text
-      printText(text)
+      panel.printText(text)
     time.sleep(5)
+    
+if __name__ == '__main__':
+  textChecker()
