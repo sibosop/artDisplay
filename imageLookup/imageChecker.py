@@ -27,6 +27,7 @@ def displayImage(img):
   global currentImg
   if debug:
     print "display ",img
+  syslog.syslog("calling feh with "+img);
   p = subprocess.Popen("feh -Z -F "+img,shell=True)
   time.sleep(4)
   if currentProc is not None:

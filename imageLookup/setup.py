@@ -7,6 +7,7 @@ import master
 import sys
 import imageLookup
 import imageChecker
+import os
 
 debug = True
 if __name__ == '__main__':
@@ -18,6 +19,7 @@ if __name__ == '__main__':
   test = subprocess.check_call(["sudo","service","slpd","start"])
   test = subprocess.check_call(["slptool","register","service:artdisplay.x://"+host[0]])
   try:
+    os.environ["DISPLAY"] = ":0.0"
     tc = threading.Thread(target=textChecker.textChecker)
     tc.setDaemon(True)
     tc.start()
