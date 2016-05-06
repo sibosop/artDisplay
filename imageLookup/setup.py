@@ -18,12 +18,17 @@ if __name__ == '__main__':
     syslog.syslog("host ="+host[0])
     
   test = subprocess.check_call(["sudo","service","slpd","start"])
-  test = subprocess.check_call(["slptool","register","service:artdisplay.x://"+host[0]])
+  regs=["slptool","register","service:artdisplay.x://"+host[0]]
+  hp=panel.hasPanel()
+  if hp:
+    regs.append("hasPanel=true")
+  test = subprocess.check_call(regs)
+
   try:
     os.environ["DISPLAY"] = ":0.0"
     tc = threading.Thread(target=textChecker.textChecker)
     tc.setDaemon(True)
-    hp=panel.hasPanel()
+    
     if hp:
       tc.start()
     
