@@ -4,7 +4,12 @@ import os
 import syslog
 import adGlobal
 
-
+def hasPanel():
+  if os.path.exists(adGlobal.panelDev):
+    syslog.syslog("Located usb serial device at "+adGlobal.panelDev)
+    return True;
+  syslog.syslog("No usb serial device at "+adGlobal.panelDev)
+  return False;
 
 def clear():
   ser.write([0xfe,0x51]) 
@@ -23,8 +28,7 @@ def printText(t):
     
 def setUpPanel():
   global ser
-  if os.path.exists(adGlobal.panelDev):
+  if hasPanel():
     ser = serial.Serial('/dev/ttyUSB0', 9600)
     return True; 
-  syslog.syslog("No usb serial device at "+adGlobal.panelDev)
   return False

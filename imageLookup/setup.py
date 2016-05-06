@@ -8,6 +8,7 @@ import sys
 import imageLookup
 import imageChecker
 import os
+import panel
 
 debug = True
 if __name__ == '__main__':
@@ -22,7 +23,9 @@ if __name__ == '__main__':
     os.environ["DISPLAY"] = ":0.0"
     tc = threading.Thread(target=textChecker.textChecker)
     tc.setDaemon(True)
-    tc.start()
+    hp=panel.hasPanel()
+    if hp:
+      tc.start()
     
     im = master.isMaster()
     ti = threading.Thread(target=imageLookup.imageLookup)
@@ -33,7 +36,8 @@ if __name__ == '__main__':
     tic.setDaemon(True)
     tic.start()
     while True:
-      tc.join(1)  
+      if hp:
+        tc.join(1)  
       if im:
         ti.join(1)
       tic.join(1)
