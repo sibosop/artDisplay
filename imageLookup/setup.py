@@ -10,6 +10,7 @@ import imageChecker
 import os
 import panel
 
+os.chdir(os.path.dirname(sys.argv[0]))
 debug = True
 if __name__ == '__main__':
 
