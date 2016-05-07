@@ -18,6 +18,7 @@ def get_soup(url,header):
 
 def imageLookup():
   DIR = adGlobal.getCacheDir();
+  imageDir = adGlobal.imageDir;
   
   wordFile = adGlobal.wordFile;
   maxImagesPerHost = 3
@@ -66,7 +67,12 @@ def imageLookup():
     if 1:
       images = [a['src'] for a in soup.find_all("img", {"src": re.compile("gstatic.com")})]
       imageTotal=0
+      copyList = {}
       for h in hosts:
+        copyList[h['ip']] = {}
+        copyList[h['ip']]['image'] = []
+        copyList[h['ip']]['flag'] = []
+        copyList[h['ip']]['text'] = []
         imageCount = 0
         while ( imageCount < maxImagesPerHost ):
           raw_img = urllib2.urlopen(images[imageTotal+imageCount]).read()
@@ -96,8 +102,42 @@ def imageLookup():
             if textPath is not None:
               print "textPath:",textPath
             print "imgCount:",imageCount
+          copyList[h['ip']]['image'].append(imgPath)
+          copyList[h['ip']]['flag'].append(flgPath)
+          if textPath is not None:
+            copyList[h['ip']]['text']=textPath
         imageTotal+=imageCount
         if debug: print "imageTotal:",imageTotal
+        if debug:
+          for ip in copyList.keys():
+            print "ip:",ip
+            for i in copyList[ip]['image']:
+              print "\timg:",i
+            for i in copyList[ip]['flag']:
+              print "\tflag:",i
+            print "\ttext:",copyList[ip]['text']
+        for ip in copylist.keys():
+          destination="pi@"+ip+":"+adGlobal.imageRoot
+          if copyList[ip]['text'] is not None:
+            cmd=['scp']
+            cmd.append(copyList[ip]['text'])
+            cmd.append(destination)
+            subprocess.check_call(cmd)
+          cmd=['scp']
+          for i in copyList[ip]['image']:
+            cmd.append(i)
+          cmd.append(destination)
+          subprocess.check_call(cmd)
+          cmd=['scp']
+          for i in copyList[ip]['flag']:
+              cmd.append(i)
+          cmd.append(destination)
+          subprocess.check_call(cmd)
+          
+            
+            
+            
+          
     else:
       print soup
     time.sleep(60)

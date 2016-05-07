@@ -41,7 +41,7 @@ def displayImage(img):
   return None
 
 def getImage():
-  filenames = next(os.walk(cacheDir))[2]
+  filenames = next(os.walk(imageDir))[2]
   for f in filenames:
     if debug:
       print "filename:",f
@@ -55,11 +55,11 @@ def getImage():
     if debug:
       print"flag ext = ",flag
     if flag == flagExt:
-      delFile = cacheDir+'/'+f
+      delFile = imageDir+'/'+f
       os.unlink(delFile)
       root = f[:ext]
       for se in imageExts:
-        look=cacheDir+'/'+root+se;
+        look=imageDir+'/'+root+se;
         if debug:
           print "looking for",look
         if os.path.exists(look):
@@ -67,10 +67,10 @@ def getImage():
   return None
 
 def imageChecker():
-  global cacheDir
-  cacheDir = adGlobal.getCacheDir()
+  global imageDir
+  imageDir = adGlobal.getImageDir()
   if debug:
-    print "image cache dir:",cacheDir
+    print "image image dir:",imageDir
   count=0
   syslog.syslog("image checker started successfully")
   while True:

@@ -11,7 +11,7 @@ debug = False
       
 textExt = ".lkp"
 def getText():
-  filenames = next(os.walk(cacheDir))[2]
+  filenames = next(os.walk( imageDir))[2]
   for f in filenames:
     if debug:
       print "filename:",f
@@ -25,7 +25,7 @@ def getText():
     if flag == textExt:  
       if debug:
         print "found text file",f
-      path = cacheDir + "/" + f
+      path =  imageDir + "/" + f
       lines = open(path).read().split('\n')
       if len(lines) > 1:
         os.unlink(path)
@@ -38,8 +38,8 @@ def textChecker():
     syslog.syslog("exiting")
     return
     
-  global cacheDir
-  cacheDir=adGlobal.getCacheDir()
+  global  imageDir
+   imageDir=adGlobal.getImageDir()
 
   
   count=0
