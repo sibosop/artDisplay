@@ -6,9 +6,9 @@ import subprocess
 
 debug=True
 home="/home/pi"
-imageRoot='../Images'
+imageDir='../Images'
 cacheDir="../ImageCache"
-imageDest="GitProjects/artdisplay/imageLookup/"+"imageRoot"
+imageDest="GitProjects/artdisplay/imageLookup/"+imageDir
 wordFile="./corncob_lowercase.txt"
 panelDev="/dev/ttyUSB0"
 

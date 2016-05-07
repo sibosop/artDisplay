@@ -67,8 +67,9 @@ def getImage():
   return None
 
 def imageChecker():
+  os.environ["DISPLAY"] = ":0.0"
   global imageDir
-  imageDir = adGlobal.getImageDir()
+  imageDir = adGlobal.imageDir
   if debug:
     print "image image dir:",imageDir
   count=0

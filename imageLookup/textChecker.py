@@ -39,7 +39,7 @@ def textChecker():
     return
     
   global  imageDir
-   imageDir=adGlobal.getImageDir()
+  imageDir=adGlobal.imageDir
 
   
   count=0
