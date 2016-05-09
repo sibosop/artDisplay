@@ -1,9 +1,10 @@
+
 #!/usr/bin/env python
 import serial
 import os
 import syslog
 import adGlobal
-
+debug=True
 def hasPanel():
   if os.path.exists(adGlobal.panelDev):
     syslog.syslog("Located usb serial device at "+adGlobal.panelDev)
@@ -22,9 +23,11 @@ def setRow(r):
 
 def printText(t):
     clear()
-    ser.write('{0: ^15}'.format(t[0]))
+    if debug: print "len:",t[0],len(t[0])
+    ser.write('{0: ^16}'.format(t[0]).upper())
+    if debug: print "len:",t[1],len(t[1])
     setRow(1)
-    ser.write('{0: ^15}'.format(t[1]))
+    ser.write('{0: ^16}'.format(t[1]).upper())
     
 def setUpPanel():
   global ser
