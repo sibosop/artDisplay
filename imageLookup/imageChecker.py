@@ -5,6 +5,7 @@ import time
 import psutil
 import adGlobal
 import syslog
+import signal
 
 debug = False
 flagExt=".flg"
@@ -27,13 +28,13 @@ def displayImage(img):
   global currentImg
   if debug:
     print "display ",img
-  syslog.syslog("calling feh with "+img);
-  p = subprocess.Popen("feh -Z -F "+img,shell=True)
+  #syslog.syslog("calling feh with "+img);
+  p = subprocess.Popen("/usr/bin/feh -Z -F "+img,shell=True, preexec_fn=os.setpgrp)
   time.sleep(4)
   if currentProc is not None:
     if debug:
-      print "kill ",currentProc
-    kill(currentProc.pid)
+      print "kill ",os.getpgid(currentProc.pid)
+    os.killpg(os.getpgid(currentProc.pid), signal.SIGTERM) 
     
   currentProc = p
   currentImg=img
