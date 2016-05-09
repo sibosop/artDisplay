@@ -9,16 +9,28 @@ import time
 import adGlobal
 import syslog
 import subprocess
+import glob
 
 debug=True
+
+
+def getCmdVars(ip):
+  cmdVars = []
+  if adGlobal.isLocalHost(ip):
+    cmdVars.append("cp")
+    cmdVars.append(adGlobal.imageDir)
+  else:
+    cmdVars.append("scp");
+    cmdVars.append("pi@"+ip+":"+adGlobal.imageDest)
+  return cmdVars;
+    
 
 def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
   #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url)), "html.parser")
 
 def imageLookup():
-  DIR = adGlobal.getCacheDir();
-  imageDir = adGlobal.imageDir;
+  DIR = adGlobal.cacheDir;
   
   wordFile = adGlobal.wordFile;
   maxImagesPerHost = 3
@@ -72,7 +84,7 @@ def imageLookup():
         copyList[h['ip']] = {}
         copyList[h['ip']]['image'] = []
         copyList[h['ip']]['flag'] = []
-        copyList[h['ip']]['text'] = []
+        copyList[h['ip']]['text'] = None
         imageCount = 0
         while ( imageCount < maxImagesPerHost ):
           raw_img = urllib2.urlopen(images[imageTotal+imageCount]).read()
@@ -95,17 +107,15 @@ def imageLookup():
               f.write(tests[0]+'\n')
               f.write(tests[1]+'\n')
               f.close();
+              copyList[h['ip']]['text']=textPath 
           if debug:
             print "h{'ip'}:",h['ip']
             print "imgPath:",imgPath
             print "flgPath:",flgPath
-            if textPath is not None:
-              print "textPath:",textPath
+            print "textPath:",textPath
             print "imgCount:",imageCount
           copyList[h['ip']]['image'].append(imgPath)
-          copyList[h['ip']]['flag'].append(flgPath)
-          if textPath is not None:
-            copyList[h['ip']]['text']=textPath
+          copyList[h['ip']]['flag'].append(flgPath)     
         imageTotal+=imageCount
         if debug: print "imageTotal:",imageTotal
         if debug:
@@ -116,28 +126,33 @@ def imageLookup():
             for i in copyList[ip]['flag']:
               print "\tflag:",i
             print "\ttext:",copyList[ip]['text']
-        for ip in copylist.keys():
-          destination="pi@"+ip+":"+adGlobal.imageRoot
+        for ip in copyList.keys():
+          cv=getCmdVars(ip)
+          cmd=[cv[0]]
           if copyList[ip]['text'] is not None:
-            cmd=['scp']
             cmd.append(copyList[ip]['text'])
-            cmd.append(destination)
+            cmd.append(cv[1])
+            if debug: print "cmd:",cmd
             subprocess.check_call(cmd)
-          cmd=['scp']
+          cmd=[cv[0]]
           for i in copyList[ip]['image']:
             cmd.append(i)
-          cmd.append(destination)
+          cmd.append(cv[1])
+          if debug: print "cmd:",cmd
           subprocess.check_call(cmd)
-          cmd=['scp']
+          cmd=[cv[0]]
           for i in copyList[ip]['flag']:
               cmd.append(i)
-          cmd.append(destination)
+          cmd.append(cv[1])
+          if debug: print "cmd:",cmd
           subprocess.check_call(cmd)
           
-            
-            
-            
-          
+      files = glob.glob(DIR+"/*")
+      if debug: print "removing:",files
+      for f in files:
+          if f == DIR+"/placeholder":
+            continue
+          os.remove(f)
     else:
       print soup
     time.sleep(60)
