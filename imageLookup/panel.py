@@ -22,9 +22,9 @@ def setRow(r):
 
 def printText(t):
     clear()
-    ser.write(t[0])
+    ser.write('{0: ^15}'.format(t[0]))
     setRow(1)
-    ser.write(t[1])
+    ser.write('{0: ^15}'.format(t[1]))
     
 def setUpPanel():
   global ser

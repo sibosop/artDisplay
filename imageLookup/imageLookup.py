@@ -155,7 +155,7 @@ def imageLookup():
           os.remove(f)
     else:
       print soup
-    time.sleep(60)
+    time.sleep(30)
 
 if __name__ == '__main__':
   imageLookup()
