@@ -11,19 +11,26 @@ import syslog
 import subprocess
 import glob
 
-debug=True
+debug=False
 
 
 def getCmdVars(ip):
   cmdVars = []
   if adGlobal.isLocalHost(ip):
-    cmdVars.append("cp")
-    cmdVars.append(adGlobal.imageDir)
+    cmdVars.append("cp")  
   else:
-    cmdVars.append("scp");
-    cmdVars.append("pi@"+ip+":"+adGlobal.imageDest)
+    cmdVars.append("scp")
+    cmdVars.append("-q")
+    cmdVars.append("-B")
   return cmdVars;
-    
+  
+def getDest(ip):
+  dest=None
+  if adGlobal.isLocalHost(ip):
+    dest = adGlobal.imageDir
+  else:
+    dest = "pi@"+ip+":"+adGlobal.imageDest
+  return dest
 
 def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
@@ -128,22 +135,27 @@ def imageLookup():
             print "\ttext:",copyList[ip]['text']
         for ip in copyList.keys():
           cv=getCmdVars(ip)
-          cmd=[cv[0]]
+          dest=getDest(ip)
+          cmd=cv[:]
           if copyList[ip]['text'] is not None:
             cmd.append(copyList[ip]['text'])
-            cmd.append(cv[1])
+            cmd.append(dest)
             if debug: print "cmd:",cmd
             subprocess.check_call(cmd)
-          cmd=[cv[0]]
+          cmd=[]
+          cmd=cv[:]
+          if debug: print "cmd afer set to cv:",cmd,"cv:",cv
           for i in copyList[ip]['image']:
             cmd.append(i)
-          cmd.append(cv[1])
+          cmd.append(dest)
           if debug: print "cmd:",cmd
           subprocess.check_call(cmd)
-          cmd=[cv[0]]
+          
+          cmd=cv[:]
+          if debug: print "cmd afer set to cv:",cmd
           for i in copyList[ip]['flag']:
               cmd.append(i)
-          cmd.append(cv[1])
+          cmd.append(dest)
           if debug: print "cmd:",cmd
           subprocess.check_call(cmd)
           

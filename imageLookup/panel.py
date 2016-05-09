@@ -4,7 +4,7 @@ import serial
 import os
 import syslog
 import adGlobal
-debug=True
+debug=False
 def hasPanel():
   if os.path.exists(adGlobal.panelDev):
     syslog.syslog("Located usb serial device at "+adGlobal.panelDev)

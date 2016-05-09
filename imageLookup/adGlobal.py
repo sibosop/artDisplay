@@ -4,7 +4,7 @@ import os
 import syslog
 import subprocess
 
-debug=True
+debug=False
 home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
