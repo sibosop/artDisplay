@@ -134,31 +134,35 @@ def imageLookup():
               print "\tflag:",i
             print "\ttext:",copyList[ip]['text']
         for ip in copyList.keys():
-          cv=getCmdVars(ip)
-          dest=getDest(ip)
-          cmd=cv[:]
-          if copyList[ip]['text'] is not None:
-            cmd.append(copyList[ip]['text'])
+          cmd=[]
+          try:
+            cv=getCmdVars(ip)
+            dest=getDest(ip)
+            cmd=cv[:]
+            if copyList[ip]['text'] is not None:
+              cmd.append(copyList[ip]['text'])
+              cmd.append(dest)
+              if debug: print "cmd:",cmd
+              subprocess.check_output(cmd)
+            cmd=[]
+            cmd=cv[:]
+            if debug: print "cmd afer set to cv:",cmd,"cv:",cv
+            for i in copyList[ip]['image']:
+              cmd.append(i)
             cmd.append(dest)
             if debug: print "cmd:",cmd
-            subprocess.check_call(cmd)
-          cmd=[]
-          cmd=cv[:]
-          if debug: print "cmd afer set to cv:",cmd,"cv:",cv
-          for i in copyList[ip]['image']:
-            cmd.append(i)
-          cmd.append(dest)
-          if debug: print "cmd:",cmd
-          subprocess.check_call(cmd)
-          
-          cmd=cv[:]
-          if debug: print "cmd afer set to cv:",cmd
-          for i in copyList[ip]['flag']:
-              cmd.append(i)
-          cmd.append(dest)
-          if debug: print "cmd:",cmd
-          subprocess.check_call(cmd)
-          
+            subprocess.check_output(cmd)
+            cmd=[]
+            cmd=cv[:]
+            if debug: print "cmd afer set to cv:",cmd
+            for i in copyList[ip]['flag']:
+                cmd.append(i)
+            cmd.append(dest)
+            if debug: print "cmd:",cmd
+            subprocess.check_output(cmd)
+          except subprocess.CalledProcessError, e:
+            syslog.syslog("file copy problem:\n"+cmd.str()+e.output)
+            continue
       files = glob.glob(DIR+"/*")
       if debug: print "removing:",files
       for f in files:
