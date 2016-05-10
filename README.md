@@ -10,6 +10,16 @@ This installation guide assumes you have:
 * an extra usb keyboard and mouse
 * some sort of pc/mac/linux that has a terminal window and ssh called *local machine* from now on
 
+**NOTE: once you done one install then here is the way to clone the others (MAC):**
+* `diskutil list`
+* *assuming here that disk4 is the src and disk5 is the dest
+* `sudo diskutil unmountDisk /dev/disk4`
+* `sudo diskutil unmountDisk /dev/disk5`
+* `sudo dd if=/dev/rdisk4 of=/dev/rdisk5 bs=1m`
+* *Put r in front of disk to make it faster*
+* `diskutil eject /dev/disk4`
+* `diskutil eject /dev/disk5`
+
 #### Installation guide
 Here is the current hardware used:
 * http://www.amazon.com/Raspberry-Pi-Model-Project-Board/dp/B00T2U7R7I?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00
@@ -64,6 +74,11 @@ Here is the current hardware used:
     * `hdmi_mode=1`
     * `hdmi_mode=87`
     * `hdmi_cvt 800 480 60 6 0 0 0`
+* turn off screen blanking
+ * `sudo vi /etc/kbd/config` 
+ * set `BLANK_TIME=0`
+ * set `POWERDOWN_TIME=0`
+ * 
 * power off
   * `sudo poweroff`
   * wait for green blinky light to turn off
@@ -71,6 +86,33 @@ Here is the current hardware used:
 * power up and verify that screen configures correctly
 
 #### installing software
+* do a full software update
+ * `sudo apt-get update`
+ * `sudo apt-get upgrade`
+ * `mkdir GitProjects`
+ * `cd !$`
+ * `git clone git@github.com:sibosop/artDisplay.git`
+ * `sudo pip install beautifulsoup4`
+ * `sudo apt-get install gcc python-dev`
+ * `sudo pip install psutil`
+ * `sudo apt-get install slpd`
+ * `sudo service slpd stop`
+ * `sudo update-rc.d -f slpd remove`
+ * `sudo apt-get install openslp-doc`
+ * `sudo apt-get install slptool`
+ * `sudo apt-get install feh`
+ * `sudo pip install --upgrade pyserial`
+ 
+#### seting up unit for run
+ * the master needs the jumper mentioned above
+ * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
+ * ssh from master to slave once to get the host configuration set up
+ * to start at boot
+  * `crontab -e`
+  * add these lines
+   * MAILTO=""
+   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/setup.py
+ * with any luck the system will start after reboot
 
 
 
