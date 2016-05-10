@@ -12,7 +12,7 @@ import subprocess
 import glob
 import scraper
 
-debug=True
+debug=False
 
 
 def getCmdVars(ip):
