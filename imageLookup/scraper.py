@@ -10,7 +10,7 @@ import adGlobal
 import syslog
 import subprocess
 import glob
-debug=True
+debug=False
 def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
   #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url)), "html.parser")

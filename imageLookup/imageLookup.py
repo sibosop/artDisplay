@@ -142,7 +142,7 @@ def imageLookup():
           if debug: print "cmd:",cmd
           subprocess.check_output(cmd)
         except subprocess.CalledProcessError, e:
-          syslog.syslog("file copy problem:\n"+cmd.str()+e.output)
+          syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
           continue
     files = glob.glob(DIR+"/*")
     if debug: print "removing:",files
