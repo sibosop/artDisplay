@@ -39,7 +39,7 @@ def scraper(lines,image_type):
 if __name__ == '__main__':
   wordFile = adGlobal.wordFile
   lines = open(wordFile).read().split('\n')
-  ret=scraper(lines)
+  ret=scraper(lines,"Action")
   for t in ret[1]:
     print t
   for i in ret[0]:
