@@ -37,7 +37,7 @@ def imageLookup():
   DIR = adGlobal.cacheDir;
   image_type = "Action"
   wordFile = adGlobal.wordFile;
-  maxImagesPerHost = 3
+  maxImagesPerHost = 4
   lines = open(wordFile).read().split('\n')
   while True:
     hosts=[]

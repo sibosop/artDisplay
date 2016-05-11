@@ -9,8 +9,8 @@ home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
 imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
-wordFile="./corncob_lowercase.txt"
-#wordFile="./words.txt"
+#wordFile="./corncob_lowercase.txt"
+wordFile="./words.txt"
 panelDev="/dev/ttyUSB0"
 
   
