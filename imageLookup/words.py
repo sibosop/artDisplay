@@ -2,7 +2,7 @@
 import adGlobal
 import random
 
-debug=True
+debug=False
 
 class Words:
   
