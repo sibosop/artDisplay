@@ -11,6 +11,7 @@ import syslog
 import subprocess
 import glob
 import scraper
+import words
 
 debug=False
 
@@ -36,9 +37,8 @@ def getDest(ip):
 def imageLookup():
   DIR = adGlobal.cacheDir;
   image_type = "Action"
-  wordFile = adGlobal.wordFile;
   maxImagesPerHost = 4
-  lines = open(wordFile).read().split('\n')
+  wds=words;
   while True:
     hosts=[]
     services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
@@ -62,10 +62,12 @@ def imageLookup():
       if debug: print host
       hosts.append(host)
     if debug: print hosts
-
-    ret = scraper.scraper(lines,image_type)
-    images=ret[0]
-    tests=ret[1]
+    images=[]
+    choices=[]
+    w=words.Words()
+    while len(images) < 20:
+      choices = w.getWords()
+      images = scraper.scraper(choices,image_type)
     imageTotal=0
     copyList = {}
     for h in hosts:
@@ -92,8 +94,8 @@ def imageLookup():
           if imageCount == 1:
             textPath=DIR+"/newText.lkp"
             f = open(textPath,'w')
-            f.write(tests[0]+'\n')
-            f.write(tests[1]+'\n')
+            f.write(choices[0]+'\n')
+            f.write(choices[1]+'\n')
             f.close();
             copyList[h['ip']]['text']=textPath 
         if debug:
