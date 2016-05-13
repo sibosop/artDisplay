@@ -10,7 +10,10 @@ class Words:
   wordFile = None
 
   def __init__(self):
-    self.wordFile = adGlobal.wordFile
+    if adGlobal.searchType == "Google":
+      self.wordFile = adGlobal.googleFile
+    else:
+      self.wordFile = adGlobal.bingFile
     self.lines = open(self.wordFile).read().split('\n')
 
   def getWords(self):

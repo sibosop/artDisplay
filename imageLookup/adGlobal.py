@@ -9,9 +9,10 @@ home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
 imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
-#wordFile="./corncob_lowercase.txt"
-wordFile="./words"
+bingFile="./corncob_lowercase.txt"
+googleFile="./words"
 panelDev="/dev/ttyUSB0"
+searchType="Bing"
 
   
 def isLocalHost(ip):
