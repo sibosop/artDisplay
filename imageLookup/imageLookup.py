@@ -12,8 +12,9 @@ import subprocess
 import glob
 import scraper
 import words
+import sys
 
-debug=False
+debug=True
 
 
 def getCmdVars(ip):
@@ -67,7 +68,7 @@ def imageLookup():
     w=words.Words()
     while len(images) < 20:
       choices = w.getWords()
-      images = scraper.scraper(choices,image_type)
+      images = scraper.scraper(choices)
     imageTotal=0
     copyList = {}
     for h in hosts:
@@ -77,7 +78,14 @@ def imageLookup():
       copyList[h['ip']]['text'] = None
       imageCount = 0
       while ( imageCount < maxImagesPerHost ):
-        raw_img = urllib2.urlopen(images[imageTotal+imageCount]).read()
+        if debug: print "open image:",images[imageTotal+imageCount]
+        try:
+          raw_img = urllib2.urlopen(images[imageTotal+imageCount]).read()
+        except:
+          e = sys.exc_info()[0]
+          syslog.syslog("return from exception "+str(e))
+          imageCount += 1
+          continue;
         imageCount += 1
         cntr = len([i for i in os.listdir(DIR) if image_type in i]) + 1
         if debug: print cntr

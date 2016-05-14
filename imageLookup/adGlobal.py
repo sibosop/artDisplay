@@ -10,7 +10,7 @@ imageDir='../Images'
 cacheDir="../ImageCache"
 imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
 bingFile="./corncob_lowercase.txt"
-googleFile="./words"
+googleFile="./corncob_lowercase.txt"
 panelDev="/dev/ttyUSB0"
 searchType="Bing"
 

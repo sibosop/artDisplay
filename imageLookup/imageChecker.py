@@ -6,7 +6,7 @@ import psutil
 import adGlobal
 import syslog
 import signal
-
+import sys
 debug = False
 flagExt=".flg"
 currentProc = None
@@ -29,7 +29,12 @@ def displayImage(img):
   if debug:
     print "display ",img
   #syslog.syslog("calling feh with "+img);
-  p = subprocess.Popen("/usr/bin/feh -Z -F "+img,shell=True, preexec_fn=os.setpgrp)
+  try:
+    p = subprocess.Popen("/usr/bin/feh -Z -F "+img,shell=True, preexec_fn=os.setpgrp)
+  except:
+    e = sys.exc_info()[0]
+    print "return from exception "+str(e)
+    return None
   time.sleep(4)
   if currentProc is not None:
     if debug:
