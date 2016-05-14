@@ -14,7 +14,7 @@ import scraper
 import words
 import sys
 
-debug=True
+debug=False
 
 
 def getCmdVars(ip):
