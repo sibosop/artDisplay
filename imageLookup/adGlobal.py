@@ -12,7 +12,10 @@ imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
 bingFile="./corncob_lowercase.txt"
 googleFile="./corncob_lowercase.txt"
 panelDev="/dev/ttyUSB0"
-searchType="Google"
+#searchType="Google"
+searchType="Bing"
+archiveDir='../archive'
+archiveCache='../archiveCache'
 
   
 def isLocalHost(ip):

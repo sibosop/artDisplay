@@ -13,8 +13,10 @@ import glob
 import scraper
 import words
 import sys
+import uuid
+import archive
 
-debug=False
+debug=True
 
 
 def getCmdVars(ip):
@@ -36,7 +38,7 @@ def getDest(ip):
   return dest
 
 def imageLookup():
-  DIR = adGlobal.cacheDir;
+  cacheDir = adGlobal.cacheDir;
   image_type = "Action"
   maxImagesPerHost = 4
   wds=words;
@@ -65,10 +67,15 @@ def imageLookup():
     if debug: print hosts
     images=[]
     choices=[]
-    w=words.Words()
-    while len(images) < 20:
-      choices = w.getWords()
-      images = scraper.scraper(choices)
+    if adGlobal.searchType == "Archive":
+      vars=archive.getArchive();
+      images=vars[0]
+      choices=vars[1]
+    else:
+      w=words.Words()
+      while len(images) < 20:
+        choices = w.getWords()
+        images = scraper.scraper(choices)
     imageTotal=0
     copyList = {}
     for h in hosts:
@@ -87,20 +94,20 @@ def imageLookup():
           imageCount += 1
           continue;
         imageCount += 1
-        cntr = len([i for i in os.listdir(DIR) if image_type in i]) + 1
+        cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
         if debug: print cntr
-        imgPath=DIR + '/' + image_type + "_"+ str(cntr)+".jpg"
+        imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
         f = open(imgPath, 'wb')
         f.write(raw_img)
         f.close()
-        flgPath=DIR + '/' + image_type + "_"+ str(cntr)+".flg"
+        flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
         f = open(flgPath, 'w')
         f.close()
         textPath=None
         if h['hasPanel']:
           if debug: print "doing has panel"
           if imageCount == 1:
-            textPath=DIR+"/newText.lkp"
+            textPath=cacheDir+"/newText.lkp"
             f = open(textPath,'w')
             f.write(choices[0]+'\n')
             f.write(choices[1]+'\n')
@@ -154,10 +161,30 @@ def imageLookup():
         except subprocess.CalledProcessError, e:
           syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
           continue
-    files = glob.glob(DIR+"/*")
+    if adGlobal.searchType == "Bing":
+      if debug: print "archiving cacheDir"
+      try:
+        tmpFile="/tmp/tarFiles";
+        f = open(tmpFile,"w");
+        afiles=glob.glob(cacheDir+"/*.jpg")
+        for af in afiles:
+          fb=os.path.basename(af)
+          f.write(fb+"\n");
+        afiles=glob.glob(cacheDir+"/*.lkp")
+        for af in afiles:
+          fb=os.path.basename(af)
+          f.write(fb+"\n");
+        f.close()
+        cmd = ["tar","-czf",adGlobal.archiveDir+"/"+str(uuid.uuid4())+".tgz","-C",cacheDir,"-T",tmpFile]
+        if debug: print "cmd:",cmd
+        subprocess.check_output(cmd)
+      except subprocess.CalledProcessError, e:
+        syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
+        
+    files = glob.glob(cacheDir+"/*")
     if debug: print "removing:",files
     for f in files:
-        if f == DIR+"/placeholder":
+        if f == cacheDir+"/placeholder":
           continue
         os.remove(f)
     time.sleep(30)
