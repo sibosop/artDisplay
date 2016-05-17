@@ -16,7 +16,7 @@ import sys
 import uuid
 import archive
 
-debug=True
+debug=False
 
 
 def getCmdVars(ip):
@@ -76,53 +76,77 @@ def imageLookup():
       while len(images) < 20:
         choices = w.getWords()
         images = scraper.scraper(choices)
-    imageTotal=0
+    imageIndex = 0
     copyList = {}
     for h in hosts:
       copyList[h['ip']] = {}
       copyList[h['ip']]['image'] = []
       copyList[h['ip']]['flag'] = []
       copyList[h['ip']]['text'] = None
-      imageCount = 0
-      while ( imageCount < maxImagesPerHost ):
-        if debug: print "open image:",images[imageTotal+imageCount]
-        try:
-          raw_img = urllib2.urlopen(images[imageTotal+imageCount]).read()
-        except:
-          e = sys.exc_info()[0]
-          syslog.syslog("return from exception "+str(e))
-          imageCount += 1
-          continue;
-        imageCount += 1
-        cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
-        if debug: print cntr
-        imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
-        f = open(imgPath, 'wb')
-        f.write(raw_img)
-        f.close()
-        flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
-        f = open(flgPath, 'w')
-        f.close()
+      hostCount=0
+      while ( hostCount < maxImagesPerHost ):
+        if imageIndex >= len(images):
+          if debug: print "not enough images for all hosts img total img index:",len(images),imageIndex
+          break; 
+        if debug: print "open image:",images[imageIndex]
+        if ( adGlobal.searchType != "Archive"):
+          try:
+            raw_img = urllib2.urlopen(images[imageIndex]).read()
+          except:
+            e = sys.exc_info()[0]
+            syslog.syslog("return from exception "+str(e))
+            imageIndex += 1
+            continue;
+          imageIndex += 1
+          hostCount += 1
+          cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
+          if debug: print cntr
+          imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
+          f = open(imgPath, 'wb')
+          f.write(raw_img)
+          f.close()
+          flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
+          f = open(flgPath, 'w')
+          f.close()
+        else:
+          try:
+            i = images[imageIndex]
+            cmd=["cp",i,cacheDir]
+            if debug: print "cmd",cmd
+            subprocess.check_output(cmd)
+            imgPath=cacheDir+"/"+os.path.basename(i)
+            i=os.path.basename(i)
+            flgPath=cacheDir+"/"+i[:i.rindex(".")]+".flg"
+            cmd=["touch",flgPath]
+            if debug: print "cmd",cmd
+            subprocess.check_output(cmd)
+          except subprocess.CalledProcessError, e:
+            syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+            exit(-1)
+          imageIndex+=1
+          hostCount+=1
         textPath=None
         if h['hasPanel']:
           if debug: print "doing has panel"
-          if imageCount == 1:
-            textPath=cacheDir+"/newText.lkp"
-            f = open(textPath,'w')
-            f.write(choices[0]+'\n')
-            f.write(choices[1]+'\n')
-            f.close();
-            copyList[h['ip']]['text']=textPath 
+          if hostCount == 1:
+            if len(choices) < 2:
+              syslog.syslog("WARNING, choices array not loaded")
+            else: 
+              textPath=cacheDir+"/"+adGlobal.textName
+              f = open(textPath,'w')
+              f.write(choices[0]+'\n')
+              f.write(choices[1]+'\n')
+              f.close();
+              copyList[h['ip']]['text']=textPath 
         if debug:
           print "h{'ip'}:",h['ip']
           print "imgPath:",imgPath
           print "flgPath:",flgPath
           print "textPath:",textPath
-          print "imgCount:",imageCount
+          print "hostCount:",hostCount
         copyList[h['ip']]['image'].append(imgPath)
-        copyList[h['ip']]['flag'].append(flgPath)     
-      imageTotal+=imageCount
-      if debug: print "imageTotal:",imageTotal
+        copyList[h['ip']]['flag'].append(flgPath)
+
       if debug:
         for ip in copyList.keys():
           print "ip:",ip

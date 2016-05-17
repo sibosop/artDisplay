@@ -62,10 +62,10 @@ def scraper(choices):
         params = urllib.urlencode({
             # Request parameters
             'q': choices[0]+' '+choices[1],
-            'count': '20',
+            'count': '50',
             'offset': '0',
             'mkt': 'en-us',
-            'safeSearch': 'Off',
+            'safeSearch': 'Moderate',
         })
         if debug: print "params:", params
         conn = httplib.HTTPSConnection('bingapis.azure-api.net')
