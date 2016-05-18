@@ -42,6 +42,7 @@ def imageLookup():
   image_type = "Action"
   maxImagesPerHost = 4
   wds=words;
+  syslog.syslog("search method: "+adGlobal.searchType)
   while True:
     hosts=[]
     services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
