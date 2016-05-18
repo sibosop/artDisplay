@@ -15,7 +15,7 @@ import httplib, urllib, base64
 import json
 import sys
 from py_bing_search import PyBingImageSearch
-debug=True
+debug=False
 
 
 headers = {

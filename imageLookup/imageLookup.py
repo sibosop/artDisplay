@@ -76,7 +76,8 @@ def imageLookup():
       w=words.Words()
       while len(images) < 20:
         choices = w.getWords()
-        images = scraper.scraper(choices)
+        sc=choices[:]
+        images = scraper.scraper(sc)
     imageIndex = 0
     copyList = {}
     for h in hosts:

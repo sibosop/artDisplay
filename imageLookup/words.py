@@ -2,7 +2,7 @@
 import adGlobal
 import random
 
-debug=True
+debug=False
 
 class Words:
   
@@ -31,4 +31,4 @@ class Words:
 if __name__ == '__main__':
   w=Words()
   choices = w.getWords()
-  if debug: print choices
+  print choices
