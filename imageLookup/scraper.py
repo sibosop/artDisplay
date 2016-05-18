@@ -68,7 +68,7 @@ def scraper(choices):
             'count': '50',
             'offset': '0',
             'mkt': 'en-us',
-            'safeSearch': 'Moderate',
+            'safeSearch': 'Off',
         })
         if debug: print "params:", params
         conn = httplib.HTTPSConnection('bingapis.azure-api.net')
