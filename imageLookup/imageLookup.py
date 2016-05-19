@@ -186,6 +186,14 @@ def imageLookup():
           cmd.append(dest)
           if debug: print "cmd:",cmd
           subprocess.check_output(cmd)
+        except subprocess.CalledProcessError, e:
+          syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+          continue  
+          
+      for ip in copyList.keys():
+        try:
+          cv=getCmdVars(ip)
+          dest=getDest(ip)
           cmd=[]
           cmd=cv[:]
           if copyList[ip]['text'] is not None:
@@ -195,8 +203,8 @@ def imageLookup():
             subprocess.check_output(cmd)
         except subprocess.CalledProcessError, e:
           syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-          continue  
-          
+          continue
+
     if adGlobal.searchType == "Bing":
       if debug: print "archiving cacheDir"
       try:
