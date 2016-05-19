@@ -157,18 +157,12 @@ def imageLookup():
           for i in copyList[ip]['flag']:
             print "\tflag:",i
           print "\ttext:",copyList[ip]['text']
+          
       for ip in copyList.keys():
         cmd=[]
         try:
           cv=getCmdVars(ip)
           dest=getDest(ip)
-          cmd=cv[:]
-          if copyList[ip]['text'] is not None:
-            cmd.append(copyList[ip]['text'])
-            cmd.append(dest)
-            if debug: print "cmd:",cmd
-            subprocess.check_output(cmd)
-          cmd=[]
           cmd=cv[:]
           if debug: print "cmd afer set to cv:",cmd,"cv:",cv
           for i in copyList[ip]['image']:
@@ -176,6 +170,14 @@ def imageLookup():
           cmd.append(dest)
           if debug: print "cmd:",cmd
           subprocess.check_output(cmd)
+        except subprocess.CalledProcessError, e:
+          syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+          continue
+          
+      for ip in copyList.keys():
+        try:
+          cv=getCmdVars(ip)
+          dest=getDest(ip)
           cmd=[]
           cmd=cv[:]
           if debug: print "cmd afer set to cv:",cmd
@@ -184,9 +186,17 @@ def imageLookup():
           cmd.append(dest)
           if debug: print "cmd:",cmd
           subprocess.check_output(cmd)
+          cmd=[]
+          cmd=cv[:]
+          if copyList[ip]['text'] is not None:
+            cmd.append(copyList[ip]['text'])
+            cmd.append(dest)
+            if debug: print "cmd:",cmd
+            subprocess.check_output(cmd)
         except subprocess.CalledProcessError, e:
           syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-          continue
+          continue  
+          
     if adGlobal.searchType == "Bing":
       if debug: print "archiving cacheDir"
       try:
