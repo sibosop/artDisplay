@@ -103,6 +103,7 @@ Here is the current hardware used:
  * `sudo apt-get install feh`
  * `sudo pip install --upgrade pyserial`
  * `sudo -H pip install py-bing-search`
+ * `sudo -H pip install --upgrade google-api-python-client`
  
 #### seting up unit for run
  * the master needs the jumper mentioned above
