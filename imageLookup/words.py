@@ -7,16 +7,22 @@ debug=False
 lines = []
 wordList = None
 wordDir = None
+init=False
 
-wordList = adGlobal.wordList
-wordDir= adGlobal.wordDir
-for w in wordList:
-  f = open(wordDir+"/"+w,"r")
-  for l in f.read().split('\n'):
-    lines.append(l)
+
+def initWords():
+  wordList = adGlobal.wordList
+  wordDir= adGlobal.wordDir
+  for w in wordList:
+    f = open(wordDir+"/"+w,"r")
+    for l in f.read().split('\n'):
+      lines.append(l)
+  init=True
 
 
 def getWords():
+  if init==False:
+    initWords()
   tests=[]
   for i in range(0,2):
     n = random.randint(0,len(lines)-1)

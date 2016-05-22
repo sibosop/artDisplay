@@ -1,19 +1,25 @@
 #!/usr/bin/env python
-import subprocess
-import syslog
-import threading
-import textChecker
-import master
 import sys
-import imageLookup
-import imageChecker
 import os
+import syslog
+syslog.syslog("starting setup.py")
+import subprocess
+import threading
+syslog.syslog("import textChecker.py")
+import textChecker
+syslog.syslog("import master.py")
+import master
+syslog.syslog("import imageLookup.py")
+import imageLookup
+syslog.syslog("import imageChecker.py")
+import imageChecker
+syslog.syslog("import panel.py")
 import panel
 
-os.chdir(os.path.dirname(sys.argv[0]))
-debug = False
 if __name__ == '__main__':
-
+  debug = False
+  os.chdir(os.path.dirname(sys.argv[0]))
+  syslog.syslog("starting setup.py")
   host = subprocess.check_output(["hostname","-I"]).split();
   if debug:
     syslog.syslog("host ="+host[0])
