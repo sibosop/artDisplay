@@ -61,13 +61,15 @@ def getImages(qs):
           q=query,
           cx=creds['cx'],
           searchType='image',
+          safe='medium',
         ).execute()
     else:
       res = service.cse().list(
           q=query,
           cx=creds['cx'],
           searchType='image',
-          start=int(startReq)
+          start=int(startReq),
+          safe='medium',
         ).execute()
     if debug: print "type:",type(res),"num items:",len(res['items'])
     if len(res['items']) < 10:
