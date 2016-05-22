@@ -41,7 +41,6 @@ def imageLookup():
   cacheDir = adGlobal.cacheDir;
   image_type = "Action"
   maxImagesPerHost = 4
-  wds=words;
   syslog.syslog("search method: "+adGlobal.searchType)
   while True:
     hosts=[]
@@ -73,11 +72,9 @@ def imageLookup():
       images=vars[0]
       choices=vars[1]
     else:
-      w=words.Words()
       while len(images) < 20:
-        choices = w.getWords()
-        sc=choices[:]
-        images = scraper.scraper(sc)
+        choices = words.getWords()
+        images = scraper.scraper(choices[:])
     imageIndex = 0
     copyList = {}
     for h in hosts:
@@ -205,7 +202,7 @@ def imageLookup():
           syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
           continue
 
-    if adGlobal.searchType == "Bing":
+    if adGlobal.searchType != "Archive":
       if debug: print "archiving cacheDir"
       try:
         tmpFile="/tmp/tarFiles";

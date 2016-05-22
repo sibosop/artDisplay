@@ -13,13 +13,13 @@ bingFile="./corncob_lowercase.txt"
 wordDir="../lists"
 wordList=["cities.txt","celebrities.txt","corncob_lowercase.txt"]
 panelDev="/dev/ttyUSB0"
-#searchType="Google"
+searchType="Google"
 #searchType="Bing"
-searchType="Archive"
+#searchType="Archive"
 archiveDir='/media/pi/ARCHIVE/ArchiveImages/'
 archiveCache='../archiveCache'
 textName='newText.lkp'
-
+credFile='/media/pi/ARCHIVE/creds.txt'
   
 def isLocalHost(ip):
   plats=platform.platform().split('-');

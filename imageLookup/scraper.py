@@ -14,6 +14,7 @@ import words
 import httplib, urllib, base64
 import json
 import sys
+import google
 from py_bing_search import PyBingImageSearch
 debug=False
 
@@ -49,9 +50,7 @@ def get_soup(url,header):
   
 def scraper(choices):
   images=[]
-  choices[0]=choices[0].replace(" ","+")
-  choices[1]=choices[1].replace(" ","+")
-  if adGlobal.searchType == "Google":
+  if adGlobal.searchType == "Google-old":
     if debug: print "doing Google fetch"
     query=html_escape(choices[0])+'+'+html_escape(choices[1])
     url="http://www.google.com/images?q="+query
@@ -59,8 +58,13 @@ def scraper(choices):
     header = {'User-Agent': 'Mozilla/5.0'} 
     soup = get_soup(url,header)
     images = [a['src'] for a in soup.find_all("img", {"src": re.compile("gstatic.com")})]
+  elif adGlobal.searchType == "Google":
+    if debug: print "doing Google CSE"
+    return google.getImages(choices)
   elif adGlobal.searchType == "Bing":
     if debug: print "doing bing fetch"
+    choices[0]=choices[0].replace(" ","+")
+    choices[1]=choices[1].replace(" ","+")
     try:
         params = urllib.urlencode({
             # Request parameters
@@ -68,7 +72,7 @@ def scraper(choices):
             'count': '50',
             'offset': '0',
             'mkt': 'en-us',
-            'safeSearch': 'Off',
+            'safeSearch': 'Moderate',
         })
         if debug: print "params:", params
         conn = httplib.HTTPSConnection('bingapis.azure-api.net')
@@ -95,12 +99,10 @@ def scraper(choices):
 
 if __name__ == '__main__':
   images=[]
-  w=words.Words()
   choices=[]
   while len(images) < 20:
-    choices=w.getWords()
-    sc=choices[:]
-    images=scraper(sc)
+    choices=words.getWords()
+    images=scraper(choices[:])
   for t in choices:
     print t
   for i in images:

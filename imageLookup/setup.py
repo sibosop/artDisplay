@@ -11,7 +11,7 @@ import os
 import panel
 
 os.chdir(os.path.dirname(sys.argv[0]))
-debug = True
+debug = False
 if __name__ == '__main__':
 
   host = subprocess.check_output(["hostname","-I"]).split();
