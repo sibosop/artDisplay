@@ -27,22 +27,28 @@ import adGlobal
 import words
 
 debug=False
+init=False
 
 from apiclient.discovery import build
 
-lines = open(adGlobal.credFile).read().split('\n')
-creds={}
-for l in lines:
-  vars=l.split("=")
-  if len(vars) == 2:
-    creds[vars[0]]=vars[1]
+def doSetup():
+  if init==True:
+    return
+  init=True
+  lines = open(adGlobal.credFile).read().split('\n')
+  creds={}
+  for l in lines:
+    vars=l.split("=")
+    if len(vars) == 2:
+      creds[vars[0]]=vars[1]
 
-for k in creds.keys():
-  if debug: print "key:",k,"value:",creds[k]
+  for k in creds.keys():
+    if debug: print "key:",k,"value:",creds[k]
   
 
   
 def getImages(qs):
+  doSetup()
   images=[]
   index=0
   while len(images) < 15:
