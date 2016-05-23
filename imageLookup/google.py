@@ -24,19 +24,17 @@ __author__ = 'jcgregorio@google.com (Joe Gregorio)'
 
 import pprint
 import adGlobal
-import words
-
-debug=False
-init=False
-
 from apiclient.discovery import build
 
+global initFlag
+initFlag=False
+debug=False
+global creds
+creds={}
+
 def doSetup():
-  if init==True:
-    return
-  init=True
+  global creds
   lines = open(adGlobal.credFile).read().split('\n')
-  creds={}
   for l in lines:
     vars=l.split("=")
     if len(vars) == 2:
@@ -48,7 +46,10 @@ def doSetup():
 
   
 def getImages(qs):
-  doSetup()
+  global initFlag
+  if initFlag==False:
+    doSetup()
+    initFlag=True
   images=[]
   index=0
   while len(images) < 15:
@@ -95,6 +96,7 @@ def getImages(qs):
 
 
 if __name__ == '__main__':
+  import words
   images=getImages(words.getWords())
   for i in images:
     print i
