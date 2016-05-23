@@ -79,7 +79,8 @@ def getImages(qs):
           safe='medium',
         ).execute()
     if debug: print "type:",type(res),"num items:",len(res['items'])
-    if len(res['items']) < 10:
+    tst= 'items' in res
+    if tst==False or len(res['items']) < 10:
       if debug: print "rejecting to few items"
       return []
 
