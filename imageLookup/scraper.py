@@ -44,6 +44,7 @@ def get_soup(url,header):
   return BeautifulSoup(urllib2.urlopen(urllib2.Request(url,headers=header)), "html5lib")
   #return BeautifulSoup(urllib2.urlopen(urllib2.Request(url)), "html.parser")
   
+#@profile
 def scraper(choices):
   images=[]
   if adGlobal.searchType == "Google-old":

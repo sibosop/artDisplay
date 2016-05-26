@@ -7,10 +7,19 @@ import subprocess
 import os
 import sys
 import syslog
+import time
 
 debug=False
 
+global init
+init=False
+
 def getArchive():
+  global init
+  if init == False:
+    if debug: print "init seed"
+    random.seed(time.time())
+    init=True
   adir=adGlobal.archiveDir
   cdir=adGlobal.archiveCache
   files = glob.glob(cdir+"/*")
