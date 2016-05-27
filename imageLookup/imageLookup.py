@@ -15,9 +15,12 @@ import words
 import sys
 import uuid
 import archive
+import traceback
+import ssl
 
 debug=False
 
+imageDebug=False
 
 def getCmdVars(ip):
   cmdVars = []
@@ -88,13 +91,22 @@ def imageLookupLoop():
       if imageIndex >= len(images):
         if debug: print "not enough images for all hosts img total img index:",len(images),imageIndex
         break; 
-      if debug: print "open image:",images[imageIndex]
       if ( adGlobal.searchType != "Archive"):
         try:
-          raw_img = urllib2.urlopen(images[imageIndex]).read()
+          startTime = time.time()
+          if imageDebug: print "open image:",images[imageIndex]
+          req = urllib2.Request(images[imageIndex]
+              ,headers={'User-Agent' : "Magic Browser"})
+          gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+          con = urllib2.urlopen( req, context=gcontext )
+          raw_img = con.read()
+          #raw_img = urllib2.urlopen(images[imageIndex]).read()
+          if imageDebug: print "elapsed:",time.time() - startTime
         except:
+          print "return from exception for image:",images[imageIndex]
+          print "elapsed:",time.time() - startTime
+          traceback.print_exc()
           e = sys.exc_info()[0]
-          syslog.syslog("return from exception "+str(e))
           imageIndex += 1
           continue;
         imageIndex += 1
@@ -220,7 +232,9 @@ def imageLookupLoop():
       f.close()
       cmd = ["tar","-czf",adGlobal.archiveDir+"/"+str(uuid.uuid4())+".tgz","-C",cacheDir,"-T",tmpFile]
       if debug: print "cmd:",cmd
+      syslog.syslog("doing archive")
       subprocess.check_output(cmd)
+      syslog.syslog("archive complete")
     except subprocess.CalledProcessError, e:
       syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
       
