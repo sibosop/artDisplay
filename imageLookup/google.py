@@ -85,8 +85,8 @@ def getImages(qs):
       elapsed_time = time.time() - start_time
       if 'error' in res:
         print "google responded with error message: ",pprint.pformat(res)
-        time.sleep(10)
-        exit -1 
+        time.sleep(60)
+        return []
       tst= 'items' in res
       if tst==False or len(res['items']) < 10:
         if debug: print "rejecting too few items"
@@ -106,8 +106,8 @@ def getImages(qs):
       #if debug: pprint.pprint(res)
     except:
       print "google cse:",traceback.print_exc()
-      time.sleep(10)
-      exit -1
+      time.sleep(60)
+      return []
 
       
 

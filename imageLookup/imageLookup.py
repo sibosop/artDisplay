@@ -135,7 +135,8 @@ def imageLookupLoop():
           subprocess.check_output(cmd)
         except subprocess.CalledProcessError, e:
           syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-          exit(-1)
+          time.sleep(60)
+          break;
         imageIndex+=1
         hostCount+=1
       textPath=None
