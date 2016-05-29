@@ -19,7 +19,6 @@ import traceback
 import ssl
 
 debug=False
-
 imageDebug=False
 
 def getCmdVars(ip):
@@ -39,6 +38,31 @@ def getDest(ip):
   else:
     dest = "pi@"+ip+":"+adGlobal.imageDest
   return dest
+
+
+def getRawImage(image):
+  if imageDebug: print "image:",image
+  imageTypes=['full','thumb']
+  raw_img=None
+  for t in imageTypes: 
+    try:
+      startTime = time.time()
+      if imageDebug: print "open image type",t,"image:",image[t]
+      req = urllib2.Request(image[t],headers={'User-Agent' : "Magic Browser"})
+      gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+      con = urllib2.urlopen( req, context=gcontext )
+      raw_img = con.read()
+      #raw_img = urllib2.urlopen(images[imageIndex]).read()
+      if imageDebug: print "elapsed:",time.time() - startTime
+      break;
+    except:
+      print "return from exception for type",t,"image:",image[t]
+      print "elapsed:",time.time() - startTime
+      traceback.print_exc()
+      e = sys.exc_info()[0]
+      continue;
+  return raw_img 
+    
 
 #@profile
 def imageLookupLoop():
@@ -89,24 +113,12 @@ def imageLookupLoop():
     hostCount=0
     while ( hostCount < maxImagesPerHost ):
       if imageIndex >= len(images):
-        if debug: print "not enough images for all hosts img total img index:",len(images),imageIndex
+        print "not enough images for all hosts img total img index:",len(images),imageIndex
         break; 
       if ( adGlobal.searchType != "Archive"):
-        try:
-          startTime = time.time()
-          if imageDebug: print "open image:",images[imageIndex]
-          req = urllib2.Request(images[imageIndex]
-              ,headers={'User-Agent' : "Magic Browser"})
-          gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-          con = urllib2.urlopen( req, context=gcontext )
-          raw_img = con.read()
-          #raw_img = urllib2.urlopen(images[imageIndex]).read()
-          if imageDebug: print "elapsed:",time.time() - startTime
-        except:
-          print "return from exception for image:",images[imageIndex]
-          print "elapsed:",time.time() - startTime
-          traceback.print_exc()
-          e = sys.exc_info()[0]
+        raw_img=getRawImage(images[imageIndex])
+        if raw_img is None:
+          print "raw_image = none",images[imageIndex]
           imageIndex += 1
           continue;
         imageIndex += 1

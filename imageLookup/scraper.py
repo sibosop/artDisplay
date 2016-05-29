@@ -84,7 +84,10 @@ def scraper(choices):
         if debug: print "num vals",len(results)
         for i in results:
           if debug: print "i['contentUrl']:",i['contentUrl']
-          images.append(i['contentUrl'])
+          relem={}
+          relem['full']=i['contentUrl']
+          relem['thumb']=i['thumbnailUrl']
+          images.append(relem)
         conn.close()
     except:
       e = sys.exc_info()[0]

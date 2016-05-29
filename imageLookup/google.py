@@ -95,11 +95,10 @@ def getImages(qs):
       #if debug: print "res:",res 
       for l in res['items']:
         if debug: print "link",l['link']
-        if l['link'].find("x-raw-image") != -1:
-          if debug: print "found raw image replacing with thumbnail",l['image']['thumbnailLink']
-          images.append(l['image']['thumbnailLink'])
-        else:
-          images.append(l['link'])
+        relem={}
+        relem['full']=l['link']
+        relem['thumb']=l['image']['thumbnailLink']
+        images.append(relem)
     
       index += 1
           
@@ -118,4 +117,5 @@ if __name__ == '__main__':
   import words
   images=getImages(words.getWords())
   for i in images:
-    print i
+    print "full:",i['full']
+    print "thumb:",i['thumb']
