@@ -21,6 +21,8 @@ import fehtest
 
 debug=False
 imageDebug=False
+copyDebug=False
+slpDebug=False
 
 def getCmdVars(ip):
   cmdVars = []
@@ -78,7 +80,7 @@ def getRawImage(image):
 def imageLookupLoop():
   cacheDir = adGlobal.cacheDir;
   image_type = "Action"
-  maxImagesPerHost = 4
+  maxImagesPerHost = 5
   syslog.syslog("search method: "+adGlobal.searchType)
   hosts=[]
   services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
@@ -86,7 +88,7 @@ def imageLookupLoop():
     syslog.syslog("no available services")
     return
   for s in services:
-    if debug: print "s:",s
+    if slpDebug: print "s:",s
     loc=s.split(',');
     if loc[0] == '':
       continue
@@ -100,7 +102,7 @@ def imageLookupLoop():
       host['hasPanel']=True
     if debug: print host
     hosts.append(host)
-  if debug: print hosts
+  if slpDebug: print "hosts:",str(hosts)
   images=[]
   choices=[]
   if adGlobal.searchType == "Archive":
@@ -183,61 +185,61 @@ def imageLookupLoop():
       copyList[h['ip']]['image'].append(imgPath)
       copyList[h['ip']]['flag'].append(flgPath)
 
-    if debug:
-      for ip in copyList.keys():
-        print "ip:",ip
-        for i in copyList[ip]['image']:
-          print "\timg:",i
-        for i in copyList[ip]['flag']:
-          print "\tflag:",i
-        print "\ttext:",copyList[ip]['text']
-        
+  if debug:
     for ip in copyList.keys():
+      print "ip:",ip
+      for i in copyList[ip]['image']:
+        print "\timg:",i
+      for i in copyList[ip]['flag']:
+        print "\tflag:",i
+      print "\ttext:",copyList[ip]['text']
+      
+  for ip in copyList.keys():
+    cmd=[]
+    try:
+      cv=getCmdVars(ip)
+      dest=getDest(ip)
+      cmd=cv[:]
+      if debug: print "cmd afer set to cv:",cmd,"cv:",cv
+      for i in copyList[ip]['image']:
+        cmd.append(i)
+      cmd.append(dest)
+      if copyDebug: print "file copy:",str(cmd)
+      subprocess.check_output(cmd)
+    except subprocess.CalledProcessError, e:
+      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+      continue
+      
+  for ip in copyList.keys():
+    try:
+      cv=getCmdVars(ip)
+      dest=getDest(ip)
       cmd=[]
-      try:
-        cv=getCmdVars(ip)
-        dest=getDest(ip)
-        cmd=cv[:]
-        if debug: print "cmd afer set to cv:",cmd,"cv:",cv
-        for i in copyList[ip]['image']:
+      cmd=cv[:]
+      if debug: print "cmd afer set to cv:",cmd
+      for i in copyList[ip]['flag']:
           cmd.append(i)
+      cmd.append(dest)
+      if copyDebug: print "flag copy cmd:",str(cmd)
+      subprocess.check_output(cmd)
+    except subprocess.CalledProcessError, e:
+      print "file copy problem: ",str(cmd),str(e.output)
+      continue  
+      
+  for ip in copyList.keys():
+    try:
+      cv=getCmdVars(ip)
+      dest=getDest(ip)
+      cmd=[]
+      cmd=cv[:]
+      if copyList[ip]['text'] is not None:
+        cmd.append(copyList[ip]['text'])
         cmd.append(dest)
-        if debug: print "cmd:",cmd
+        if copyDebug: print "text copy cmd:",str(cmd)
         subprocess.check_output(cmd)
-      except subprocess.CalledProcessError, e:
-        syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-        continue
-        
-    for ip in copyList.keys():
-      try:
-        cv=getCmdVars(ip)
-        dest=getDest(ip)
-        cmd=[]
-        cmd=cv[:]
-        if debug: print "cmd afer set to cv:",cmd
-        for i in copyList[ip]['flag']:
-            cmd.append(i)
-        cmd.append(dest)
-        if debug: print "cmd:",cmd
-        subprocess.check_output(cmd)
-      except subprocess.CalledProcessError, e:
-        syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-        continue  
-        
-    for ip in copyList.keys():
-      try:
-        cv=getCmdVars(ip)
-        dest=getDest(ip)
-        cmd=[]
-        cmd=cv[:]
-        if copyList[ip]['text'] is not None:
-          cmd.append(copyList[ip]['text'])
-          cmd.append(dest)
-          if debug: print "cmd:",cmd
-          subprocess.check_output(cmd)
-      except subprocess.CalledProcessError, e:
-        syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-        continue
+    except subprocess.CalledProcessError, e:
+      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+      continue
 
   if adGlobal.searchType != "Archive":
     if debug: print "archiving cacheDir"
