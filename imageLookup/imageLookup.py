@@ -115,75 +115,64 @@ def imageLookupLoop():
       choices=[]
       choices = words.getWords()
       images = scraper.scraper(choices[:])
-  imageIndex = 0
   copyList = {}
   for h in hosts:
     copyList[h['ip']] = {}
     copyList[h['ip']]['image'] = []
     copyList[h['ip']]['flag'] = []
     copyList[h['ip']]['text'] = None
-    hostCount=0
-    while ( hostCount < maxImagesPerHost ):
-      if imageIndex >= len(images):
-        print "not enough images for all hosts img total img index:",len(images),imageIndex
-        break; 
-      if ( adGlobal.searchType != "Archive"):
-        raw_img=getRawImage(images[imageIndex])
-        if raw_img is None:
-          print "raw_image = none",images[imageIndex]
-          imageIndex += 1
-          continue;
-        imageIndex += 1
-        hostCount += 1
-        cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
-        if debug: print cntr
-        imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
-        f = open(imgPath, 'wb')
-        f.write(raw_img)
-        f.close()
-        flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
-        f = open(flgPath, 'w')
-        f.close()
-        del raw_img
-      else:
-        try:
-          i = images[imageIndex]
-          cmd=["cp",i,cacheDir]
-          if debug: print "cmd",cmd
-          subprocess.check_output(cmd)
-          imgPath=cacheDir+"/"+os.path.basename(i)
-          i=os.path.basename(i)
-          flgPath=cacheDir+"/"+i[:i.rindex(".")]+".flg"
-          cmd=["touch",flgPath]
-          if debug: print "cmd",cmd
-          subprocess.check_output(cmd)
-        except subprocess.CalledProcessError, e:
-          syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
-          time.sleep(60)
-          break;
-        imageIndex+=1
-        hostCount+=1
-      textPath=None
-      if h['hasPanel']:
-        if debug: print "doing has panel"
-        if hostCount == 1:
-          if len(choices) < 2:
-            syslog.syslog("WARNING, choices array not loaded")
-          else: 
-            textPath=cacheDir+"/"+adGlobal.textName
-            f = open(textPath,'w')
-            f.write(choices[0]+'\n')
-            f.write(choices[1]+'\n')
-            f.close();
-            copyList[h['ip']]['text']=textPath 
-      if debug:
-        print "h{'ip'}:",h['ip']
-        print "imgPath:",imgPath
-        print "flgPath:",flgPath
-        print "textPath:",textPath
-        print "hostCount:",hostCount
-      copyList[h['ip']]['image'].append(imgPath)
-      copyList[h['ip']]['flag'].append(flgPath)
+    if h['hasPanel']:
+      if debug: print "doing has panel"
+      if len(choices) < 2:
+        syslog.syslog("WARNING, choices array not loaded")
+      else: 
+        textPath=cacheDir+"/"+adGlobal.textName
+        f = open(textPath,'w')
+        f.write(choices[0]+'\n')
+        f.write(choices[1]+'\n')
+        f.close();
+        copyList[h['ip']]['text']=textPath 
+        if debug: print "textPath:",textPath
+
+  hostCount=0
+  for image in images:
+    if ( adGlobal.searchType != "Archive"):
+      raw_img=getRawImage(image)
+      if raw_img is None:
+        print "raw_image = none",image
+        continue;
+      cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
+      if debug: print cntr
+      imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
+      f = open(imgPath, 'wb')
+      f.write(raw_img)
+      f.close()
+      flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
+      f = open(flgPath, 'w')
+      f.close()
+      del raw_img
+    else:
+      try:
+        cmd=["cp",image,cacheDir]
+        if debug: print "cmd",cmd
+        subprocess.check_output(cmd)
+        imgPath=cacheDir+"/"+os.path.basename(image)
+        i=os.path.basename(image)
+        flgPath=cacheDir+"/"+image[:image.rindex(".")]+".flg"
+        cmd=["touch",flgPath]
+        if debug: print "cmd",cmd
+        subprocess.check_output(cmd)
+      except subprocess.CalledProcessError, e:
+        syslog.syslog("archive file copy problem: "+', '.join(cmd)+str(e.output))
+        continue;
+
+    if imageDebug:  print "imgPath:",imgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
+    if imageDebug: print "flgPath:",flgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
+    copyList[hosts[hostCount]['ip']]['image'].append(imgPath)
+    copyList[hosts[hostCount]['ip']]['flag'].append(flgPath)
+    hostCount += 1
+    if hostCount == len(hosts):
+      hostCount=0
 
   if debug:
     for ip in copyList.keys():
