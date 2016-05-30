@@ -72,7 +72,7 @@ def getImages(qs):
             q=query,
             cx=creds['cx'],
             searchType='image',
-            safe='medium',
+            safe='off',
           ).execute()
       else:
         res = service.cse().list(

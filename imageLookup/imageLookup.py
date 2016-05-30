@@ -17,6 +17,7 @@ import uuid
 import archive
 import traceback
 import ssl
+import fehtest
 
 debug=False
 imageDebug=False
@@ -54,6 +55,15 @@ def getRawImage(image):
       raw_img = con.read()
       #raw_img = urllib2.urlopen(images[imageIndex]).read()
       if imageDebug: print "elapsed:",time.time() - startTime
+      tmpPath = "/tmp/fehTest.jpg"
+      f = open(tmpPath, 'wb')
+      f.write(raw_img)
+      f.close()
+      if fehtest.fehTest(tmpPath) != 0:
+        print "feh fails for ",image[t]
+        continue;
+      else:
+        if imageDebug: print "feh test good for",image[t]
       break;
     except:
       print "return from exception for type",t,"image:",image[t]
