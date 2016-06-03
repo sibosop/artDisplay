@@ -80,7 +80,7 @@ def getImages(qs):
             cx=creds['cx'],
             searchType='image',
             start=int(startReq),
-            safe='medium',
+            safe='off',
           ).execute()
       elapsed_time = time.time() - start_time
       if 'error' in res:

@@ -68,8 +68,9 @@ def getRawImage(image):
         if imageDebug: print "feh test good for",image[t]
       break;
     except:
-      print "return from exception for type",t,"image:",image[t]
-      print "elapsed:",time.time() - startTime
+      sys.stderr.write("return from exception for type "
+                            +t+" image: "+image[t]+"\n")
+      sys.stderr.write("elapsed:"+str(time.time() - startTime)+"\n")
       traceback.print_exc()
       e = sys.exc_info()[0]
       continue;
