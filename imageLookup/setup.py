@@ -16,10 +16,10 @@ if __name__ == '__main__':
   sys.stderr.write("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')+"\n")
   debug = False
   os.chdir(os.path.dirname(sys.argv[0]))
-  syslog.syslog("starting setup.py")
+  sys.stderr.write("starting setup.py"+"\n")
   host = subprocess.check_output(["hostname","-I"]).split();
   if debug:
-    syslog.syslog("host ="+host[0])
+    sys.stderr.write("host ="+host[0]+"\n")
     
   test = subprocess.check_call(["sudo","service","slpd","start"])
   regs=["slptool","register","service:artdisplay.x://"+host[0]]
@@ -52,4 +52,4 @@ if __name__ == '__main__':
       tic.join(1)
   except:
     e = sys.exc_info()[0]
-    syslog.syslog("return from exception "+str(e))
+    sys.stderr.write("return from exception "+str(e)+"\n")

@@ -84,11 +84,11 @@ def imageLookupLoop():
   cacheDir = adGlobal.cacheDir;
   image_type = "Action"
   maxImagesPerHost = 5
-  syslog.syslog("search method: "+adGlobal.searchType)
+  sys.stderr.write("search method: "+adGlobal.searchType+"\n")
   hosts=[]
   services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
   if len(services) == 0:
-    syslog.syslog("no available services")
+    sys.stderr.write("no available services"+"\n")
     return
   for s in services:
     if slpDebug: print "s:",s
@@ -118,6 +118,7 @@ def imageLookupLoop():
       choices=[]
       choices = words.getWords()
       images = scraper.scraper(choices[:])
+  sys.stderr.write("select: "+choices[0]+" "+choices[1]+"\n")
   copyList = {}
   for h in hosts:
     copyList[h['ip']] = {}
@@ -127,7 +128,7 @@ def imageLookupLoop():
     if h['hasPanel']:
       if debug: print "doing has panel"
       if len(choices) < 2:
-        syslog.syslog("WARNING, choices array not loaded")
+        sys.stderr.write("WARNING, choices array not loaded"+"\n")
       else: 
         textPath=cacheDir+"/"+adGlobal.textName
         f = open(textPath,'w')
@@ -166,7 +167,7 @@ def imageLookupLoop():
         if debug: print "cmd",cmd
         subprocess.check_output(cmd)
       except subprocess.CalledProcessError, e:
-        syslog.syslog("archive file copy problem: "+', '.join(cmd)+str(e.output))
+        sys.stderr.write("archive file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
         continue;
 
     if imageDebug:  print "imgPath:",imgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
@@ -199,7 +200,7 @@ def imageLookupLoop():
       if copyDebug: print "file copy:",str(cmd)
       subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
-      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+      sys.stderr.write("file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
       continue
       
   for ip in copyList.keys():
@@ -230,7 +231,7 @@ def imageLookupLoop():
         if copyDebug: print "text copy cmd:",str(cmd)
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
-      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
+      sys.stderr.write("file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
       continue
 
   if adGlobal.searchType != "Archive":
@@ -249,11 +250,11 @@ def imageLookupLoop():
       f.close()
       cmd = ["tar","-czf",adGlobal.archiveDir+"/"+str(uuid.uuid4())+".tgz","-C",cacheDir,"-T",tmpFile]
       if debug: print "cmd:",cmd
-      syslog.syslog("doing archive")
+      sys.stderr.write("doing archive"+"\n")
       subprocess.check_output(cmd)
-      syslog.syslog("archive complete")
+      sys.stderr.write("archive complete"+"\n")
     except subprocess.CalledProcessError, e:
-      syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
+      sys.stderr.write("archive problem: "+', '.join(cmd)+str(e.output)+"\n")
       
   files = glob.glob(cacheDir+"/*")
   if debug: print "removing:",files

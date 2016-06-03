@@ -79,7 +79,7 @@ def imageChecker():
   if debug:
     print "image image dir:",imageDir
   count=0
-  syslog.syslog("image checker started successfully")
+  sys.stderr.write("image checker started successfully"+"\n")
   while True:
     if debug:
       count += 1

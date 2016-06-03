@@ -5,6 +5,7 @@ import time
 import adGlobal
 import panel
 import syslog
+import sys
 debug = False
 
 
@@ -35,7 +36,7 @@ def getText():
 
 def textChecker():
   if not panel.setUpPanel():
-    syslog.syslog("exiting")
+    sys.stderr.write("exiting"+"\n")
     return
     
   global  imageDir
@@ -43,7 +44,7 @@ def textChecker():
 
   
   count=0
-  syslog.syslog("text checker started successfully")
+  sys.stderr.write("text checker started successfully"+"\n")
   while True:
     if debug:
       count += 1
