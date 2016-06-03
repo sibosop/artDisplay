@@ -2,18 +2,12 @@
 import sys
 import os
 import syslog
-syslog.syslog("starting setup.py")
 import subprocess
 import threading
-syslog.syslog("import textChecker.py")
 import textChecker
-syslog.syslog("import master.py")
 import master
-syslog.syslog("import imageLookup.py")
 import imageLookup
-syslog.syslog("import imageChecker.py")
 import imageChecker
-syslog.syslog("import panel.py")
 import panel
 
 if __name__ == '__main__':
