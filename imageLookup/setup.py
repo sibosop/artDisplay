@@ -9,8 +9,11 @@ import master
 import imageLookup
 import imageChecker
 import panel
+import time
+import datetime
 
 if __name__ == '__main__':
+  sys.stderr.write("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')+"\n")
   debug = False
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog("starting setup.py")

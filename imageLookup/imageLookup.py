@@ -18,6 +18,7 @@ import archive
 import traceback
 import ssl
 import fehtest
+import datetime
 
 debug=False
 imageDebug=False
@@ -71,6 +72,7 @@ def getRawImage(image):
       sys.stderr.write("return from exception for type "
                             +t+" image: "+image[t]+"\n")
       sys.stderr.write("elapsed:"+str(time.time() - startTime)+"\n")
+      sys.stderr.write(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')+"\n")
       traceback.print_exc()
       e = sys.exc_info()[0]
       continue;
