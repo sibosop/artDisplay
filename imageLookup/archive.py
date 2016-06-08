@@ -40,7 +40,7 @@ def getArchive():
     if debug: print "cmd:",cmd
     subprocess.check_output(cmd)
   except subprocess.CalledProcessError, e:
-    sys.stderr.write("archive problem: "+', '.join(cmd)+str(e.output)+"\n")
+    syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
   images=[]
   choices=[]
   try:
@@ -49,7 +49,7 @@ def getArchive():
       images.append(a);
   except:
     e = sys.exc_info()[0]
-    sys.stderr.write("return from archive image append "+str(e)+"\n")
+    syslog.syslog("return from archive image append "+str(e))
   
   textName=cdir+"/"+adGlobal.textName
   if debug: print "textName",textName  
@@ -60,7 +60,7 @@ def getArchive():
             choices.append(line.rstrip())
   except:
     e = sys.exc_info()[0]
-    sys.stderr.write("choice name append "+str(e)+"\n")
+    syslog.syslog("choice name append "+str(e))
   return [images,choices]
   
     

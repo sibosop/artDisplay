@@ -36,7 +36,7 @@ def getText():
 
 def textChecker():
   if not panel.setUpPanel():
-    sys.stderr.write("exiting"+"\n")
+    syslog.syslog("exiting")
     return
     
   global  imageDir
@@ -44,7 +44,7 @@ def textChecker():
 
   
   count=0
-  sys.stderr.write("text checker started successfully"+"\n")
+  syslog.syslog("text checker started successfully")
   while True:
     if debug:
       count += 1

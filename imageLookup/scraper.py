@@ -92,6 +92,7 @@ def scraper(choices):
     except:
       e = sys.exc_info()[0]
       print "return from exception "+str(e)
+      time.sleep(10)
   else:
     if debug: print "doing archive fetch"
   if debug: print "num images:",len(images)

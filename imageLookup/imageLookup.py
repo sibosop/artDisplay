@@ -19,6 +19,7 @@ import traceback
 import ssl
 import fehtest
 import datetime
+import signal
 
 debug=False
 imageDebug=False
@@ -69,12 +70,11 @@ def getRawImage(image):
         if imageDebug: print "feh test good for",image[t]
       break;
     except:
-      sys.stderr.write("return from exception for type "
-                            +t+" image: "+image[t]+"\n")
-      sys.stderr.write("elapsed:"+str(time.time() - startTime)+"\n")
-      sys.stderr.write(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')+"\n")
-      traceback.print_exc()
-      e = sys.exc_info()[0]
+      syslog.syslog("return from exception for type "
+                            +t+" image: "+image[t])
+      syslog.syslog("elapsed:"+str(time.time() - startTime))
+      syslog.syslog(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+      syslog.syslog(traceback.format_exc())
       continue;
   return raw_img 
     
@@ -84,11 +84,11 @@ def imageLookupLoop():
   cacheDir = adGlobal.cacheDir;
   image_type = "Action"
   maxImagesPerHost = 5
-  sys.stderr.write("search method: "+adGlobal.searchType+"\n")
+  syslog.syslog("search method: "+adGlobal.searchType)
   hosts=[]
   services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
   if len(services) == 0:
-    sys.stderr.write("no available services"+"\n")
+    syslog.syslog("no available services")
     return
   for s in services:
     if slpDebug: print "s:",s
@@ -118,7 +118,7 @@ def imageLookupLoop():
       choices=[]
       choices = words.getWords()
       images = scraper.scraper(choices[:])
-  sys.stderr.write("select: "+choices[0]+" "+choices[1]+"\n")
+  syslog.syslog("select: "+choices[0]+" "+choices[1])
   copyList = {}
   for h in hosts:
     copyList[h['ip']] = {}
@@ -128,7 +128,7 @@ def imageLookupLoop():
     if h['hasPanel']:
       if debug: print "doing has panel"
       if len(choices) < 2:
-        sys.stderr.write("WARNING, choices array not loaded"+"\n")
+        syslog.syslog("WARNING, choices array not loaded")
       else: 
         textPath=cacheDir+"/"+adGlobal.textName
         f = open(textPath,'w')
@@ -167,7 +167,7 @@ def imageLookupLoop():
         if debug: print "cmd",cmd
         subprocess.check_output(cmd)
       except subprocess.CalledProcessError, e:
-        sys.stderr.write("archive file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
+        syslog.syslog("archive file copy problem: "+', '.join(cmd)+str(e.output))
         continue;
 
     if imageDebug:  print "imgPath:",imgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
@@ -200,7 +200,7 @@ def imageLookupLoop():
       if copyDebug: print "file copy:",str(cmd)
       subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
-      sys.stderr.write("file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
+      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
       
   for ip in copyList.keys():
@@ -231,7 +231,7 @@ def imageLookupLoop():
         if copyDebug: print "text copy cmd:",str(cmd)
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
-      sys.stderr.write("file copy problem: "+', '.join(cmd)+str(e.output)+"\n")
+      syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
 
   if adGlobal.searchType != "Archive":
@@ -250,11 +250,11 @@ def imageLookupLoop():
       f.close()
       cmd = ["tar","-czf",adGlobal.archiveDir+"/"+str(uuid.uuid4())+".tgz","-C",cacheDir,"-T",tmpFile]
       if debug: print "cmd:",cmd
-      sys.stderr.write("doing archive"+"\n")
+      syslog.syslog("doing archive")
       subprocess.check_output(cmd)
-      sys.stderr.write("archive complete"+"\n")
+      syslog.syslog("archive complete")
     except subprocess.CalledProcessError, e:
-      sys.stderr.write("archive problem: "+', '.join(cmd)+str(e.output)+"\n")
+      syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
       
   files = glob.glob(cacheDir+"/*")
   if debug: print "removing:",files
@@ -264,7 +264,10 @@ def imageLookupLoop():
       os.remove(f)
 
 def imageLookup():
+  loopStart= time.time()
   while True:
+    syslog.syslog("ImageLookup Loop Time "+str(time.time()-loopStart))
+    loopStart=time.time()
     imageLookupLoop()
     time.sleep(30)
 

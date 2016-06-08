@@ -8,9 +8,9 @@ import adGlobal
 debug=False
 def hasPanel():
   if os.path.exists(adGlobal.panelDev):
-    sys.stderr.write("Located usb serial device at "+adGlobal.panelDev+"\n")
+    syslog.syslog("Located usb serial device at "+adGlobal.panelDev)
     return True;
-  sys.stderr.write("No usb serial device at "+adGlobal.panelDev+"\n")
+  syslog.syslog("No usb serial device at "+adGlobal.panelDev)
   return False;
 
 def clear():

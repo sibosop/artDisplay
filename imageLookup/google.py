@@ -26,6 +26,7 @@ import pprint
 import adGlobal
 import time
 import traceback
+import syslog
 from apiclient.discovery import build
 
 global initFlag
@@ -102,9 +103,9 @@ def getImages(qs):
     
       index += 1
           
-      #if debug: pprint.pprint(res)
+      if debug: pprint.pprint(res)
     except:
-      print "google cse:",traceback.print_exc()
+      syslog.syslog("google cse:"+traceback.format_exc())
       time.sleep(60)
       return []
 
