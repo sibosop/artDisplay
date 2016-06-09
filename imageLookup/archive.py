@@ -13,28 +13,27 @@ debug=False
 
 global init
 init=False
+archives=[]
 
 def getArchive():
   global init
+  adir=adGlobal.archiveDir
+  cdir=adGlobal.archiveCache
   if init == False:
     if debug: print "init seed"
     random.seed(time.time())
     init=True
-  adir=adGlobal.archiveDir
-  cdir=adGlobal.archiveCache
+    for a in glob.glob(adir+"/*.tgz"):
+      if debug: print "a:",a
+      archives.append(a)
   files = glob.glob(cdir+"/*")
   if debug: print "removing:",files
   for f in files:
     if f == cdir+"/placeholder":
       continue
     os.remove(f)
-    
-  archives=[]
-  for a in glob.glob(adir+"/*.tgz"):
-    if debug: print "a:",a
-    archives.append(a)
   n = random.randint(0,len(archives)-1)
-  if debug: print "archive choice",archives[n]
+  syslog.syslog("n:"+str(n)+" archive:"+archives[n])
   try:  
     cmd=["tar","xzf",archives[n],"-C",cdir]
     if debug: print "cmd:",cmd
@@ -55,9 +54,9 @@ def getArchive():
   if debug: print "textName",textName  
   try:  
     with open(textName) as fp:
-        for line in fp:
-            if debug: print line.rstrip()
-            choices.append(line.rstrip())
+      for line in fp:
+        if debug: print line.rstrip()
+        choices.append(line.rstrip())
   except:
     e = sys.exc_info()[0]
     syslog.syslog("choice name append "+str(e))

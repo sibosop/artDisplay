@@ -266,6 +266,7 @@ def imageLookupLoop():
 def imageLookup():
   loopStart= time.time()
   while True:
+    signal.alarm(600)
     syslog.syslog("ImageLookup Loop Time "+str(time.time()-loopStart))
     loopStart=time.time()
     imageLookupLoop()

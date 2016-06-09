@@ -11,10 +11,19 @@ import imageChecker
 import panel
 import time
 import datetime
+import traceback
+import signal
+
+def watchdog(signum,frame):
+  syslog.syslog("watchdog handler rebooting")
+  syslog.syslog(traceback.format_exc())
+  subprocess.check_output(["sudo","reboot"])
+  time.sleep(10)
 
 if __name__ == '__main__':
   syslog.syslog("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   debug = False
+  signal.signal(signal.SIGALRM, watchdog)
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog("starting setup.py")
   host = subprocess.check_output(["hostname","-I"]).split();
