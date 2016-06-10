@@ -91,7 +91,7 @@ def scraper(choices):
         conn.close()
     except:
       e = sys.exc_info()[0]
-      print "return from exception "+str(e)
+      syslog.syslog("return from exception "+str(e))
       time.sleep(10)
   else:
     if debug: print "doing archive fetch"
