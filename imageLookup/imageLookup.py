@@ -84,7 +84,8 @@ def imageLookupLoop():
   cacheDir = adGlobal.cacheDir;
   image_type = "Action"
   maxImagesPerHost = 5
-  syslog.syslog("search method: "+adGlobal.searchType)
+  searchType = adGlobal.searchType
+  syslog.syslog("search method: "+searchType)
   hosts=[]
   services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
   if len(services) == 0:
@@ -108,7 +109,7 @@ def imageLookupLoop():
   if slpDebug: print "hosts:",str(hosts)
   images=[]
   choices=[]
-  if adGlobal.searchType == "Archive":
+  if searchType == "Archive":
     vars=archive.getArchive();
     images=vars[0]
     choices=vars[1]
@@ -118,6 +119,8 @@ def imageLookupLoop():
       choices=[]
       choices = words.getWords()
       images = scraper.scraper(choices[:])
+      if len(images) == 1 and images[0] == "error":
+        return
   syslog.syslog("select: "+choices[0]+" "+choices[1])
   copyList = {}
   for h in hosts:
@@ -140,7 +143,7 @@ def imageLookupLoop():
 
   hostCount=0
   for image in images:
-    if ( adGlobal.searchType != "Archive"):
+    if ( searchType != "Archive"):
       raw_img=getRawImage(image)
       if raw_img is None:
         print "raw_image = none",image
@@ -234,7 +237,7 @@ def imageLookupLoop():
       syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
 
-  if adGlobal.searchType != "Archive":
+  if searchType != "Archive":
     if debug: print "archiving cacheDir"
     try:
       tmpFile="/tmp/tarFiles";

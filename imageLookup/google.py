@@ -27,6 +27,9 @@ import adGlobal
 import time
 import traceback
 import syslog
+import sys
+import apiclient
+
 from apiclient.discovery import build
 
 global initFlag
@@ -104,10 +107,17 @@ def getImages(qs):
       index += 1
           
       if debug: pprint.pprint(res)
+
+    except apiclient.errors.HttpError,e:
+      syslog.syslog("google cse status:"+str(e.resp.status))
+      if e.resp.status == 403:
+        syslog.syslog("Google Quota Exceeded, switching to Archive")
+        adGlobal.searchType="Archive"
+      return ["error"]
+      
     except:
-      syslog.syslog("google cse:"+traceback.format_exc())
-      time.sleep(60)
-      return []
+      syslog.syslog("google cse:"+str(sys.exc_info()[0]))
+      return ["error"]
 
       
 

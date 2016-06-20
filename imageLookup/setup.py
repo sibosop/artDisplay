@@ -13,12 +13,19 @@ import time
 import datetime
 import traceback
 import signal
+import schedule
+import adGlobal
 
 def watchdog(signum,frame):
   syslog.syslog("watchdog handler rebooting")
   syslog.syslog(traceback.format_exc())
   subprocess.check_output(["sudo","reboot"])
   time.sleep(10)
+
+def changeSearch(s):
+  syslog.syslog("changing search type to "+s)
+  adGlobal.searchType = s
+  
 
 if __name__ == '__main__':
   syslog.syslog("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
@@ -53,7 +60,11 @@ if __name__ == '__main__':
     tic = threading.Thread(target=imageChecker.imageChecker)
     tic.setDaemon(True)
     tic.start()
+    schedule.every().day.at("07:34").do(changeSearch,"Google")
+    schedule.every().day.at("20:00").do(changeSearch,"Bing")
+    schedule.every().day.at("20:40").do(changeSearch,"Archive")
     while True:
+      schedule.run_pending()
       if hp:
         tc.join(1)  
       if im:
