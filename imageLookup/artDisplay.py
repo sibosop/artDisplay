@@ -32,7 +32,7 @@ if __name__ == '__main__':
   debug = False
   signal.signal(signal.SIGALRM, watchdog)
   os.chdir(os.path.dirname(sys.argv[0]))
-  syslog.syslog("starting setup.py")
+  syslog.syslog("starting artDisplay.py")
   host = subprocess.check_output(["hostname","-I"]).split();
   if debug:
     syslog.syslog("host ="+host[0])
