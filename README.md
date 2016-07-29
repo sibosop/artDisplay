@@ -78,6 +78,7 @@ Here is the current hardware used:
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
  * set `POWERDOWN_TIME=0`
+ * Load screensaver program (see below) disable in perferences
  * 
 * power off
   * `sudo poweroff`
