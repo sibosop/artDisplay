@@ -105,6 +105,7 @@ Here is the current hardware used:
  * `sudo -H pip install py-bing-search`
  * `sudo -H pip install --upgrade google-api-python-client`
  * `sudo -H pip install schedule`
+ * `sudo apt-get install xscreensaver`
  
 #### seting up unit for run
  * the master needs the jumper mentioned above
