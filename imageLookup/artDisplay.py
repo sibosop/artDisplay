@@ -61,8 +61,9 @@ if __name__ == '__main__':
     tic.setDaemon(True)
     tic.start()
     schedule.every().day.at("07:34").do(changeSearch,"Google")
+    schedule.every().day.at("08:14").do(changeSearch,"Archive")
     schedule.every().day.at("20:00").do(changeSearch,"Bing")
-    schedule.every().day.at("20:40").do(changeSearch,"Archive")
+    schedule.every().day.at("20:30").do(changeSearch,"Archive")
     while True:
       schedule.run_pending()
       if hp:
