@@ -107,6 +107,7 @@ Here is the current hardware used:
  * `sudo -H pip install --upgrade google-api-python-client`
  * `sudo -H pip install schedule`
  * `sudo apt-get install xscreensaver`
+ * `sudo apt-get install unclutter`
  
 #### seting up unit for run
  * the master needs the jumper mentioned above
@@ -118,7 +119,7 @@ Here is the current hardware used:
    * MAILTO=""
    * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/artDisplay.py
  * with any luck the system will start after reboot
-
+ * unclutter removes cursor. You may need to run unclutter -display .0:0 once
 
 
 
