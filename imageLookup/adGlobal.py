@@ -9,6 +9,7 @@ home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
 imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
+defaultImg="./tufa1.jpg"
 bingFile="./corncob_lowercase.txt"
 wordDir="../lists"
 wordList=["corncob_lowercase.txt"]

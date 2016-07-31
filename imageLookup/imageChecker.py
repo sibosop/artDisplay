@@ -80,6 +80,12 @@ def imageChecker():
     print "image image dir:",imageDir
   count=0
   syslog.syslog("image checker started successfully")
+  try:
+    p = subprocess.Popen("/usr/bin/feh -Z -F "+adGlobal.defaultImg,shell=True, preexec_fn=os.setpgrp)
+  except:
+    e = sys.exc_info()[0]
+    print "return from exception "+str(e)
+    return None
   while True:
     if debug:
       count += 1
