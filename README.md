@@ -78,6 +78,7 @@ Here is the current hardware used:
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
  * set `POWERDOWN_TIME=0`
+ * Load screensaver program (see below) disable in perferences
  * 
 * power off
   * `sudo poweroff`
@@ -104,6 +105,8 @@ Here is the current hardware used:
  * `sudo pip install --upgrade pyserial`
  * `sudo -H pip install py-bing-search`
  * `sudo -H pip install --upgrade google-api-python-client`
+ * `sudo -H pip install schedule`
+ * `sudo apt-get install xscreensaver`
  
 #### seting up unit for run
  * the master needs the jumper mentioned above
@@ -113,7 +116,7 @@ Here is the current hardware used:
   * `crontab -e`
   * add these lines
    * MAILTO=""
-   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/setup.py
+   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/artDisplay.py
  * with any luck the system will start after reboot
 
 
