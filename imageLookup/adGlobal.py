@@ -17,6 +17,7 @@ panelDev="/dev/ttyUSB0"
 #searchType="Google"
 #searchType="Bing"
 searchType="Archive"
+doArchive=True
 archiveDir='/media/pi/ARCHIVE/ArchiveImages/'
 archiveCache='../archiveCache'
 textName='newText.lkp'

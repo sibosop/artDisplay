@@ -237,7 +237,7 @@ def imageLookupLoop():
       syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
 
-  if searchType != "Archive":
+  if ((searchType != "Archive") and adGlobal.doArchive ):
     if debug: print "archiving cacheDir"
     try:
       tmpFile="/tmp/tarFiles";
@@ -273,7 +273,11 @@ def imageLookup():
     syslog.syslog("ImageLookup Loop Time "+str(time.time()-loopStart))
     loopStart=time.time()
     imageLookupLoop()
-    time.sleep(30)
+    sleepTime = 30
+    if adGlobal.searchType == "Archive":
+      sleepTime = 60
+    syslog.syslog("ImageLookup sleep Time "+str(sleepTime))
+    time.sleep(sleepTime)
 
 if __name__ == '__main__':
   imageLookupLoop()
