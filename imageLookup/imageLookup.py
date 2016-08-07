@@ -275,7 +275,7 @@ def imageLookup():
     imageLookupLoop()
     sleepTime = 30
     if adGlobal.searchType == "Archive":
-      sleepTime = 60
+      sleepTime = 120
     syslog.syslog("ImageLookup sleep Time "+str(sleepTime))
     time.sleep(sleepTime)
 
