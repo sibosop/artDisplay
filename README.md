@@ -109,7 +109,7 @@ Here is the current hardware used:
  * `sudo apt-get install xscreensaver`
  * `sudo apt-get install unclutter`
  
-#### seting up unit for run
+#### setting up unit for run
  * the master needs the jumper mentioned above
  * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
  * ssh from master to slave once to get the host configuration set up
@@ -120,6 +120,11 @@ Here is the current hardware used:
    * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/artDisplay.py
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display .0:0 once
+#### to change to a different wifi router
+ * use screen to connect to wifi
+ * sudo vi /etc/wpa_supplicant/wpa_supplicant.conf  is where wifi info is store. remove old wifi info, add new etc
+ * slptool findsrvs service:artdisplay.x will give you addresses of all connected devices
+ * ssh into each device once from master to get the known_host files initialized
 
 
 
