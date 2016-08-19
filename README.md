@@ -124,7 +124,10 @@ Here is the current hardware used:
  * use screen to connect to wifi
  * sudo vi /etc/wpa_supplicant/wpa_supplicant.conf  is where wifi info is store. remove old wifi info, add new etc
  * slptool findsrvs service:artdisplay.x will give you addresses of all connected devices
- * ssh into each device once from master to get the known_host files initialized
+ * To get rid of the 'known host problems' figure out the router ip and add these lines to ~/.ssh/config
+  * Host 192.168.10.*
+  * StrictHostKeyChecking no
+  * UserKnownHostsFile=/dev/null
 
 
 
