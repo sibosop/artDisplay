@@ -22,6 +22,7 @@ archiveDir='/media/pi/ARCHIVE/ArchiveImages/'
 archiveCache='../archiveCache'
 textName='newText.lkp'
 credFile='/media/pi/ARCHIVE/creds.txt'
+timeStampFile = '/tmp/adTimeStamp'
   
 def isLocalHost(ip):
   plats=platform.platform().split('-');

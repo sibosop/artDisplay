@@ -205,6 +205,19 @@ def imageLookupLoop():
     except subprocess.CalledProcessError, e:
       syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
+
+  for ip in copyList.keys():
+    try:
+      login = "pi@"+ip
+      if adGlobal.isLocalHost(ip):
+        cmd = ["touch",adGlobal.timeStampFile]
+      else:
+        cmd=["ssh",ip,"touch",adGlobal.timeStampFile]
+      syslog.syslog("sending cmd:"+str(cmd));
+      subprocess.check_output(cmd)
+    except subprocess.CalledProcessError, e:
+      syslog.syslog("timestamp set problem: "+', '.join(cmd)+str(e.output))
+      continue
       
   for ip in copyList.keys():
     try:
@@ -236,6 +249,8 @@ def imageLookupLoop():
     except subprocess.CalledProcessError, e:
       syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
+
+  
 
   if ((searchType != "Archive") and adGlobal.doArchive ):
     if debug: print "archiving cacheDir"
@@ -275,7 +290,7 @@ def imageLookup():
     imageLookupLoop()
     sleepTime = 30
     if adGlobal.searchType == "Archive":
-      sleepTime = 90
+      sleepTime = 30
     syslog.syslog("ImageLookup sleep Time "+str(sleepTime))
     time.sleep(sleepTime)
 

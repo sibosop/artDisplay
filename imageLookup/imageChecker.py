@@ -11,6 +11,8 @@ debug = False
 flagExt=".flg"
 currentProc = None
 currentImg = None
+timestamp = 0;
+
 
 
 
@@ -47,10 +49,15 @@ def displayImage(img):
   return None
 
 def getImage():
+  global timestamp;
+  stampFile = adGlobal.timeStampFile;
+  if os.path.isfile(stampFile):
+    timestamp = os.path.getmtime(stampFile)
+
   filenames = next(os.walk(imageDir))[2]
   for f in filenames:
     if debug:
-      print "filename:",f
+      syslog.syslog("filename:"+f)
     try:
       ext = f.rindex(flagExt)
     except ValueError:
@@ -62,14 +69,24 @@ def getImage():
       print"flag ext = ",flag
     if flag == flagExt:
       delFile = imageDir+'/'+f
+      flagTimeStamp = os.path.getctime(delFile);
       os.unlink(delFile)
       root = f[:ext]
       for se in imageExts:
         look=imageDir+'/'+root+se;
-        if debug:
-          print "looking for",look
+        syslog.syslog( "look:"+look )
         if os.path.exists(look):
-          return look
+          syslog.syslog("look:"
+                +look
+                + " flagTimeStamp:"
+                + str(flagTimeStamp)
+                + " timestamp:"+str(timestamp))
+          if flagTimeStamp < timestamp:
+            syslog.syslog("deleting out of date image:"+look);
+            os.unlink(look)
+          else:
+            syslog.syslog("returning for display: "+look);
+            return look
   return None
 
 def imageChecker():
