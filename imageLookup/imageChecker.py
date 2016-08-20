@@ -74,9 +74,9 @@ def getImage():
       root = f[:ext]
       for se in imageExts:
         look=imageDir+'/'+root+se;
-        syslog.syslog( "look:"+look )
         if os.path.exists(look):
-          syslog.syslog("look:"
+          if debug:
+            syslog.syslog("look:"
                 +look
                 + " flagTimeStamp:"
                 + str(flagTimeStamp)

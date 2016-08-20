@@ -213,7 +213,7 @@ def imageLookupLoop():
         cmd = ["touch",adGlobal.timeStampFile]
       else:
         cmd=["ssh",ip,"touch",adGlobal.timeStampFile]
-      syslog.syslog("sending cmd:"+str(cmd));
+      if debug: syslog.syslog("sending cmd:"+str(cmd));
       subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
       syslog.syslog("timestamp set problem: "+', '.join(cmd)+str(e.output))
@@ -289,9 +289,6 @@ def imageLookup():
     loopStart=time.time()
     imageLookupLoop()
     sleepTime = 30
-    if adGlobal.searchType == "Archive":
-      sleepTime = 30
-    syslog.syslog("ImageLookup sleep Time "+str(sleepTime))
     time.sleep(sleepTime)
 
 if __name__ == '__main__':
