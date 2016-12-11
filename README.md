@@ -22,6 +22,7 @@ This installation guide assumes you have:
 
 #### Installation guide
 Here is the current hardware used:
+* http://www.newhavendisplay.com/specs/NHD-0216K3Z-FL-GBW-V3.pdf
 * http://www.amazon.com/Raspberry-Pi-Model-Project-Board/dp/B00T2U7R7I?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00
 * http://www.amazon.com/Edimax-EW-7811Un-150Mbps-Raspberry-Supports/dp/B003MTTJOY?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00
 * http://www.amazon.com/Resistive-interface-compatible-Raspberry-Pi/dp/B00U21UA16?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00
