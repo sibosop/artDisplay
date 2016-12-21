@@ -43,6 +43,7 @@ Here is the current hardware used:
   * https://www.raspberrypi.org/documentation/remote-access/ssh/
 * using that address verify the you can log into the pi from devel machine with `ssh pi@<ip_addr>` 
 * password is raspberry
+* raspberry pi now complains about raspberry password, set it to the router password
 
 #### set up network keys
 
