@@ -97,6 +97,9 @@ Here is the current hardware used:
  * `sudo apt-get upgrade`
  * `mkdir GitProjects`
  * `cd !$`
+ * `ssh-keygen`
+ * `vi ~/.ssh/id_rsa.pub`
+ * copy the ~/.ssh/id_rsa.pub to github
  * `git clone git@github.com:sibosop/artDisplay.git`
  * `sudo pip install beautifulsoup4`
  * `sudo apt-get install gcc python-dev`
