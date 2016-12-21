@@ -43,6 +43,8 @@ Here is the current hardware used:
 * password is raspberry
 
 #### set up network keys
+* ssh is no longer enabled, you must enable it
+  * https://www.raspberrypi.org/documentation/remote-access/ssh/
 * start ssh session on the pi from *local machine*
   * `ssh pi@<ip_addr>`
   * `mkdir .ssh`
