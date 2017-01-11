@@ -20,8 +20,11 @@ import ssl
 import fehtest
 import datetime
 import signal
+import inspect
+
 
 debug=False
+hangDebug=True;
 imageDebug=False
 copyDebug=False
 slpDebug=False
@@ -86,12 +89,19 @@ def imageLookupLoop():
   maxImagesPerHost = 5
   searchType = adGlobal.searchType
   syslog.syslog("search method: "+searchType)
+  if hangDebug: syslog.syslog("Hang debug:"
+		+__file__+" "
+		+str(inspect.currentframe().f_lineno))
   hosts=[]
+
   services = subprocess.check_output(["slptool","findsrvs","service:artdisplay.x"]).split('\n');
   if len(services) == 0:
     syslog.syslog("no available services")
     return
   for s in services:
+    if hangDebug: syslog.syslog("Hang debug:"
+      +__file__+" "
+      +str(inspect.currentframe().f_lineno))
     if slpDebug: print "s:",s
     loc=s.split(',');
     if loc[0] == '':
@@ -107,12 +117,21 @@ def imageLookupLoop():
     if debug: print host
     hosts.append(host)
   if slpDebug: print "hosts:",str(hosts)
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   images=[]
   choices=[]
   if searchType == "Archive":
+    if hangDebug: syslog.syslog("Hang debug:"
+      +__file__+" "
+      +str(inspect.currentframe().f_lineno))
     vars=archive.getArchive();
     images=vars[0]
     choices=vars[1]
+    if hangDebug: syslog.syslog("Hang debug:"
+      +__file__+" "
+      +str(inspect.currentframe().f_lineno))
   else:
     while len(images) < 20:
       images=[]
@@ -144,7 +163,13 @@ def imageLookupLoop():
   hostCount=0
   for image in images:
     if ( searchType != "Archive"):
+      if hangDebug: syslog.syslog("Hang debug:"
+        +__file__+" "
+        +str(inspect.currentframe().f_lineno))
       raw_img=getRawImage(image)
+      if hangDebug: syslog.syslog("Hang debug:"
+        +__file__+" "
+        +str(inspect.currentframe().f_lineno))
       if raw_img is None:
         print "raw_image = none",image
         continue;
