@@ -142,6 +142,9 @@ def imageLookupLoop():
         return
   syslog.syslog("select: "+choices[0]+" "+choices[1])
   copyList = {}
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for h in hosts:
     copyList[h['ip']] = {}
     copyList[h['ip']]['image'] = []
@@ -161,6 +164,9 @@ def imageLookupLoop():
         if debug: print "textPath:",textPath
 
   hostCount=0
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for image in images:
     if ( searchType != "Archive"):
       if hangDebug: syslog.syslog("Hang debug:"
@@ -215,6 +221,9 @@ def imageLookupLoop():
         print "\tflag:",i
       print "\ttext:",copyList[ip]['text']
       
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for ip in copyList.keys():
     cmd=[]
     try:
@@ -231,6 +240,9 @@ def imageLookupLoop():
       syslog.syslog("file copy problem: "+', '.join(cmd)+str(e.output))
       continue
 
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for ip in copyList.keys():
     try:
       login = "pi@"+ip
@@ -244,6 +256,9 @@ def imageLookupLoop():
       syslog.syslog("timestamp set problem: "+', '.join(cmd)+str(e.output))
       continue
       
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for ip in copyList.keys():
     try:
       cv=getCmdVars(ip)
@@ -260,6 +275,9 @@ def imageLookupLoop():
       print "file copy problem: ",str(cmd),str(e.output)
       continue  
       
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   for ip in copyList.keys():
     try:
       cv=getCmdVars(ip)
@@ -277,6 +295,9 @@ def imageLookupLoop():
 
   
 
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   if ((searchType != "Archive") and adGlobal.doArchive ):
     if debug: print "archiving cacheDir"
     try:
@@ -299,6 +320,9 @@ def imageLookupLoop():
     except subprocess.CalledProcessError, e:
       syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
       
+  if hangDebug: syslog.syslog("Hang debug:"
+    +__file__+" "
+    +str(inspect.currentframe().f_lineno))
   files = glob.glob(cacheDir+"/*")
   if debug: print "removing:",files
   for f in files:
