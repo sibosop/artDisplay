@@ -14,13 +14,13 @@ def hasPanel():
   return False;
 
 def clear():
-  ser.write([0xfe,0x51]) 
+  ser.write(bytearray([0xfe,0x51])) 
   
 def setRow(r):
   val = 0 
   if ( r == 1 ):
     val = 0x40 
-  ser.write([0xfe,0x45,val])
+  ser.write(bytearray([0xfe,0x45,val]))
 
 def printText(t):
     clear()
