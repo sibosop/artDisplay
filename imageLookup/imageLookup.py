@@ -27,7 +27,7 @@ debug=False
 hangDebug=True;
 imageDebug=False
 copyDebug=False
-slpDebug=False
+slpDebug=True
 
 def getCmdVars(ip):
   cmdVars = []
@@ -102,21 +102,24 @@ def imageLookupLoop():
     if hangDebug: syslog.syslog("Hang debug:"
       +__file__+" "
       +str(inspect.currentframe().f_lineno))
-    if slpDebug: print "s:",s
+    if slpDebug: syslog.syslog("slp s:"+s)
     loc=s.split(',');
     if loc[0] == '':
       continue
-    if debug: print "loc:",loc
+    if slpDebug: syslog.syslog("loc:"+str(loc))
+    if hangDebug: syslog.syslog("Hang debug:"
+      +__file__+" "
+      +str(inspect.currentframe().f_lineno))
     attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
     host={}
     host['ip']=loc[0].split("//")[1]
     host['hasPanel']=False
     if attr.find("hasPanel") != -1:
-      if debug: print "host has panel"
+      if slpDebug: syslog.syslog(str(host)+"host has panel");
       host['hasPanel']=True
-    if debug: print host
+    if slpDebug: syslog.syslog("slp host"+str(host))
     hosts.append(host)
-  if slpDebug: print "hosts:",str(hosts)
+  if slpDebug: syslog.syslog("hosts:"+str(hosts))
   if hangDebug: syslog.syslog("Hang debug:"
     +__file__+" "
     +str(inspect.currentframe().f_lineno))
