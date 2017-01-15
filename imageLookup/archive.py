@@ -52,6 +52,7 @@ def getArchive():
   
   textName=cdir+"/"+adGlobal.textName
   if debug: print "textName",textName  
+  adGlobal.mutex.acquire()
   try:  
     with open(textName) as fp:
       for line in fp:
@@ -60,6 +61,8 @@ def getArchive():
   except:
     e = sys.exc_info()[0]
     syslog.syslog("choice name append "+str(e))
+  finally:
+    adGlobal.mutex.release()
   return [images,choices]
   
     

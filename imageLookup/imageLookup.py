@@ -63,9 +63,11 @@ def getRawImage(image):
       #raw_img = urllib2.urlopen(images[imageIndex]).read()
       if imageDebug: print "elapsed:",time.time() - startTime
       tmpPath = "/tmp/fehTest.jpg"
+      adGlobal.mutex.acquire()
       f = open(tmpPath, 'wb')
       f.write(raw_img)
       f.close()
+      adGlobal.mutex.release()
       if fehtest.fehTest(tmpPath) != 0:
         print "feh fails for ",image[t]
         continue;
@@ -78,7 +80,10 @@ def getRawImage(image):
       syslog.syslog("elapsed:"+str(time.time() - startTime))
       syslog.syslog(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
       syslog.syslog(traceback.format_exc())
+      adGlobal.mutex.release()
       continue;
+    finally:
+      adGlobal.mutex.release()
   return raw_img 
     
 
@@ -159,10 +164,12 @@ def imageLookupLoop():
         syslog.syslog("WARNING, choices array not loaded")
       else: 
         textPath=cacheDir+"/"+adGlobal.textName
+        adGlobal.mutex.acquire()
         f = open(textPath,'w')
         f.write(choices[0]+'\n')
         f.write(choices[1]+'\n')
         f.close();
+        adGlobal.mutex.release()
         copyList[h['ip']]['text']=textPath 
         if debug: print "textPath:",textPath
 
@@ -182,17 +189,22 @@ def imageLookupLoop():
       if raw_img is None:
         print "raw_image = none",image
         continue;
+      adGlobal.mutex.acquire()
       cntr = len([i for i in os.listdir(cacheDir) if image_type in i]) + 1
+      adGlobal.mutex.release()
       if debug: print cntr
       imgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".jpg"
+      adGlobal.mutex.acquire()
       f = open(imgPath, 'wb')
       f.write(raw_img)
       f.close()
       flgPath=cacheDir + '/' + image_type + "_"+ str(cntr)+".flg"
       f = open(flgPath, 'w')
       f.close()
+      adGlobal.mutex.release()
       del raw_img
     else:
+      adGlobal.mutex.acquire()
       try:
         cmd=["cp",image,cacheDir]
         if debug: print "cmd",cmd
@@ -205,7 +217,10 @@ def imageLookupLoop():
         subprocess.check_output(cmd)
       except subprocess.CalledProcessError, e:
         syslog.syslog("archive file copy problem: "+', '.join(cmd)+str(e.output))
+        adGlobal.mutex.release()
         continue;
+      finally:
+        adGlobal.mutex.release()
 
     if imageDebug:  print "imgPath:",imgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
     if imageDebug: print "flgPath:",flgPath,"to host",hostCount,"-",hosts[hostCount]['ip']
@@ -303,6 +318,7 @@ def imageLookupLoop():
     +str(inspect.currentframe().f_lineno))
   if ((searchType != "Archive") and adGlobal.doArchive ):
     if debug: print "archiving cacheDir"
+    adGlobal.mutex.acquire()
     try:
       tmpFile="/tmp/tarFiles";
       f = open(tmpFile,"w");
@@ -322,6 +338,9 @@ def imageLookupLoop():
       syslog.syslog("archive complete")
     except subprocess.CalledProcessError, e:
       syslog.syslog("archive problem: "+', '.join(cmd)+str(e.output))
+    finally:
+      adGlobal.mutex.release()
+      
       
   if hangDebug: syslog.syslog("Hang debug:"
     +__file__+" "

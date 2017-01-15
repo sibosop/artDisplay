@@ -45,16 +45,21 @@ def displayImage(img):
     
   currentProc = p
   currentImg=img
+  adGlobal.mutex.acquire()
   os.unlink(currentImg)
+  adGlobal.mutex.release()
   return None
 
 def getImage():
   global timestamp;
   stampFile = adGlobal.timeStampFile;
   if os.path.isfile(stampFile):
+    adGlobal.mutex.acquire()
     timestamp = os.path.getmtime(stampFile)
-
+    adGlobal.mutex.release()
+  adGlobal.mutex.acquire()
   filenames = next(os.walk(imageDir))[2]
+  adGlobal.mutex.release()
   for f in filenames:
     if debug:
       syslog.syslog("filename:"+f)
@@ -69,8 +74,10 @@ def getImage():
       print"flag ext = ",flag
     if flag == flagExt:
       delFile = imageDir+'/'+f
+      adGlobal.mutex.acquire()
       flagTimeStamp = os.path.getctime(delFile);
       os.unlink(delFile)
+      adGlobal.mutex.release()
       root = f[:ext]
       for se in imageExts:
         look=imageDir+'/'+root+se;
@@ -83,7 +90,9 @@ def getImage():
                 + " timestamp:"+str(timestamp))
           if flagTimeStamp < timestamp:
             syslog.syslog("deleting out of date image:"+look);
+            adGlobal.mutex.acquire()
             os.unlink(look)
+            adGlobal.mutex.release()
           else:
             syslog.syslog("returning for display: "+look);
             return look

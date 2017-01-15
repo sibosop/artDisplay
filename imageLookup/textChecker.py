@@ -29,7 +29,9 @@ def getText():
       path =  imageDir + "/" + f
       lines = open(path).read().split('\n')
       if len(lines) > 1:
+        adGlobal.mutex.acquire()
         os.unlink(path)
+        adGlobal.mutex.release()
         return lines
       
   return None

@@ -3,6 +3,8 @@ import platform
 import os
 import syslog
 import subprocess
+from threading import Lock
+mutex = Lock()
 
 debug=False
 home="/home/pi"
