@@ -49,6 +49,7 @@ Here is the current hardware used:
 
 * start ssh session on the pi from *local machine*
   * `ssh pi@<ip_addr>`
+  * `sudo dpkg-reconfigure tzdata`
   * `mkdir .ssh`
   * `cd !$`
   * `vi authorized_keys`
