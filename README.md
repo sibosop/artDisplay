@@ -30,7 +30,7 @@ Here is the current hardware used:
 
 #### Boot steps
 * Make NOOBS boot sd card
-* insert wifi dongle
+* insert wifi dongle (not needed for pi3s)
 * Do first NOOBS/setup boot with USB keyboard/Mouse and standard HDMI terminal
 * disable power management to stop wifi from constantly disconnecting
   * start a terminal window
