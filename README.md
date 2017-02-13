@@ -127,7 +127,7 @@ Here is the current hardware used:
   * `crontab -e`
   * add these lines
    * MAILTO=""
-   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/artDisplay.py
+   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display .0:0 once
 #### to change to a different wifi router
@@ -135,9 +135,11 @@ Here is the current hardware used:
  * sudo vi /etc/wpa_supplicant/wpa_supplicant.conf  is where wifi info is store. remove old wifi info, add new etc
  * slptool findsrvs service:artdisplay.x will give you addresses of all connected devices
  * To get rid of the 'known host problems' figure out the router ip and add these lines to ~/.ssh/config
+  * LogLevel=QUIET
   * Host 192.168.10.*
   * StrictHostKeyChecking no
   * UserKnownHostsFile=/dev/null
+  * LogLevel=QUIET
 
 
 
