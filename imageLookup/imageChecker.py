@@ -7,12 +7,14 @@ import adGlobal
 import syslog
 import signal
 import sys
+import inspect
 debug = False
 flagExt=".flg"
 currentProc = None
 currentImg = None
 timestamp = 0;
 
+hangDebug=True;
 
 
 
@@ -32,6 +34,9 @@ def displayImage(img):
     print "display ",img
   #syslog.syslog("calling feh with "+img);
   try:
+    if hangDebug: syslog.syslog("Hang debug:"
+		+__file__+" "
+		+str(inspect.currentframe().f_lineno))
     p = subprocess.Popen("/usr/bin/feh -Z -F "+img,shell=True, preexec_fn=os.setpgrp)
   except:
     e = sys.exc_info()[0]
@@ -41,12 +46,24 @@ def displayImage(img):
   if currentProc is not None:
     if debug:
       print "kill ",os.getpgid(currentProc.pid)
+    if hangDebug: syslog.syslog("Hang debug:"
+		+__file__+" "
+		+str(inspect.currentframe().f_lineno))
     os.killpg(os.getpgid(currentProc.pid), signal.SIGTERM) 
     
   currentProc = p
   currentImg=img
+  if hangDebug: syslog.syslog("Hang debug:"
+	+__file__+" "
+	+str(inspect.currentframe().f_lineno))
   adGlobal.mutex.acquire()
+  if hangDebug: syslog.syslog("Hang debug:"
+		+__file__+" "
+		+str(inspect.currentframe().f_lineno))
   os.unlink(currentImg)
+  if hangDebug: syslog.syslog("Hang debug:"
+		+__file__+" "
+		+str(inspect.currentframe().f_lineno))
   adGlobal.mutex.release()
   return None
 

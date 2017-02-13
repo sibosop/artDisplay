@@ -8,9 +8,10 @@ import syslog
 
 
 def watchdog(signum,frame):
-  syslog.syslog("watchdog handler rebooting")
-  subprocess.check_output(["sudo","reboot"])
+  syslog.syslog("watchdog handler causing exit")
+  #subprocess.check_output(["sudo","reboot"])
   time.sleep(10)
+  exit(-1)
   
 def testThread():
   len  = 1

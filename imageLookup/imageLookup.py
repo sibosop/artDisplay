@@ -36,6 +36,8 @@ def getCmdVars(ip):
   else:
     cmdVars.append("scp")
     cmdVars.append("-q")
+    cmdVars.append("-o")
+    cmdVars.append("LogLevel=QUIET")
     cmdVars.append("-B")
   return cmdVars;
   
@@ -354,6 +356,7 @@ def imageLookupLoop():
 
 def imageLookup():
   loopStart= time.time()
+  signal.alarm(30)
   while True:
     signal.alarm(300)
     syslog.syslog("ImageLookup Loop Time "+str(time.time()-loopStart))

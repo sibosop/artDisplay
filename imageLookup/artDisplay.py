@@ -19,8 +19,9 @@ import adGlobal
 def watchdog(signum,frame):
   syslog.syslog("watchdog handler rebooting")
   syslog.syslog(traceback.format_exc())
-  subprocess.check_output(["sudo","reboot"])
+  #subprocess.check_output(["sudo","reboot"])
   time.sleep(10)
+  exit(-1)
 
 def changeSearch(s):
   syslog.syslog("changing search type to "+s)
