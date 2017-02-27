@@ -118,6 +118,7 @@ Here is the current hardware used:
  * `sudo -H pip install schedule`
  * `sudo apt-get install xscreensaver`
  * `sudo apt-get install unclutter`
+ * `sudo apt-get install vim`
  
 #### setting up unit for run
  * the master needs the jumper mentioned above
