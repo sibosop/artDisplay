@@ -15,4 +15,6 @@ sudo -H pip install --upgrade google-api-python-client
 sudo -H pip install schedule
 sudo apt-get -y install xscreensaver
 sudo apt-get -y install unclutter
+sudo apt-get -y install vim
+sudo apt-get -y install python-pygame
 
