@@ -5,7 +5,7 @@ import sys
 import adGlobal
 import syslog
 import time
-debug = True
+debug = False
 
 
 pygame.init()
@@ -23,6 +23,7 @@ def printText(text):
     maxWidth = max(label1.get_width(),label2.get_width())
     maxHeight = label1.get_height() + label2.get_height() + lineSpacing 
     wordRect = pygame.Surface((maxWidth,maxHeight))
+    screen.fill((0,0,0));
     if maxWidth == label1.get_width():
         wordRect.blit(label1, (0, 0))
         offset = (maxWidth - label2.get_width()) / 2

@@ -15,6 +15,7 @@ import traceback
 import signal
 import schedule
 import adGlobal
+import dispTextChecker
 
 def watchdog(signum,frame):
   syslog.syslog("watchdog handler rebooting")
@@ -30,7 +31,7 @@ def changeSearch(s):
 
 if __name__ == '__main__':
   syslog.syslog("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
-  debug = False
+  debug = True
   signal.signal(signal.SIGALRM, watchdog)
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog("starting artDisplay.py")
@@ -43,6 +44,12 @@ if __name__ == '__main__':
   hp=panel.hasPanel()
   if hp:
     regs.append("hasPanel=true")
+
+  dt = master.isDispText();
+  if dt:
+    regs.append("isDispText=true");
+
+  if debug: syslog.syslog("regs:"+str(regs));
   test = subprocess.check_call(regs)
 
   try:
@@ -52,15 +59,23 @@ if __name__ == '__main__':
     
     if hp:
       tc.start()
+
+    td = threading.Thread(target=dispTextChecker.dispTextChecker)
+    td.setDaemon(True);
+    if dt:
+      syslog.syslog("starting text disp daemon");
+      td.start()
     
     im = master.isMaster()
     ti = threading.Thread(target=imageLookup.imageLookup)
     ti.setDaemon(True)
     if im:
       ti.start()  
+
     tic = threading.Thread(target=imageChecker.imageChecker)
     tic.setDaemon(True)
-    tic.start()
+    if dt is False:
+      tic.start()
     #schedule.every().day.at("07:34").do(changeSearch,"Google")
     #schedule.every().day.at("08:14").do(changeSearch,"Archive")
     #schedule.every().day.at("20:00").do(changeSearch,"Bing")
@@ -71,7 +86,10 @@ if __name__ == '__main__':
         tc.join(1)  
       if im:
         ti.join(1)
-      tic.join(1)
+      if dt:
+        td.join(1)
+      else:
+        tic.join(1)
   except:
     e = sys.exc_info()[0]
     syslog.syslog("return from exception "+str(e))
