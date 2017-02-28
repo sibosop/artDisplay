@@ -6,7 +6,7 @@ import adGlobal
 import panel
 import syslog
 import sys
-debug = True
+debug = False
 
 
       
