@@ -6,27 +6,27 @@ import adGlobal
 import panel
 import syslog
 import sys
-debug = False
+debug = True
 
 
       
 textExt = ".lkp"
 def getText():
-  filenames = next(os.walk( imageDir))[2]
+  filenames = next(os.walk( adGlobal.imageDir))[2]
   for f in filenames:
     if debug:
-      print "filename:",f
+      syslog.syslog( "filename:"+f )
     try:
       ext = f.rindex(textExt)
     except ValueError:
       if debug:
-        print "not lookup text file"
+        syslog.syslog( "not lookup text file" )
       continue
     flag = f[ext:]
     if flag == textExt:  
       if debug:
-        print "found text file",f
-      path =  imageDir + "/" + f
+          syslog.syslog("found text file:"+f)
+      path =  adGlobal.imageDir + "/" + f
       lines = open(path).read().split('\n')
       if len(lines) > 1:
         adGlobal.mutex.acquire()
@@ -41,9 +41,6 @@ def textChecker():
     syslog.syslog("exiting")
     return
     
-  global  imageDir
-  imageDir=adGlobal.imageDir
-
   
   count=0
   syslog.syslog("text checker started successfully")

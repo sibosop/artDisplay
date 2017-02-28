@@ -10,6 +10,7 @@ debug=False
 home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
+fontDir="../fonts"
 imageDest="GitProjects/artDisplay/imageLookup/"+imageDir
 defaultImg="./splash.jpg"
 bingFile="./corncob_lowercase.txt"
@@ -25,6 +26,7 @@ archiveCache='../archiveCache'
 textName='newText.lkp'
 credFile='/media/pi/ARCHIVE/creds.txt'
 timeStampFile = '/tmp/adTimeStamp'
+lineSpacing = 20
   
 def isLocalHost(ip):
   plats=platform.platform().split('-');
