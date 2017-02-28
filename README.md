@@ -102,6 +102,9 @@ Here is the current hardware used:
  * `vi ~/.ssh/id_rsa.pub`
  * copy the ~/.ssh/id_rsa.pub to github
  * `git clone git@github.com:sibosop/artDisplay.git`
+ * `cd artDisplay`
+ * `git config --global user.email "brian@eastshore.com"`
+ * `git config --global user.name "brian reinbolt"`
  * (there is a script packageSetup.sh that will do the following)
  * `sudo pip install beautifulsoup4`
  * `sudo apt-get install gcc python-dev`
