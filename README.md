@@ -119,6 +119,7 @@ Here is the current hardware used:
  * `sudo apt-get install xscreensaver`
  * `sudo apt-get install unclutter`
  * `sudo apt-get install vim`
+ * `sudo apt-get install python-pygame`
  
 #### setting up unit for run
  * the master needs the jumper mentioned above
