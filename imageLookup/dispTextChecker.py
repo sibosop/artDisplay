@@ -7,11 +7,14 @@ import syslog
 import time
 debug = False
 
+screen=None
+myfont=None
 
-pygame.init()
-pygame.mouse.set_visible(False);
-screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-myfont = pygame.font.Font(adGlobal.fontDir + "/Watchword_bold_demo.otf", 200)
+def setup():
+  pygame.init()
+  pygame.mouse.set_visible(False);
+  screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+  myfont = pygame.font.Font(adGlobal.fontDir + "/Watchword_bold_demo.otf", 200)
 
 def printText(text):
     global screen
@@ -43,6 +46,7 @@ def printText(text):
     pygame.display.flip() 
 
 def dispTextChecker():
+    setup()
     imageDir=adGlobal.imageDir
     count=0
     syslog.syslog("disp text checker started successfully")
