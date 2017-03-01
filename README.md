@@ -33,15 +33,16 @@ Here is the current hardware used:
 * insert wifi dongle (not needed for pi3s)
 * ssh is no longer enabled, you must enable it
 * start a terminal window
-* sudo raspi-config
+* `sudo raspi-config`
+* get the ip addr `hostname -I`
+* `ssh pi@<ip_addr>`
 * Do first NOOBS/setup boot with USB keyboard/Mouse and standard HDMI terminal
 * disable power management to stop wifi from constantly disconnecting
 * `sudo vi /etc/modprobe.d/8192cu.conf`
 * add the line `options 8192cu rtw_power_mgnt=0 rtw_enusbss=0`
 * reboot
 * connect to the wifi using the screen icon on the right corner, use right button to enter passcode
-* on terminal window get the ip addr `hostname -I`
-
+* on terminal window 
 * using that address verify the you can log into the pi from devel machine with `ssh pi@<ip_addr>` 
 * password is raspberry
 * raspberry pi now complains about raspberry password, set it to the router password
