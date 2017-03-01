@@ -17,7 +17,6 @@ import uuid
 import archive
 import traceback
 import ssl
-import fehtest
 import datetime
 import signal
 import inspect
@@ -65,17 +64,6 @@ def getRawImage(image):
       raw_img = con.read()
       #raw_img = urllib2.urlopen(images[imageIndex]).read()
       if imageDebug: syslog.syslog( "elapsed:"+str(time.time() - startTime))
-      tmpPath = "/tmp/fehTest.jpg"
-      adGlobal.mutex.acquire()
-      f = open(tmpPath, 'wb')
-      f.write(raw_img)
-      f.close()
-      adGlobal.mutex.release()
-      if fehtest.fehTest(tmpPath) != 0:
-        syslog.syslog( "feh fails for "+image[t] )
-        continue;
-      else:
-        if imageDebug: syslog.syslog( "feh test good for",image[t] )
       break;
     except:
       syslog.syslog("return from exception for type "
@@ -83,7 +71,6 @@ def getRawImage(image):
       syslog.syslog("elapsed:"+str(time.time() - startTime))
       syslog.syslog(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
       syslog.syslog(traceback.format_exc())
-      adGlobal.mutex.release()
       continue;
     finally:
       adGlobal.mutex.release()
