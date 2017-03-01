@@ -185,6 +185,12 @@ def imageLookupLoop():
     +__file__+" "
     +str(inspect.currentframe().f_lineno))
   for image in images:
+    if hosts[hostCount]['isDispText']:
+      if dispDebug: syslog.syslog("skipping image store for:"+hosts[hostCount]['ip'])
+      hostCount += 1
+      if hostCount == len(hosts):
+        hostCount=0
+
     if ( searchType != "Archive"):
       if hangDebug: syslog.syslog("Hang debug:"
         +__file__+" "
@@ -228,19 +234,16 @@ def imageLookupLoop():
         continue;
       finally:
         adGlobal.mutex.release()
-    if hosts[hostCount]['isDispText']:
-	if dispDebug: syslog.syslog("skipping images for "+hosts[hostCount]['ip'])
-    else:
-    	if imageDebug:  syslog.syslog( "imgPath:"
+    if imageDebug:  syslog.syslog( "imgPath:"
 		+imgPath
 		+"to host"
 		+str(hostCount)+"-"+hosts[hostCount]['ip'])
-    	if imageDebug: syslog.syslog( "flgPath:"+flgPath
+    if imageDebug: syslog.syslog( "flgPath:"+flgPath
 			+"to host"
 			+str(hostCount)
 			+"-"+hosts[hostCount]['ip'])
-    	copyList[hosts[hostCount]['ip']]['image'].append(imgPath)
-    	copyList[hosts[hostCount]['ip']]['flag'].append(flgPath)
+    copyList[hosts[hostCount]['ip']]['image'].append(imgPath)
+    copyList[hosts[hostCount]['ip']]['flag'].append(flgPath)
     hostCount += 1
     if hostCount == len(hosts):
       hostCount=0
