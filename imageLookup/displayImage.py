@@ -31,25 +31,38 @@ def displayImage(img):
     except:
         syslog.syslog("display Image can't render "+img)
         return;
-    sw=screen.get_width()
-    sh=screen.get_height()
-    iw = image.get_width()
-    ih = image.get_height()
-    iratio = float(iw) / float(ih)
-    dw = iratio * sh
-    
+    ws=screen.get_width()
+    hs=screen.get_height()
+    rs = float(ws)/float(hs)
+    wi = image.get_width()
+    hi = image.get_height()
+    ri = float(wi)/float(hi)
+    dw = 0
+    dh = 0
 
-    simage = pygame.transform.scale(image,(int(dw),sh))
-    xoffset = (sw - simage.get_width()) / 2
-    if debug: syslog.syslog("displayImage sw:"+str(sw) 
-            + " sh:"+str(sh) 
-            + " ratio:"+str(iratio)
-            +" iw:"+str(iw) 
-            + " ih:"+str(ih) 
+    if rs > ri:
+        dw = wi * (float(hs)/float(hi))
+        dh = hs
+    else:
+        dw = ws
+        dh = hi * (float(ws)/float(wi))
+
+    simage = pygame.transform.scale(image,(int(dw),int(dh)))
+    xoffset = (ws - simage.get_width()) / 2
+    yoffset = (hs - simage.get_height()) / 2
+    if debug: syslog.syslog("displayImage ws:"+str(ws) 
+            + " hs:"+str(hs) 
+            + " rs:"+str(rs)
+            +"  wi:"+str(wi) 
+            + " hi:"+str(hi) 
+            + " ri:"+str(ri) 
+            + " dw:"+str(dw) 
+            + " dh:"+str(dh) 
             + " xoffset:"+str(xoffset) 
-            + " dw:"+str(dw))
-    screen.fill((0,0,0));
-    screen.blit(simage,(xoffset,0)) 
+            + " yoffset:"+str(yoffset) 
+            )
+    screen.fill((0,0,0))
+    screen.blit(simage,(xoffset,yoffset)) 
     pygame.display.flip() 
 
 
