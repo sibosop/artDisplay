@@ -136,7 +136,7 @@ Here is the current hardware used:
    * MAILTO=""
    * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh
  * with any luck the system will start after reboot
- * unclutter removes cursor. You may need to run unclutter -display .0:0 once
+ * unclutter removes cursor. You may need to run unclutter -display :0.0 once
 #### to change to a different wifi router
  * use screen to connect to wifi
  * `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`  is where wifi info is store. remove old wifi info, add new etc
