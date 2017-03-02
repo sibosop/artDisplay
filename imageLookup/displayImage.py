@@ -25,11 +25,11 @@ def displayImage(img):
     global screen
     global setupDone
     setup()
-    # render text
     try:
         image = pygame.image.load(img);
     except:
         syslog.syslog("display Image can't render "+img)
+        image = pygame.image.load(adGlobal.defaultImg)
         return;
     ws=screen.get_width()
     hs=screen.get_height()
