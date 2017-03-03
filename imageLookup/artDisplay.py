@@ -43,7 +43,9 @@ if __name__ == '__main__':
     if debug: syslog.syslog("test host:"+str(v))
     if len(v) == 4 and v[2] == adGlobal.subnet:
       shost = h
-      if debug: syslog.syslog("found subnet " + adGlobal.subnet + " using:" + shost);
+      if debug: syslog.syslog("found subnet " 
+        + adGlobal.subnet 
+        + " using:" + shost)
       break
 
   test = subprocess.check_call(["sudo","service","slpd","start"])

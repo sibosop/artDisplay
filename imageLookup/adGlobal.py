@@ -7,7 +7,7 @@ import urllib2
 from threading import Lock
 mutex = Lock()
 
-debug=False
+debug=True
 home="/home/pi"
 imageDir='../Images'
 cacheDir="../ImageCache"
@@ -41,7 +41,10 @@ def isLocalHost(ip):
   plats=platform.platform().split('-');
   if plats[0] == 'Darwin':
     return False
-  myIp = subprocess.check_output(["hostname","-I"]).split()[0]
-  if debug: print "ip:",ip
-  if debug: print "myIp:",myIp
-  return myIp == ip
+  myIp = subprocess.check_output(["hostname","-I"]).split()
+  for i in myIp:
+    if debug: print "ip:",ip
+    if debug: print "myIp:",i
+    if i == ip:
+      return true
+  return false
