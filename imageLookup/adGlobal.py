@@ -3,6 +3,7 @@ import platform
 import os
 import syslog
 import subprocess
+import urllib2
 from threading import Lock
 mutex = Lock()
 
@@ -27,6 +28,13 @@ textName='newText.lkp'
 credFile='/media/pi/ARCHIVE/creds.txt'
 timeStampFile = '/tmp/adTimeStamp'
 lineSpacing = 20
+
+def internetOn():
+  try:
+    urllib2.urlopen('http://216.58.192.142', timeout=1)
+    return True
+  except urllib2.URLError as err: 
+    return False
   
 def isLocalHost(ip):
   plats=platform.platform().split('-');

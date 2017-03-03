@@ -17,4 +17,7 @@ sudo apt-get -y install xscreensaver
 sudo apt-get -y install unclutter
 sudo apt-get -y install vim
 sudo apt-get -y install python-pygame
-
+sudo -H pip install gTTS
+sudo -H pip install pydub
+sudo apt-get -y install libav-tools
+sudo apt-get -y install espeak

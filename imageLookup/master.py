@@ -21,8 +21,18 @@ def isDispText():
     return False;
   syslog.syslog("is disp text")
   return True;
+
+def hasAudio():
+  GPIO.setmode(GPIO.BCM)
+  GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  if GPIO.input(5):
+    syslog.syslog("no audio");
+    return False;
+  syslog.syslog("has audio")
+  return True;
   
 if __name__ == '__main__':
   isMaster()
   isDispText()
+  hasAudio()
 
