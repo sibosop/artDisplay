@@ -28,6 +28,7 @@ textName='newText.lkp'
 credFile='/media/pi/ARCHIVE/creds.txt'
 timeStampFile = '/tmp/adTimeStamp'
 lineSpacing = 20
+subnet="10"
 
 def internetOn():
   try:

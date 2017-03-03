@@ -36,11 +36,18 @@ if __name__ == '__main__':
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog("starting artDisplay.py")
   host = subprocess.check_output(["hostname","-I"]).split();
-  if debug:
-    syslog.syslog("host ="+host[0])
-    
+  shost = host[0]
+  for h in host:
+    if debug: syslog.syslog("check host ="+h)
+    v = h.split('.')
+    if debug: syslog.syslog("test host:"+str(v))
+    if len(v) == 4 and v[2] == adGlobal.subnet:
+      shost = h
+      if debug: syslog.syslog("found subnet " + adGlobal.subnet + " using:" + shost);
+      break
+
   test = subprocess.check_call(["sudo","service","slpd","start"])
-  regs=["slptool","register","service:artdisplay.x://"+host[0]]
+  regs=["slptool","register","service:artdisplay.x://"+shost]
   hp=panel.hasPanel()
   if hp:
     regs.append("hasPanel=true")
