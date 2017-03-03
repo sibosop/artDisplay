@@ -126,7 +126,9 @@ Here is the current hardware used:
  * `sudo apt-get install vim`
  * `sudo apt-get install python-pygame`
  * `sudo -H pip install gTTS`
- 
+ * `sudo -H pip install pydub`
+ * `sudo apt-get install libav-tools`
+ * `sudo apt-get install espeak`
 #### setting up unit for run
  * the master needs the jumper mentioned above
  * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
