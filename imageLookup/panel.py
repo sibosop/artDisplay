@@ -24,9 +24,9 @@ def setRow(r):
 
 def printText(t):
     clear()
-    if debug: print "len:",t[0],len(t[0])
+    if debug: syslog.syslog("panel len:"+str(t[0])+str(len(t[0])))
     ser.write('{0: ^16}'.format(t[0]).upper())
-    if debug: print "len:",t[1],len(t[1])
+    if debug: syslog.syslog("panel len:"+str(t[1])+str(len(t[1])))
     setRow(1)
     ser.write('{0: ^16}'.format(t[1]).upper())
     

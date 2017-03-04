@@ -38,7 +38,7 @@ def getText():
 
 def textChecker():
   if not panel.setUpPanel():
-    syslog.syslog("exiting")
+    syslog.syslog("text checker exiting: no Panel")
     return
     
   
@@ -47,14 +47,14 @@ def textChecker():
   while True:
     if debug:
       count += 1
-      print "checking for text. count:",count
+      syslog.syslog( "checking for text. count:"+str(count))
     text = getText();
     if text == None:
       if debug:
-        print "no text"
+        syslog.syslog("no text")
     else:
       if debug:
-        print "found test",text
+        syslog.syslog("found text"+str(text))
       panel.printText(text)
     time.sleep(5)
     
