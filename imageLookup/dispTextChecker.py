@@ -16,7 +16,7 @@ screen=None
 myfont=None
 setupDone=False
 Gran=500
-hasAudio=False
+hasAudio=True
 count=0
 voiceChan=None
 voiceSound=None
@@ -34,14 +34,14 @@ def setup():
   if setupDone:
       return
   hasAudio = master.hasAudio()
-  #if hasAudio:
-  #  pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
+  if hasAudio:
+    pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
   pygame.init()
   pygame.mouse.set_visible(False);
   screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
   myfont = pygame.font.Font(adGlobal.fontDir + "/Watchword_bold_demo.otf", 200)
   pygame.init()
-  if hasAudio and debug:
+  if hasAudio:
     syslog.syslog("soundtrack:"+str( pygame.mixer.get_init() ))
   pygame.time.set_timer(TimerEvent, int(Gran))
   voiceChan = pygame.mixer.Channel(0)
