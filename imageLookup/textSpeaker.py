@@ -48,7 +48,7 @@ def makeSpeakFile(line):
       if debug: syslog.syslog("playText line:"+line)
       fname = fnameRoot + ".mp3"
       if debug: syslog.syslog("speak:"+fname)
-      tts1=gTTS(text=line,lang='en')
+      tts1=gTTS(text=line,lang='en-uk')
       tts1.save(fname)
       if debug: syslog.syslog("speak:"+fname)
       sound = AudioSegment.from_mp3(fname)
