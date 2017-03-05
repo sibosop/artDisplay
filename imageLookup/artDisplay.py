@@ -60,12 +60,10 @@ if __name__ == '__main__':
 
   if debug: syslog.syslog("regs:"+str(regs));
   test = subprocess.check_call(regs)
-
   try:
     os.environ["DISPLAY"] = ":0.0"
     tc = threading.Thread(target=textChecker.textChecker)
     tc.setDaemon(True)
-    
     if hp:
       tc.start()
 
@@ -101,4 +99,4 @@ if __name__ == '__main__':
         tic.join(1)
   except:
     e = sys.exc_info()[0]
-    syslog.syslog("return from exception "+str(e))
+    syslog.syslog(sys.argv[0]+":return from exception "+str(e))
