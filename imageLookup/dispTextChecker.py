@@ -206,7 +206,9 @@ def checkText():
     printText(text)
     if master.hasAudio():
       speakText = text[0]+" "+text[1]
-      file=textSpeaker.makeSpeakFile(speakText)
+      file=None
+      while file is None:
+        file=textSpeaker.makeSpeakFile(speakText)
       voiceSound = pygame.mixer.Sound(file)
       voiceChan = pygame.mixer.find_channel()
       voiceChan.set_endevent(VoiceDoneEvent);
