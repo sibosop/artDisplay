@@ -11,7 +11,7 @@ import wave
 import audioop
 from gtts import gTTS
 from pydub import AudioSegment
-debug = True
+debug = False
 
 def convertSampleRate(fname):
   spf = wave.open(fname, 'rb')

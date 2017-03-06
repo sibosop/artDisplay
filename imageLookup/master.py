@@ -4,6 +4,8 @@ import RPi.GPIO as GPIO
 import syslog
 import sys
 
+debug=False
+
 def isMaster():
   GPIO.setmode(GPIO.BCM)
   GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -26,9 +28,9 @@ def hasAudio():
   GPIO.setmode(GPIO.BCM)
   GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
   if GPIO.input(5):
-    syslog.syslog("no audio");
+    if debug: syslog.syslog("no audio");
     return False;
-  syslog.syslog("has audio")
+  if debug: syslog.syslog("has audio")
   return True;
   
 if __name__ == '__main__':

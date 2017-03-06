@@ -11,12 +11,13 @@ import random
 import os
 debug = False
 debugFound = True
+debugSoundTrack=True
+debugSoundTrack=True
 
 screen=None
 myfont=None
 setupDone=False
 Gran=500
-hasAudio=True
 count=0
 voiceChan=None
 voiceSound=None
@@ -25,11 +26,66 @@ voiceExt = ".wav"
 TimerEvent = pygame.USEREVENT
 VoiceDoneEvent = pygame.USEREVENT+1
 VoiceReadyEvent = pygame.USEREVENT+2
+BackgroundDoneEvent = pygame.USEREVENT+3
+EventDoneEvent=pygame.USEREVENT+4
+EventReadyEvent=pygame.USEREVENT+5
+backgroundSound=None
+backgroundChan=None
+eventChan=None
+eventSounds=None
+
+def setNewSoundTrack():
+  global backgroundSound
+  global backgroundChan
+  filenames = next(os.walk( adGlobal.backgroundDir))[2]
+  choice = random.choice(filenames)
+  if debugSoundTrack: syslog.syslog("setNewSoundTrack background file choice:"+choice)
+  backgroundSound = pygame.mixer.Sound(adGlobal.backgroundDir+choice)
+  if backgroundChan is None:
+    backgroundChan = pygame.mixer.Channel(1)
+    backgroundChan.set_volume(0.2)
+    backgroundChan.play(backgroundSound,fade_ms=5000)
+  else:
+    backgroundChan.fadeout(2000)
+  backgroundChan.set_endevent(BackgroundDoneEvent)
+
+def playEvent():
+  numEvents = len(eventSounds)
+  choice = random.randint(0,numEvents-1) 
+  syslog.syslog("soundTrack numEvents:"+str(numEvents)+" choice:"+str(choice))
+  sound  = eventSounds[choice]
+  eventChan.set_volume(random.random(),random.random())
+  eventChan.set_endevent(EventDoneEvent)
+  eventChan.play(sound)
+
+  
+
+def newEvents():
+  global eventSounds
+  global eventChan
+  syslog.syslog("new events")
+  if eventSounds is None:
+    eventSounds=[]
+    syslog.syslog("eventdir ="+adGlobal.eventDir)
+    filenames = next(os.walk( adGlobal.eventDir))[2]
+    for f in filenames:
+      sfile=adGlobal.eventDir+f
+      syslog.syslog("sountrack loading:"+sfile)
+      eventSounds.append(pygame.mixer.Sound(sfile))
+    if eventChan is None:
+     eventChan = pygame.mixer.Channel(2)
+    pygame.time.set_timer(EventReadyEvent, random.randint(100,4000))
+    
+    
+
+
+
+
+
 def setup():
   global screen
   global myfont
   global setupDone
-  global hasAudio
   global voiceChan
   if setupDone:
       return
@@ -42,7 +98,7 @@ def setup():
   myfont = pygame.font.Font(adGlobal.fontDir + "/Watchword_bold_demo.otf", 200)
   pygame.init()
   if hasAudio:
-    syslog.syslog("soundtrack:"+str( pygame.mixer.get_init() ))
+    syslog.syslog("soundTrack:"+str( pygame.mixer.get_init() ))
   pygame.time.set_timer(TimerEvent, int(Gran))
   voiceChan = pygame.mixer.Channel(0)
   setupDone = True
@@ -52,16 +108,16 @@ def newVoice():
   filenames = next(os.walk( adGlobal.voiceDir))[2]
   for f in filenames:
     if debug:
-      syslog.syslog( "soundTrack: filename:"+f )
+      syslog.syslog( "newVoice: filename:"+f )
     try:
       ext = f.rindex(voiceExt)
     except ValueError:
       if debug:
-        syslog.syslog( "soundTrack: not lookup text file" )
+        syslog.syslog( "newVoice: not lookup text file" )
       continue
     flag = f[ext:]
     if flag == voiceExt:
-      if debug: syslog.syslog("soundTrack found voice file:"+f)
+      if debug: syslog.syslog("newVoice found voice file:"+f)
       fname = adGlobal.voiceDir + "/" + f
       os.unlink(fname)
 
@@ -96,9 +152,9 @@ def printText(text):
 
 def checkText():
   global count
-  global hasAudio
   global voiceChan
   global voiceSound
+  rval = False
   if debug: 
     count += 1
     syslog.syslog( "disp text checking for text. count:"+str(count) )
@@ -107,10 +163,11 @@ def checkText():
     if debug:
         syslog.syslog( "disp text no text" )
   else:
+    rval = True
     if debugFound:
         syslog.syslog("disp text found text:"+str(text))
     printText(text)
-    if hasAudio:
+    if master.hasAudio():
       speakText = text[0]+" "+text[1]
       file=textSpeaker.makeSpeakFile(speakText)
       voiceSound = pygame.mixer.Sound(file)
@@ -118,6 +175,8 @@ def checkText():
       voiceChan.set_endevent(VoiceDoneEvent);
       voiceChan.set_volume(random.random(),random.random())
       voiceChan.play(voiceSound,loops=0)
+      os.unlink(file)
+    return rval
   
 def dispTextChecker():
     global voiceChan
@@ -126,23 +185,34 @@ def dispTextChecker():
     imageDir=adGlobal.imageDir
     count=0
     syslog.syslog("disp text checker started successfully")
-    ha = master.hasAudio()
     while True:
       for event in pygame.event.get():
         if event.type == TimerEvent:
           if debug: syslog.syslog("TimerEvent:"+str(event))
-          checkText()
-          if ha:
-            newVoice()
+          if checkText():
+            if master.hasAudio():
+              syslog.syslog("calling new voice")
+              setNewSoundTrack()
+              newEvents()
         elif event.type == VoiceDoneEvent:
           pygame.time.set_timer(VoiceReadyEvent, 0)
-          voiceTimeout = random.randint(1000,10000)
-          syslog.syslog("VoiceDone replay:"+str(voiceTimeout));
+          voiceTimeout = random.randint(4000,10000)
+          if debug: syslog.syslog("VoiceDone replay:"+str(voiceTimeout));
           pygame.time.set_timer(VoiceReadyEvent, int(voiceTimeout))
         elif event.type == VoiceReadyEvent:
-          syslog.syslog("VoiceReadyEvent replay");
-          voiceChan.set_volume(random.random(),random.random())
-          voiceChan.play(voiceSound)
+          if master.hasAudio():
+            if debug: syslog.syslog("VoiceReadyEvent replay");
+            voiceChan.set_volume(random.random(),random.random())
+            voiceChan.play(voiceSound)
+        elif event.type == BackgroundDoneEvent:
+          syslog.syslog("backgroundDoneEvent");
+          backgroundChan.play(backgroundSound,fade_ms=5000)
+        elif event.type == EventDoneEvent:
+          nextTime = random.randint(3000,10000)
+          syslog.syslog("EventDoneEvent:"+str(event)+" nextTime:"+str(nextTime))
+          pygame.time.set_timer(EventReadyEvent, nextTime)
+        elif event.type == EventReadyEvent:
+          playEvent()
         elif event.type == pygame.QUIT:
           return
         else:

@@ -30,6 +30,10 @@ timeStampFile = '/tmp/adTimeStamp'
 lineSpacing = 20
 voiceDir="../tmp"
 subnet="10"
+soundDir="/media/pi/SOUND/"
+backgroundDir=soundDir+"background/"
+rythmnDir=soundDir+"rythmn/"
+eventDir=soundDir+"events/"
 
 def internetOn():
   try:
