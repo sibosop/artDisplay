@@ -12,7 +12,6 @@ import os
 debug = False
 debugFound = True
 debugSoundTrack=True
-debugSoundTrack=True
 
 screen=None
 myfont=None
@@ -33,6 +32,7 @@ backgroundSound=None
 backgroundChan=None
 eventChan=None
 eventSounds=None
+maxETimestamp=0
 
 def setNewSoundTrack():
   global backgroundSound
@@ -63,6 +63,7 @@ def playEvent():
 def newEvents():
   global eventSounds
   global eventChan
+  global maxETimestamp
   syslog.syslog("new events")
   if eventSounds is None:
     eventSounds=[]
@@ -70,11 +71,54 @@ def newEvents():
     filenames = next(os.walk( adGlobal.eventDir))[2]
     for f in filenames:
       sfile=adGlobal.eventDir+f
+      if debugSoundTrack:
+        syslog.syslog("filename:"+f)
+      try:
+        ext = f.rindex(".wav")
+      except ValueError:
+        if debugSoundTrack:
+          syslog.syslog(sfile+ ":not wav file")
+        continue
+      flag = f[ext:]
+      if debugSoundTrack:
+        syslog.syslog("flag ext = "+flag)
+      if flag != ".wav":
+        continue
+      t = os.path.getmtime(sfile)
+      maxETimestamp=max(t,maxETimestamp)
       syslog.syslog("sountrack loading:"+sfile)
       eventSounds.append(pygame.mixer.Sound(sfile))
     if eventChan is None:
-     eventChan = pygame.mixer.Channel(2)
+      eventChan = pygame.mixer.Channel(2)
     pygame.time.set_timer(EventReadyEvent, random.randint(100,4000))
+  else:
+    if debugSoundTrack: syslog.syslog("looking for new events:"+adGlobal.eventDir)
+    filenames = next(os.walk( adGlobal.eventDir))[2]
+    for f in filenames:
+      sfile=adGlobal.eventDir+f
+      if debugSoundTrack:
+        syslog.syslog("filename:"+f)
+      try:
+        ext = f.rindex(".wav")
+      except ValueError:
+        if debugSoundTrack:
+          syslog.syslog(sfile+ ":not wav file")
+        continue
+      flag = f[ext:]
+      if debug:
+        syslog.syslog("flag ext = "+flag)
+      if flag != ".wav":
+        continue
+      t = os.path.getmtime(sfile)
+      if t > maxETimestamp:
+        maxETimestamp = t
+        if debugSoundTrack: syslog.syslog("sountrack loading:"+sfile)
+        eventSounds.append(pygame.mixer.Sound(sfile))
+      else:
+        if debugSoundTrack: syslog.syslog("sountrack skipping:"+sfile)
+        
+    if eventChan is None:
+      eventChan = pygame.mixer.Channel(2)
     
     
 
