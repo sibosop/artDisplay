@@ -67,14 +67,20 @@ def getSonnet():
 
 GetSonnetEvent=pygame.USEREVENT
 LineDoneEvent=pygame.USEREVENT+1
-SonnetWaitEvent=pygame.USEREVENT+2
 
-def playText(l):
-  file = None
-  while file is None:
-    file = textSpeaker.makeSpeakFile(l)
-  sound = pygame.mixer.Sound(file)
-  os.unlink(file)
+def compileSonnet(sonnet):
+  global current
+  current = []
+  for l in sonnet:
+    file = None
+    while file is None:
+      file = textSpeaker.makeSpeakFile(l)
+    sound = pygame.mixer.Sound(file)
+    os.unlink(file)
+    current.append((l,sound));
+
+
+def playText(sound):
   chan = pygame.mixer.find_channel()
   chan.set_endevent(LineDoneEvent)
   chan.set_volume(.8,.8)
@@ -84,11 +90,11 @@ def playText(l):
 def nextLine():
   global current
   if len(current) == 0:
-    pygame.time.set_timer(SonnetWaitEvent,random.randint(2000,5000))
+    pygame.event.post(pygame.event.Event(GetSonnetEvent))
   else:
     l = current.pop(0)
-    playText(l)
-    displayText.displayText(l)
+    playText(l[1])
+    displayText.displayText(l[0])
 
 def sonnetLoop():
   global current
@@ -100,13 +106,11 @@ def sonnetLoop():
     for event in pygame.event.get():
       syslog.syslog("event:"+str(event))
       if event.type == GetSonnetEvent:
-        current = getSonnet()
+        sonnet = getSonnet()
+        compileSonnet(sonnet)
         nextLine()
       elif event.type == LineDoneEvent:
         nextLine()
-      elif event.type == SonnetWaitEvent:
-        pygame.time.set_timer(SonnetWaitEvent,0)
-        pygame.event.post(pygame.event.Event(GetSonnetEvent))
       else:
         syslog.syslog("unknown event:"+str(event))
 
