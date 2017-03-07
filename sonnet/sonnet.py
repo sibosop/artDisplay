@@ -1,12 +1,22 @@
 #!/usr/bin/env python
+import os
+home = os.environ['HOME']
+import sys
+
+
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+
 import syslog
 import time
 import random
 import re
 import displayText
+import textSpeaker
+import pygame
 
 debug = False
 numeral_map = None
+current = None
 
 def roman_to_int(n):
   n = n.strip()
@@ -54,11 +64,50 @@ def getSonnet():
           found = True
 
   return None
+
+GetSonnetEvent=pygame.USEREVENT
+LineDoneEvent=pygame.USEREVENT+1
+SonnetWaitEvent=pygame.USEREVENT+2
+
+def playText(l):
+  file = None
+  while file is None:
+    file = textSpeaker.makeSpeakFile(l)
+  sound = pygame.mixer.Sound(file)
+  chan = pygame.mixer.find_channel()
+  chan.set_endevent(LineDoneEvent)
+  chan.set_volume(.8,.8)
+  chan.play(sound)
   
+  
+def nextLine():
+  global current
+  if len(current) == 0:
+    pygame.time.set_timer(SonnetWaitEvent,random.randint(2000,5000))
+  else:
+    l = current.pop(0)
+    playText(l)
+    displayText.displayText(l)
+
+def sonnetLoop():
+  global current
+  pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
+  pygame.init()
+  pygame.mouse.set_visible(False)
+  pygame.event.post(pygame.event.Event(GetSonnetEvent))
+  while True:
+    for event in pygame.event.get():
+      syslog.syslog("event:"+str(event))
+      if event.type == GetSonnetEvent:
+        current = getSonnet()
+        nextLine()
+      elif event.type == LineDoneEvent:
+        nextLine()
+      elif event.type == SonnetWaitEvent:
+        pygame.time.set_timer(SonnetWaitEvent,0)
+        pygame.event.post(pygame.event.Event(GetSonnetEvent))
+      else:
+        syslog.syslog("unknown event:"+str(event))
 
 if __name__ == '__main__':
-  while True:
-    for l in getSonnet():
-      if debug: syslog.syslog(l)
-      displayText.displayText(l)
-      time.sleep(5)
+  sonnetLoop()

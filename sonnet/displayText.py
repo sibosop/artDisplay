@@ -19,13 +19,11 @@ def displayText(text):
   global lineLen
 
   if myFont is None:
-    pygame.init()
-    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-    pygame.mouse.set_visible(False)
     fontSize = 200
     lineSpace = 4
     lineLen = 16
     myFont = pygame.font.Font("../fonts/Watchword_bold_demo.otf", fontSize)
+    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 
   text=text.replace("."," ")
   text=text.strip()
