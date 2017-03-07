@@ -74,6 +74,7 @@ def playText(l):
   while file is None:
     file = textSpeaker.makeSpeakFile(l)
   sound = pygame.mixer.Sound(file)
+  os.unlink(file)
   chan = pygame.mixer.find_channel()
   chan.set_endevent(LineDoneEvent)
   chan.set_volume(.8,.8)
