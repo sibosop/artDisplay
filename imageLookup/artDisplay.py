@@ -32,6 +32,11 @@ def changeSearch(s):
 if __name__ == '__main__':
   syslog.syslog("art display at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   debug = True
+  try:
+    adGlobal.subnet = os.environ['SUBNET']
+  except:
+    if debug: syslog.syslog("subnet env not set")
+  syslog.syslog("artDisplay subnet:"+adGlobal.subnet)
   signal.signal(signal.SIGALRM, watchdog)
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog("starting artDisplay.py")
