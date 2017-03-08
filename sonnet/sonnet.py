@@ -2,6 +2,7 @@
 import os
 home = os.environ['HOME']
 import sys
+import threading
 
 
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
@@ -16,7 +17,9 @@ import pygame
 
 debug = False
 numeral_map = None
-current = None
+sonnetQueue=[]
+queueMutex=threading.Lock()
+
 
 def roman_to_int(n):
   n = n.strip()
@@ -65,54 +68,80 @@ def getSonnet():
 
   return None
 
-GetSonnetEvent=pygame.USEREVENT
-LineDoneEvent=pygame.USEREVENT+1
 
 def compileSonnet(sonnet):
-  global current
-  current = []
+  rval = []
   for l in sonnet:
     file = None
     while file is None:
       file = textSpeaker.makeSpeakFile(l)
     sound = pygame.mixer.Sound(file)
     os.unlink(file)
-    current.append((l,sound));
+    rval.append((l,sound));
+  return rval
+
+
+class sonnetQueueThread(threading.Thread):
+  def run(self):
+    maxQueueSize=3
+    global sonnetQueue
+    global queueMutex
+    while True:
+      queueMutex.acquire()
+      l = len(sonnetQueue)
+      queueMutex.release()
+      syslog.syslog("queue len:"+str(l))
+      if l < maxQueueSize:
+        sonnet = compileSonnet(getSonnet())
+        queueMutex.acquire()
+        sonnetQueue.append(sonnet)
+        queueMutex.release()
+      time.sleep(1)
 
 
 def playText(sound):
   chan = pygame.mixer.find_channel()
-  chan.set_endevent(LineDoneEvent)
   chan.set_volume(.8,.8)
   chan.play(sound)
+  return chan
   
   
-def nextLine():
-  global current
-  if len(current) == 0:
-    pygame.event.post(pygame.event.Event(GetSonnetEvent))
-  else:
-    l = current.pop(0)
-    playText(l[1])
-    displayText.displayText(l[0])
-
 def sonnetLoop():
-  global current
+  global sonnetQueue
   pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
   pygame.init()
   pygame.mouse.set_visible(False)
-  pygame.event.post(pygame.event.Event(GetSonnetEvent))
+  current = None
   while True:
-    for event in pygame.event.get():
-      syslog.syslog("event:"+str(event))
-      if event.type == GetSonnetEvent:
-        sonnet = getSonnet()
-        compileSonnet(sonnet)
-        nextLine()
-      elif event.type == LineDoneEvent:
-        nextLine()
+    qlen = 0
+    while qlen == 0:
+      queueMutex.acquire()
+      qlen = len(sonnetQueue)
+      queueMutex.release()
+      if qlen == 0:
+        syslog.syslog("waiting for sonnet queue")
+        time.sleep(1)
       else:
-        syslog.syslog("unknown event:"+str(event))
+        queueMutex.acquire()
+        current = sonnetQueue.pop(0)
+        queueMutex.release()
+        syslog.syslog("got a sonnet");
+        time.sleep(2)
+
+    first = True
+    for l in current:
+      chan = playText(l[1])
+      displayText.displayText(l[0])
+      while chan.get_busy():
+        time.sleep(0)
+      if first:
+        first = False
+        time.sleep(2)
 
 if __name__ == '__main__':
+  os.environ['DISPLAY']=":0.0"
+  t = sonnetQueueThread()
+  t.setDaemon(True)
+  t.start()
   sonnetLoop()
+  t.join()
