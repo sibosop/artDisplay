@@ -8,22 +8,23 @@ debug = False
 
 screen=None
 myFont=None
-lineSpace=None
 lineLen=None
 
 
 def displayText(text):
   global screen
   global myFont
-  global lineSpace
   global lineLen
 
   if myFont is None:
-    fontSize = 200
-    lineSpace = 4
+    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+    if screen.get_width() == 800:
+        fontSize = 90
+    else:
+        fontSize = 200
+    syslog.syslog("displayText setting fontSize:"+str(fontSize))
     lineLen = 16
     myFont = pygame.font.Font("../fonts/Watchword_bold_demo.otf", fontSize)
-    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 
   text=text.replace("."," ")
   text=text.strip()
@@ -52,14 +53,14 @@ def displayText(text):
     labels.append(label)
       
   numLabels = len(labels)
-  wordRect = pygame.Surface((maxWidth,(maxHeight*numLabels)+(lineSpace*numLabels-1)))
+  wordRect = pygame.Surface((maxWidth,(maxHeight*numLabels)-4))
 
   i = 0
   for l in labels:
     h = l.get_height()
     w = l.get_width()
     offset = (wordRect.get_width() - w)/2
-    wordRect.blit(l,(offset,i*h + i*lineSpace))
+    wordRect.blit(l,(offset,i*h))
     i += 1
   sx = (screen.get_width() - wordRect.get_width()) / 2
   sy = (screen.get_height() - wordRect.get_height()) / 2
