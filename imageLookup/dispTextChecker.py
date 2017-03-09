@@ -230,7 +230,7 @@ def dispTextChecker():
           if checkText():
             if master.hasAudio():
               syslog.syslog("calling new voice")
-              setNewSoundTrack()
+              #setNewSoundTrack()
               newEvents()
         elif event.type == VoiceDoneEvent:
           voiceTimeout = random.randint(4000,10000)
