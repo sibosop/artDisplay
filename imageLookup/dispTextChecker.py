@@ -24,34 +24,22 @@ voiceExt = ".wav"
 TimerEvent = pygame.USEREVENT
 VoiceDoneEvent = pygame.USEREVENT+1
 VoiceReadyEvent = pygame.USEREVENT+2
-BackgroundDoneEvent = pygame.USEREVENT+3
 EventDoneEvent=pygame.USEREVENT+4
 EventReadyEvent=pygame.USEREVENT+5
 EventReadyEvent2=pygame.USEREVENT+6
 EventDoneEvent2=pygame.USEREVENT+7
-backgroundSound=None
-backgroundChan=None
 eventSounds=None
 maxETimestamp=0
 eventMin=1000
-eventMax=8000
+eventMax=5000
+backgroundCount=0
 
-def setNewSoundTrack():
-  global backgroundSound
-  global backgroundChan
-  filenames = next(os.walk( adGlobal.backgroundDir))[2]
-  choice = random.choice(filenames)
-  if debugSoundTrack: syslog.syslog("setNewSoundTrack background file choice:"+choice)
-  backgroundSound = pygame.mixer.Sound(adGlobal.backgroundDir+choice)
-  if backgroundChan is None:
-    backgroundChan = pygame.mixer.Channel(1)
-    backgroundChan.set_volume(0.2)
-    backgroundChan.play(backgroundSound,fade_ms=5000)
-  else:
-    backgroundChan.fadeout(2000)
-  backgroundChan.set_endevent(BackgroundDoneEvent)
 
-def playEvent(n):
+def playEvent():
+  global backgroundCount
+  eventChan=pygame.mixer.find_channel()
+  if eventChan is None:
+    return;
   soundBad=True
   while soundBad:
     done = False
@@ -66,16 +54,21 @@ def playEvent(n):
     try:
       sound = pygame.mixer.Sound(file=choice)
       soundBad = False
+      syslog.syslog(choice+" len:"+str(sound.get_length())
+            + " backgroundCount:"+str(backgroundCount))
+      if sound.get_length() > 50:
+        if backgroundCount == 0:
+          backgroundCount = 8
+          syslog.syslog("playing"+choice+" len:"+str(sound.get_length()))
+        else:
+          syslog.syslog("skipping"+choice+" len:"+str(sound.get_length()))
+          soundBad = True
     except Exception as e:
       syslog.syslog("error on Sound file:"+str(e))
 
-  eventChan=pygame.mixer.find_channel()
   eventChan.set_volume(random.random(),random.random())
-  if n == 1:
-    eventChan.set_endevent(EventDoneEvent)
-  else:
-    eventChan.set_endevent(EventDoneEvent2)
   eventChan.play(sound)
+  eventChan.set_endevent()
 
   
 def isWav(f):
@@ -180,7 +173,7 @@ def checkText():
       while file is None:
         file=textSpeaker.makeSpeakFile(speakText)
       voiceSound = pygame.mixer.Sound(file)
-      voiceChan = pygame.mixer.find_channel()
+      voiceChan = pygame.mixer.find_channel(True)
       voiceChan.set_endevent(VoiceDoneEvent);
       voiceChan.set_volume(random.random(),random.random())
       voiceChan.play(voiceSound,loops=0)
@@ -189,50 +182,37 @@ def checkText():
   
 def dispTextChecker():
     global voiceSound
+    global backgroundCount
     setup()
     imageDir=adGlobal.imageDir
     count=0
     syslog.syslog("disp text checker started successfully")
+    if master.hasAudio():
+      pygame.time.set_timer(EventReadyEvent
+                  , random.randint(eventMin,eventMax))
     while True:
       for event in pygame.event.get():
         if event.type == TimerEvent:
           if debug: syslog.syslog("TimerEvent:"+str(event))
           if checkText():
-            if master.hasAudio():
-              syslog.syslog("calling new voice")
-              #setNewSoundTrack()
-              #newEvents()
-              pygame.time.set_timer(EventReadyEvent, random.randint(eventMin,eventMax))
-              pygame.time.set_timer(EventReadyEvent2, random.randint(eventMin,eventMax))
+            if backgroundCount != 0:
+              backgroundCount -= 1
         elif event.type == VoiceDoneEvent:
-          voiceTimeout = random.randint(4000,10000)
+          voiceTimeout = random.randint(10000,20000)
           if debugSoundTrack: syslog.syslog("VoiceDone replay:"+str(voiceTimeout));
           pygame.time.set_timer(VoiceReadyEvent, int(voiceTimeout))
         elif event.type == VoiceReadyEvent:
           pygame.time.set_timer(VoiceReadyEvent, 0)
           if master.hasAudio():
             if debugSoundTrack: syslog.syslog("VoiceReadyEvent replay");
-            voiceChan = pygame.mixer.find_channel()
+            voiceChan = pygame.mixer.find_channel(True)
             voiceChan.set_endevent(VoiceDoneEvent);
             voiceChan.set_volume(random.random(),random.random())
             voiceChan.play(voiceSound)
-        elif event.type == BackgroundDoneEvent:
-          syslog.syslog("backgroundDoneEvent");
-          backgroundChan.play(backgroundSound,fade_ms=5000)
-        elif event.type == EventDoneEvent:
-          nextTime = random.randint(eventMin,eventMax)
-          syslog.syslog("EventDoneEvent:"+str(event)+" nextTime:"+str(nextTime))
-          pygame.time.set_timer(EventReadyEvent, nextTime)
-        elif event.type == EventDoneEvent2:
-          nextTime = random.randint(eventMin,eventMax)
-          syslog.syslog("EventDoneEvent:"+str(event)+" nextTime:"+str(nextTime))
-          pygame.time.set_timer(EventReadyEvent2, nextTime)
         elif event.type == EventReadyEvent:
-          pygame.time.set_timer(EventReadyEvent, 0)
-          playEvent(1)
-        elif event.type == EventReadyEvent2:
-          pygame.time.set_timer(EventReadyEvent2, 0)
-          playEvent(2)
+          pygame.time.set_timer(EventReadyEvent
+                    , random.randint(eventMin,eventMax))
+          playEvent()
         elif event.type == pygame.QUIT:
           return
         else:
