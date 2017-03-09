@@ -52,10 +52,23 @@ def setNewSoundTrack():
   backgroundChan.set_endevent(BackgroundDoneEvent)
 
 def playEvent(n):
-  numEvents = len(eventSounds)
-  choice = random.randint(0,numEvents-1) 
-  syslog.syslog("soundTrack n:"+str(n)+" numEvents:"+str(numEvents)+" choice:"+str(choice))
-  sound  = eventSounds[choice]
+  soundBad=True
+  while soundBad:
+    done = False
+    while not done:
+      syslog.syslog("eventdir ="+adGlobal.eventDir)
+      filenames = next(os.walk( adGlobal.eventDir))[2]
+      choice = random.choice(filenames)
+      done = isWav(choice)
+
+    choice = adGlobal.eventDir+choice
+    syslog.syslog("soundTrack choice:"+choice)
+    try:
+      sound = pygame.mixer.Sound(file=choice)
+      soundBad = False
+    except Exception as e:
+      syslog.syslog("error on Sound file:"+str(e))
+
   eventChan=pygame.mixer.find_channel()
   eventChan.set_volume(random.random(),random.random())
   if n == 1:
@@ -65,63 +78,20 @@ def playEvent(n):
   eventChan.play(sound)
 
   
-
-def newEvents():
-  global eventSounds
-  global maxETimestamp
-  syslog.syslog("new events")
-  if eventSounds is None:
-    eventSounds=[]
-    syslog.syslog("eventdir ="+adGlobal.eventDir)
-    filenames = next(os.walk( adGlobal.eventDir))[2]
-    for f in filenames:
-      sfile=adGlobal.eventDir+f
-      if debugSoundTrack:
-        syslog.syslog("filename:"+f)
-      try:
-        ext = f.rindex(".wav")
-      except ValueError:
-        if debugSoundTrack:
-          syslog.syslog(sfile+ ":not wav file")
-        continue
-      flag = f[ext:]
-      if debugSoundTrack:
-        syslog.syslog("flag ext = "+flag)
-      if flag != ".wav":
-        continue
-      t = os.path.getmtime(sfile)
-      maxETimestamp=max(t,maxETimestamp)
-      syslog.syslog("sountrack loading:"+sfile)
-      eventSounds.append(pygame.mixer.Sound(sfile))
-    pygame.time.set_timer(EventReadyEvent, random.randint(eventMin,eventMax))
-    pygame.time.set_timer(EventReadyEvent2, random.randint(eventMin,eventMax))
-  else:
-    if debugSoundTrack: syslog.syslog("looking for new events:"+adGlobal.eventDir)
-    filenames = next(os.walk( adGlobal.eventDir))[2]
-    for f in filenames:
-      sfile=adGlobal.eventDir+f
-      if debugSoundTrack:
-        syslog.syslog("filename:"+f)
-      try:
-        ext = f.rindex(".wav")
-      except ValueError:
-        if debugSoundTrack:
-          syslog.syslog(sfile+ ":not wav file")
-        continue
-      flag = f[ext:]
-      if debug:
-        syslog.syslog("flag ext = "+flag)
-      if flag != ".wav":
-        continue
-      t = os.path.getmtime(sfile)
-      if t > maxETimestamp:
-        maxETimestamp = t
-        if debugSoundTrack: syslog.syslog("sountrack loading:"+sfile)
-        eventSounds.append(pygame.mixer.Sound(sfile))
-      else:
-        if debugSoundTrack: syslog.syslog("sountrack skipping:"+sfile)
-        
-
+def isWav(f):
+  try:
+    ext = f.rindex(".wav")
+  except ValueError:
+    if debugSoundTrack:
+      syslog.syslog(sfile+ ":not wav file")
+    return False
+  flag = f[ext:]
+  if debugSoundTrack:
+    syslog.syslog("flag ext = "+flag)
+  if flag != ".wav":
+    return False
+  return True
+  
 def setup():
   global screen
   global myfont
@@ -231,7 +201,9 @@ def dispTextChecker():
             if master.hasAudio():
               syslog.syslog("calling new voice")
               #setNewSoundTrack()
-              newEvents()
+              #newEvents()
+              pygame.time.set_timer(EventReadyEvent, random.randint(eventMin,eventMax))
+              pygame.time.set_timer(EventReadyEvent2, random.randint(eventMin,eventMax))
         elif event.type == VoiceDoneEvent:
           voiceTimeout = random.randint(4000,10000)
           if debugSoundTrack: syslog.syslog("VoiceDone replay:"+str(voiceTimeout));
