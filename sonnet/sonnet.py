@@ -15,7 +15,7 @@ import displayText
 import textSpeaker
 import pygame
 
-debug = False
+debug = True
 numeral_map = None
 sonnetQueue=[]
 queueMutex=threading.Lock()
@@ -137,9 +137,11 @@ def sonnetLoop():
       if first:
         first = False
         time.sleep(2)
+      
 
 if __name__ == '__main__':
   os.environ['DISPLAY']=":0.0"
+  os.chdir(os.path.dirname(sys.argv[0]))
   t = sonnetQueueThread()
   t.setDaemon(True)
   t.start()
