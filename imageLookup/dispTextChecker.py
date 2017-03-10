@@ -32,42 +32,73 @@ maxETimestamp=0
 eventMin=2000
 eventMax=9000
 backgroundCount=0
+eventTimeThresholdIncrement=.1
+initialEventTimeThreshold=1.5
+eventTimeThreshold=initialEventTimeThreshold
+eventTimeMaxThreshold = 50.0
+allowBackgroundThreshold=20.0
+backgroundThreshold=90.0
+backgroundIgnoreCount=8
 
+def makeEventChoice(filenames):
+  done = False
+  while not done:
+    if filenames is None:
+      syslog.syslog("eventdir ="+adGlobal.eventDir)
+      filenames = next(os.walk( adGlobal.eventDir))[2]
+    choice = random.choice(filenames)
+    done = isWav(choice)
+  return (choice,filenames)
 
 def playEvent():
   global backgroundCount
+  global backgroundCount
+  global eventTimeThreshold
+  global allowBackgroundThreshold
+  global backgroundThreshold
+  global backgroundIgnoreCount
+  global eventTimeThresholdIncrement
+  global initialEventTimeThreshold
+  global eventTimeMaxThreshold
   eventChan=pygame.mixer.find_channel()
   if eventChan is None:
     return;
-  soundBad=True
-  while soundBad:
-    done = False
-    while not done:
-      syslog.syslog("eventdir ="+adGlobal.eventDir)
-      filenames = next(os.walk( adGlobal.eventDir))[2]
-      choice = random.choice(filenames)
-      done = isWav(choice)
-
-    choice = adGlobal.eventDir+choice
+  filenames=None
+  while True:
+    vars = makeEventChoice(filenames)
+    filenames = vars[1]
+    choice = adGlobal.eventDir+vars[0]
     syslog.syslog("soundTrack choice:"+choice)
     try:
       sound = pygame.mixer.Sound(file=choice)
-      soundBad = False
-      syslog.syslog(choice+" len:"+str(sound.get_length())
+      len = sound.get_length()
+      syslog.syslog(choice+" len:"+str(len)
             + " backgroundCount:"+str(backgroundCount))
-      if sound.get_length() > 80:
+      if eventTimeThreshold > allowBackgroundThreshold and len > backgroundThreshold:
         if backgroundCount == 0:
-          backgroundCount = 8
-          syslog.syslog("playing"+choice+" len:"+str(sound.get_length()))
+          backgroundCount = backgroundIgnoreCount
+          syslog.syslog("playing"+choice+" len:"+str(len))
+          break
         else:
-          syslog.syslog("skipping"+choice+" len:"+str(sound.get_length()))
-          soundBad = True
+          syslog.syslog("skipping "+choice+" len:"+str(len))
+      elif len < eventTimeThreshold:
+        syslog.syslog("playing " + choice + " len:"+str(len)
+              +" threshold:"+str(eventTimeThreshold))
+        break
+      else:
+        syslog.syslog("skipping "+choice+" len:"+str(len)
+              +" threshold:"+str(eventTimeThreshold))
+
     except Exception as e:
       syslog.syslog("error on Sound file:"+str(e))
 
   eventChan.set_volume(random.random(),random.random())
   eventChan.play(sound)
   eventChan.set_endevent()
+  eventTimeThreshold += eventTimeThresholdIncrement
+  if  eventTimeThreshold > eventTimeMaxThreshold :
+    eventTimeThreshold = initialEventTimeThreshold
+    syslog("reseting eventTimeThreshold max:"+str(eventTimeMaxThreshold))
 
   
 def isWav(f):
