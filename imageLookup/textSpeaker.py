@@ -9,9 +9,10 @@ import master
 import os
 import wave
 import audioop
+import re
 from gtts import gTTS
 from pydub import AudioSegment
-debug = False
+debug = True
 
 def convertSampleRate(fname):
   spf = wave.open(fname, 'rb')
@@ -42,7 +43,7 @@ def makeSpeakFile(line):
     if master.hasAudio() is False:
       if debug: syslog.syslog("speak: no audio");
       return rval
-    fnameRoot = "../tmp/" + line.replace(" ","_")
+    fnameRoot = "../tmp/" + re.sub('\W+','_',line)
     if adGlobal.internetOn():
       syslog.syslog("speak: internet on using gTTS");
       if debug: syslog.syslog("playText line:"+line)
@@ -62,10 +63,12 @@ def makeSpeakFile(line):
       fname = fnameRoot + ".wav"
       if debug: syslog.syslog("speak:"+fname)
       os.system("espeak -w "+fname+" '"+line+"'")
+      os.unlink(fname)
       rval = fname
     convertSampleRate(rval)
   except Exception as e:
     syslog.syslog("speak error: "+ str(e))
+    rval = None
   return rval
 
 

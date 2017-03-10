@@ -2,6 +2,7 @@
 import os
 home = os.environ['HOME']
 import sys
+import syslog
 import threading
 
 
@@ -71,13 +72,18 @@ def getSonnet():
 
 def compileSonnet(sonnet):
   rval = []
-  for l in sonnet:
-    file = None
-    while file is None:
-      file = textSpeaker.makeSpeakFile(l)
-    sound = pygame.mixer.Sound(file)
-    os.unlink(file)
-    rval.append((l,sound));
+  syslog.syslog("compileSonnet")
+  try:
+    for l in sonnet:
+      file = None
+      while file is None:
+        file = textSpeaker.makeSpeakFile(l)
+      sound = pygame.mixer.Sound(file)
+      os.unlink(file)
+      rval.append((l,sound));
+  except Exception as e:
+    syslog.syslog("compile sonnet: "+str(e))
+    rval = []
   return rval
 
 
@@ -92,11 +98,13 @@ class sonnetQueueThread(threading.Thread):
       queueMutex.release()
       syslog.syslog("queue len:"+str(l))
       if l < maxQueueSize:
-        sonnet = compileSonnet(getSonnet())
+        sonnet = []
+        while len(sonnet) == 0:
+          sonnet = compileSonnet(getSonnet())
         queueMutex.acquire()
         sonnetQueue.append(sonnet)
         queueMutex.release()
-      time.sleep(1)
+      time.sleep(5)
 
 
 def playText(sound):
@@ -106,37 +114,39 @@ def playText(sound):
   return chan
   
   
-def sonnetLoop():
-  global sonnetQueue
-  pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
-  pygame.init()
-  pygame.mouse.set_visible(False)
-  current = None
-  while True:
-    qlen = 0
-    while qlen == 0:
-      queueMutex.acquire()
-      qlen = len(sonnetQueue)
-      queueMutex.release()
-      if qlen == 0:
-        syslog.syslog("waiting for sonnet queue")
-        time.sleep(1)
-      else:
+class sonnetLoop(threading.Thread):
+  def run(self):
+    global sonnetQueue
+    pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
+    pygame.init()
+    pygame.mouse.set_visible(False)
+    current = None
+    while True:
+      qlen = 0
+      while qlen == 0:
         queueMutex.acquire()
-        current = sonnetQueue.pop(0)
+        qlen = len(sonnetQueue)
         queueMutex.release()
-        syslog.syslog("got a sonnet");
-        time.sleep(2)
+        if qlen == 0:
+          syslog.syslog("waiting for sonnet queue")
+          time.sleep(5)
+        else:
+          queueMutex.acquire()
+          current = sonnetQueue.pop(0)
+          queueMutex.release()
+          syslog.syslog("got a sonnet");
+          time.sleep(2)
 
-    first = True
-    for l in current:
-      chan = playText(l[1])
-      displayText.displayText(l[0])
-      while chan.get_busy():
-        time.sleep(0)
-      if first:
-        first = False
-        time.sleep(2)
+      first = True
+      for l in current:
+        chan = playText(l[1])
+        syslog.syslog("sonnet loop:"+l[0])
+        displayText.displayText(l[0])
+        while chan.get_busy():
+          time.sleep(0)
+        if first:
+          first = False
+          time.sleep(2)
       
 
 if __name__ == '__main__':
@@ -145,5 +155,14 @@ if __name__ == '__main__':
   t = sonnetQueueThread()
   t.setDaemon(True)
   t.start()
-  sonnetLoop()
+  sl = sonnetLoop()
+  sl.setDaemon(True)
+  sl.start()
+
+  while True:
+    try:
+      time.sleep(1)
+    except Exception as e:
+      syslog.syslog(os.argv[0]+":"+str(e))
   t.join()
+  sl.join()
