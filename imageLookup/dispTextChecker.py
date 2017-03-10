@@ -98,7 +98,7 @@ def playEvent():
   eventTimeThreshold += eventTimeThresholdIncrement
   if  eventTimeThreshold > eventTimeMaxThreshold :
     eventTimeThreshold = initialEventTimeThreshold
-    syslog("reseting eventTimeThreshold max:"+str(eventTimeMaxThreshold))
+    syslog.syslog("reseting eventTimeThreshold max:"+str(eventTimeMaxThreshold))
 
   
 def isWav(f):
