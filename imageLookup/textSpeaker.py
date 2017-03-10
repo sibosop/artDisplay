@@ -63,7 +63,6 @@ def makeSpeakFile(line):
       fname = fnameRoot + ".wav"
       if debug: syslog.syslog("speak:"+fname)
       os.system("espeak -w "+fname+" '"+line+"'")
-      os.unlink(fname)
       rval = fname
     convertSampleRate(rval)
   except Exception as e:
