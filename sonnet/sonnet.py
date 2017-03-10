@@ -104,7 +104,8 @@ class sonnetQueueThread(threading.Thread):
         queueMutex.acquire()
         sonnetQueue.append(sonnet)
         queueMutex.release()
-      time.sleep(5)
+      else:
+        time.sleep(5)
 
 
 def playText(sound):
