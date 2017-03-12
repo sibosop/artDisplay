@@ -129,6 +129,7 @@ Here is the current hardware used:
  * `sudo -H pip install pydub`
  * `sudo apt-get install libav-tools`
  * `sudo apt-get install espeak`
+ 
 #### setting up unit for run
  * the master needs the jumper mentioned above
  * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
@@ -141,6 +142,7 @@ Here is the current hardware used:
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display :0.0 once
  * if the subnet is not 10 then put `export SUBNET=N` in the .bashrc
+ 
 #### to change to a different wifi router
  * use screen to connect to wifi
  * `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`  is where wifi info is store. remove old wifi info, add new etc
