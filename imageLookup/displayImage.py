@@ -47,7 +47,14 @@ def displayImage(img):
         dw = ws
         dh = hi * (float(ws)/float(wi))
 
-    simage = pygame.transform.scale(image,(int(dw),int(dh)))
+    try:
+        simage = pygame.transform.smoothscale(image,(int(dw),int(dh)))
+    except:
+        syslog.syslog("smoothscale failed doing normal scale for:"+img)
+        simage = pygame.transform.scale(image,(int(dw),int(dh)))
+
+
+
     xoffset = (ws - simage.get_width()) / 2
     yoffset = (hs - simage.get_height()) / 2
     if debug: syslog.syslog("displayImage ws:"+str(ws) 
