@@ -97,7 +97,7 @@ Here is the current hardware used:
 #### installing software
 * do a full software update
  * `sudo apt-get update`
- * `sudo apt-get upgrade`
+ * `sudo apt-get -y upgrade`
  * `mkdir GitProjects`
  * `cd !$`
  * `ssh-keygen`
