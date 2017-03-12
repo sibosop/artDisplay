@@ -181,10 +181,8 @@ class checkVoice(threading.Thread):
     global voiceMutex
     global voiceChanged
     while True:
-      syslog.syslog("check voice doing acquire")
       voiceMutex.acquire()
       vt = voiceSound
-      syslog.syslog("voiceSound:"+str(vt))
       voiceMutex.release()
       if voiceSound is None:
         syslog.syslog("check voice no voice")
@@ -223,6 +221,7 @@ class checkText(threading.Thread):
     global voiceSound
     global voiceMutex
     global voiceChanged
+    global backgroundCount
     while True:
       if debug: 
         count += 1
@@ -245,6 +244,8 @@ class checkText(threading.Thread):
           voiceMutex.acquire()
           voiceSound = pygame.mixer.Sound(file)
           voiceChanged = True
+          if backgroundCount != 0:
+              backgroundCount -= 1
           voiceMutex.release()
           syslog.syslog("checkText unlinking"+file+" voiceSound:"+str(voiceSound))
           os.unlink(file)
@@ -287,4 +288,4 @@ def dispTextChecker():
     time.sleep(4)
 
 if __name__ == '__main__':
-      dispTextChecker()
+  dispTextChecker()
