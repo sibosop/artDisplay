@@ -23,7 +23,7 @@ import inspect
 
 
 debug=False
-hangDebug=True
+hangDebug=False
 imageDebug=False
 copyDebug=False
 slpDebug=True
@@ -304,7 +304,7 @@ def imageLookupLoop():
       if copyDebug: syslog.syslog( "flag copy cmd:"+str(cmd) )
       subprocess.check_output(cmd)
     except subprocess.CalledProcessError, e:
-      syslog.syslog( "file copy problem: ",str(cmd),str(e.output))
+      syslog.syslog( "file copy problem: "+str(cmd)+str(e))
       continue  
       
   if hangDebug: syslog.syslog("Hang debug:"
