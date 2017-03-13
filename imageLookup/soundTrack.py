@@ -89,6 +89,7 @@ class playEvent(threading.Thread):
     syslog.syslog("play event thread")
     while True:
       while True:
+        filenames=None
         vars = makeEventChoice(filenames)
         filenames = vars[1]
         choice = adGlobal.eventDir+vars[0]
