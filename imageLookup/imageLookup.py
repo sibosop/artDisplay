@@ -28,6 +28,8 @@ imageDebug=False
 copyDebug=False
 slpDebug=True
 dispDebug=True
+loopTime=20
+watchdogTimeout=200
 
 def getCmdVars(ip):
   cmdVars = []
@@ -370,11 +372,11 @@ def imageLookup():
   loopStart= time.time()
   signal.alarm(30)
   while True:
-    signal.alarm(300)
+    signal.alarm(watchdogTimeout)
     syslog.syslog("ImageLookup Loop Time "+str(time.time()-loopStart))
     loopStart=time.time()
     imageLookupLoop()
-    sleepTime = 30
+    sleepTime = loopTime
     time.sleep(sleepTime)
 
 if __name__ == '__main__':
