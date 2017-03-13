@@ -15,7 +15,7 @@ eventMin=100
 eventMax=10000
 backgroundCount=0
 eventTimeThresholdIncrement=.1
-initialEventTimeThreshold=1.5
+initialEventTimeThreshold=2.5
 eventTimeThreshold=initialEventTimeThreshold
 eventTimeMaxThreshold = 50.0
 allowBackgroundThreshold=20.0
@@ -24,6 +24,7 @@ backgroundIgnoreCount=8
 speedChangeThreshold=20
 speedChangeMin = 0.5
 speedChangeMax = 2.0
+doSpeedX=True
 
 eventMutex=threading.Lock()
 eventMaxVol=.7
@@ -135,11 +136,12 @@ class playEvent(threading.Thread):
 
         except Exception as e:
           syslog.syslog("error on Sound file:"+str(e))
-      if sound.get_length() < speedChangeThreshold:
-        factor = ((speedChangeMax-speedChangeMin) * random.random()) +speedChangeMin
-        nsound = speedx(sound,factor)
-        if nsound is not None:
-          sound = nsound
+      if doSpeedX:
+        if sound.get_length() < speedChangeThreshold:
+          factor = ((speedChangeMax-speedChangeMin) * random.random()) +speedChangeMin
+          nsound = speedx(sound,factor)
+          if nsound is not None:
+            sound = nsound
       l = random.random() * eventMaxVol
       r = random.random() * eventMaxVol
       playSound(sound,l,r)
