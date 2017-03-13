@@ -8,6 +8,7 @@ import adGlobal
 import syslog
 import time
 import threading
+import numpy as np
 
 debugSoundTrack=True
 eventMin=100
@@ -20,9 +21,25 @@ eventTimeMaxThreshold = 50.0
 allowBackgroundThreshold=20.0
 backgroundThreshold=90.0
 backgroundIgnoreCount=8
+speedChangeThreshold=20
+speedChangeMin = 0.5
+speedChangeMax = 2.0
 
 eventMutex=threading.Lock()
 eventMaxVol=.7
+
+def speedx(sound, factor):
+  rval = None
+  try:
+    syslog.syslog("speedx factor:"+str(factor))
+    sound_array = pygame.sndarray.array(sound)
+    """ Multiplies the sound's speed by some `factor` """
+    indices = np.round( np.arange(0, len(sound_array), factor) )
+    indices = indices[indices < len(sound_array)].astype(int)
+    rval = pygame.sndarray.make_sound(sound_array[ indices.astype(int) ])
+  except Exception as e:
+    syslog.syslog("speedx:"+str(e))
+  return rval
 
 def setup():
   pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
@@ -118,6 +135,11 @@ class playEvent(threading.Thread):
 
         except Exception as e:
           syslog.syslog("error on Sound file:"+str(e))
+      if sound.get_length() < speedChangeThreshold:
+        factor = ((speedChangeMax-speedChangeMin) * random.random()) +speedChangeMin
+        nsound = speedx(sound,factor)
+        if nsound is not None:
+          sound = nsound
       l = random.random() * eventMaxVol
       r = random.random() * eventMaxVol
       playSound(sound,l,r)
