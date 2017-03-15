@@ -143,6 +143,12 @@ Here is the current hardware used:
  * unclutter removes cursor. You may need to run unclutter -display :0.0 once
  * if the subnet is not 10 then put `export SUBNET=N` in the .bashrc
  
+#### some setup for doing development on the pi
+ * copy the .vimrc from the local host to the pi
+ * `cd /usr/bin`
+ * `sudo mv vi vi.save`
+ * `sudo ln -s vim vi`
+ 
 #### to change to a different wifi router
  * use screen to connect to wifi
  * `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`  is where wifi info is store. remove old wifi info, add new etc
