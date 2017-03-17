@@ -80,6 +80,7 @@ Here is the current hardware used:
     * `hdmi_force_hotplug=1`
     * `hdmi_group=2`
     * `hdmi_mode=1`
+    * `hdmi_drive=1`
     * `hdmi_mode=87`
     * `hdmi_cvt 800 480 60 6 0 0 0`
 * turn off screen blanking
