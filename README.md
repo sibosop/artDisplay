@@ -142,6 +142,7 @@ Here is the current hardware used:
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display :0.0 once
  * if the subnet is not 10 then put `export SUBNET=N` in the .bashrc
+ * if the subnet is not 10 then put `export SUBNET=N` in adWrap.sh for boot 
  
 #### some setup for doing development on the pi
  * copy the .vimrc from the local host to the pi
