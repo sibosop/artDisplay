@@ -74,7 +74,8 @@ Here is the current hardware used:
     * `Port 22`
   * verify that `ssh wipi3` now works
 #### move to small screen
-* configure small screen
+* configure small screen (hdmi_drive=1 has been added here to remove purple line on left side of screen which
+* began to appear on versions after 3/01/2017)
   * `sudo vi /boot/config.txt`
   * add lines
     * `hdmi_force_hotplug=1`
