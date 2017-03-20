@@ -31,6 +31,8 @@ Here is the current hardware used:
 #### Boot steps
 * Make NOOBS boot sd card
 * insert wifi dongle (not needed for pi3s)
+* do the NOOBS startup with plugged into the ethernet. It speeds up the
+* upgrade process a lot
 * ssh is no longer enabled, you must enable it
 * start a terminal window
 * `sudo raspi-config`
