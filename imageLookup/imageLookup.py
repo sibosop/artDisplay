@@ -28,7 +28,7 @@ imageDebug=False
 copyDebug=False
 slpDebug=True
 dispDebug=True
-loopTime=20
+loopTime=1
 watchdogTimeout=200
 
 def getCmdVars(ip):
