@@ -136,7 +136,7 @@ Here is the current hardware used:
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
- * sudo cp /home/pi/GitProjects/artDisplay/fstab /etc/fstab
+ * `sudo cp /home/pi/GitProjects/artDisplay/fstab /etc/fstab`
  * the master needs the jumper mentioned above
  * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
  * ssh from master to slave once to get the host configuration set up
