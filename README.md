@@ -133,6 +133,7 @@ Here is the current hardware used:
  * `sudo -H pip install pydub`
  * `sudo apt-get install libav-tools`
  * `sudo apt-get install espeak`
+ * `sudo apt-get install python-pypdf2`
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
