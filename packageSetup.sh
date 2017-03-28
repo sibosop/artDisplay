@@ -21,3 +21,4 @@ sudo -H pip install gTTS
 sudo -H pip install pydub
 sudo apt-get -y install libav-tools
 sudo apt-get -y install espeak
+sudo apt-get -y install python-pypdf2
