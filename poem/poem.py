@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import os
+import roman
 home = os.environ['HOME']
 import sys
 import syslog
 import threading
+import shakes
 
 
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
@@ -17,64 +19,17 @@ import textSpeaker
 import pygame
 
 debug = True
-numeral_map = None
-sonnetQueue=[]
+poemQueue=[]
 queueMutex=threading.Lock()
 
 
-def roman_to_int(n):
-  n = n.strip()
-
-  reg=re.compile('^[IVXLCDM]+$')
-  if reg.match(n) is None:
-    #syslog.syslog(n+": not a match")
-    return 0
-  i = result = 0
-  for integer, numeral in numeral_map:
-    while n[i:i + len(numeral)] == numeral:
-      result += integer
-      i += len(numeral)
-  return result
-
-def getSonnet():
-  global numeral_map
-  if numeral_map is None:
-    numeral_map = zip(
-      (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
-      ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
-    )
-  maxSonnet=154
-  choice = random.randint(1,154)
-  if debug: syslog.syslog("Get Sonnet:"+str(choice))
-
-  found=False
-  sonnet = []
- 
-  with open("wssnt10.txt") as f:
-    for line in f:
-      if found:
-        l = line.strip()
-        if len(l) == 0:
-          if len(sonnet) != 0:
-            l = "Sonnet number "+str(choice)
-            sonnet.insert(0,l)
-            return (sonnet)
-        else:
-          sonnet.append(l)
-      else:
-        test = roman_to_int(line)
-        if test==choice:
-          if debug: syslog.syslog(line+":"+str(test))
-          found = True
-
-  return None
 
 
-def compileSonnet(sonnet):
+def compilePoem(poem):
   rval = []
-  syslog.syslog("compileSonnet")
+  syslog.syslog("compilepoem")
   try:
-    for l in sonnet:
+    for l in poem:
       file = None
       while file is None:
         file = textSpeaker.makeSpeakFile(l)
@@ -82,27 +37,27 @@ def compileSonnet(sonnet):
       os.unlink(file)
       rval.append((l,sound));
   except Exception as e:
-    syslog.syslog("compile sonnet: "+str(e))
+    syslog.syslog("compile poem: "+str(e))
     rval = []
   return rval
 
 
-class sonnetQueueThread(threading.Thread):
+class poemQueueThread(threading.Thread):
   def run(self):
     maxQueueSize=3
-    global sonnetQueue
+    global poemQueue
     global queueMutex
     while True:
       queueMutex.acquire()
-      l = len(sonnetQueue)
+      l = len(poemQueue)
       queueMutex.release()
       syslog.syslog("queue len:"+str(l))
       if l < maxQueueSize:
-        sonnet = []
-        while len(sonnet) == 0:
-          sonnet = compileSonnet(getSonnet())
+        poem = []
+        while len(poem) == 0:
+          poem = compilePoem(shakes.get())
         queueMutex.acquire()
-        sonnetQueue.append(sonnet)
+        poemQueue.append(poem)
         queueMutex.release()
       else:
         time.sleep(5)
@@ -115,9 +70,9 @@ def playText(sound):
   return chan
   
   
-class sonnetLoop(threading.Thread):
+class poemLoop(threading.Thread):
   def run(self):
-    global sonnetQueue
+    global poemQueue
     pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
     pygame.init()
     pygame.mouse.set_visible(False)
@@ -126,22 +81,22 @@ class sonnetLoop(threading.Thread):
       qlen = 0
       while qlen == 0:
         queueMutex.acquire()
-        qlen = len(sonnetQueue)
+        qlen = len(poemQueue)
         queueMutex.release()
         if qlen == 0:
-          syslog.syslog("waiting for sonnet queue")
+          syslog.syslog("waiting for poem queue")
           time.sleep(5)
         else:
           queueMutex.acquire()
-          current = sonnetQueue.pop(0)
+          current = poemQueue.pop(0)
           queueMutex.release()
-          syslog.syslog("got a sonnet");
+          syslog.syslog("got a poem");
           time.sleep(2)
 
       first = True
       for l in current:
         chan = playText(l[1])
-        syslog.syslog("sonnet loop:"+l[0])
+        syslog.syslog("poem loop:"+l[0])
         displayText.displayText(l[0])
         while chan.get_busy():
           time.sleep(0)
@@ -153,10 +108,10 @@ class sonnetLoop(threading.Thread):
 if __name__ == '__main__':
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
-  t = sonnetQueueThread()
+  t = poemQueueThread()
   t.setDaemon(True)
   t.start()
-  sl = sonnetLoop()
+  sl = poemLoop()
   sl.setDaemon(True)
   sl.start()
 
