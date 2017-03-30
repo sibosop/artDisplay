@@ -70,8 +70,8 @@ class checkVoice(threading.Thread):
       else:
         syslog.syslog("check voice found voice")
         reps = 0
-        if random.randint(0,3) == 0:
-          reps = random.randint(1,3)
+        if random.randint(0,1) == 0:
+          reps = random.randint(2,4)
         else:
           reps = 1
         if debugVoiceTrack:syslog.syslog("VoiceReadyEvent reps:"+str(reps))
@@ -84,7 +84,7 @@ class checkVoice(threading.Thread):
           if reps > 1:
             s = random.random()
             time.sleep(s)
-        voiceTimeout = random.randint(10,20)
+        voiceTimeout = random.randint(5,10)
         if debugVoiceTrack: syslog.syslog("Next Voice:"+str(voiceTimeout));
         for i in range(voiceTimeout):
           voiceMutex.acquire()
@@ -158,8 +158,8 @@ def dispTextChecker():
   syslog.syslog("disp text checker started successfully")
   startEventThread(checkText())
   if master.hasAudio():
-    for i in range(maxEventThreads):
-      startEventThread(st.playEvent())
+  #  for i in range(maxEventThreads):
+  #    startEventThread(st.playEvent())
     startEventThread(checkVoice())
   while True:
     for t in eventThreads:
