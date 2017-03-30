@@ -12,7 +12,7 @@ import audioop
 import re
 from gtts import gTTS
 from pydub import AudioSegment
-debug = True
+debug = False
 
 def convertSampleRate(fname):
   spf = wave.open(fname, 'rb')
@@ -21,7 +21,7 @@ def convertSampleRate(fname):
   rate=spf.getframerate()
   signal = spf.readframes(-1)
 
-  syslog.syslog("convertSampleRate"
+  if debug: syslog.syslog("convertSampleRate"
     + " rate:"+str(rate)
     + " channels:"+str(channels)
     + " width:"+str(width)
@@ -45,7 +45,7 @@ def makeSpeakFile(line):
       return rval
     fnameRoot = "../tmp/" + re.sub('\W+','_',line)
     if adGlobal.internetOn():
-      syslog.syslog("speak: internet on using gTTS");
+      if debug: syslog.syslog("speak: internet on using gTTS");
       if debug: syslog.syslog("playText line:"+line)
       fname = fnameRoot + ".mp3"
       if debug: syslog.syslog("speak:"+fname)

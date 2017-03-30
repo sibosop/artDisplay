@@ -6,11 +6,6 @@ numeral_map = None
 def sonnetRe():
   return re.compile('^[IVXLCDM]+$')
 
-def emilySectionRe():
-  treg=re.compile('^[IVXLCDM]+\.\s+.+\.$')
-
-def emilyRe():
-  reg=re.compile('^[IVXLCDM]+\.$')
 
 def roman_to_int(n,re=sonnetRe):
   global numeral_map

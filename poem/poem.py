@@ -6,6 +6,7 @@ import sys
 import syslog
 import threading
 import shakes
+import emily
 
 
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
@@ -27,20 +28,24 @@ queueMutex=threading.Lock()
 
 def compilePoem(poem):
   rval = []
-  syslog.syslog("compilepoem")
+  syslog.syslog("compile poem")
   try:
     for l in poem:
-      file = None
-      while file is None:
-        file = textSpeaker.makeSpeakFile(l)
-      sound = pygame.mixer.Sound(file)
-      os.unlink(file)
+      if l == "+++++":
+        sound = None
+      else:
+        file = None
+        while file is None:
+          file = textSpeaker.makeSpeakFile(l)
+        sound = pygame.mixer.Sound(file)
+        os.unlink(file)
       rval.append((l,sound));
   except Exception as e:
     syslog.syslog("compile poem: "+str(e))
     rval = []
   return rval
 
+poemGets = [emily.get,shakes.get]
 
 class poemQueueThread(threading.Thread):
   def run(self):
@@ -55,7 +60,7 @@ class poemQueueThread(threading.Thread):
       if l < maxQueueSize:
         poem = []
         while len(poem) == 0:
-          poem = compilePoem(shakes.get())
+          poem = compilePoem(random.choice(poemGets)())
         queueMutex.acquire()
         poemQueue.append(poem)
         queueMutex.release()
@@ -93,16 +98,16 @@ class poemLoop(threading.Thread):
           syslog.syslog("got a poem");
           time.sleep(2)
 
-      first = True
       for l in current:
+        if l[0] == "+++++":
+          syslog.syslog("doing sleep")
+          time.sleep(2)
+          continue
         chan = playText(l[1])
-        syslog.syslog("poem loop:"+l[0])
+        if debug: syslog.syslog("poem loop:"+l[0])
         displayText.displayText(l[0])
         while chan.get_busy():
           time.sleep(0)
-        if first:
-          first = False
-          time.sleep(2)
       
 
 if __name__ == '__main__':

@@ -18,8 +18,9 @@ def get():
         l = line.strip()
         if len(l) == 0:
           if len(sonnet) != 0:
-            l = "Sonnet number "+str(choice)
+            l = "Shakespeare Sonnet "+str(choice)
             sonnet.insert(0,l)
+            sonnet.insert(1,"+++++")
             return (sonnet)
         else:
           sonnet.append(l)
