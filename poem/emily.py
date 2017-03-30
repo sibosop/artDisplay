@@ -50,9 +50,9 @@ def get():
           pcount += 1
           if pcount == choice:
             if debug: syslog.syslog( "found: "+ choice )
-            poem.append("series "+str(series))
-            poem.append("section ")
-            poem.append(title)
+            poem.append("Number: " + str(test))
+            poem.append("Series: "+  str(series))
+            poem.append("Subject: " + title)
             poem.append("+++++")
             found = True
 
