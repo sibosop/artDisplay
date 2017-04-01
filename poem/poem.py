@@ -7,6 +7,7 @@ import syslog
 import threading
 import shakes
 import emily
+import browning
 
 
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
@@ -45,7 +46,7 @@ def compilePoem(poem):
     rval = []
   return rval
 
-poemGets = [emily.get,shakes.get]
+poemGets = [browning.get,shakes.get,emily.get]
 
 class poemQueueThread(threading.Thread):
   def run(self):
