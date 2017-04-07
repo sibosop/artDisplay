@@ -4,6 +4,7 @@ import sys
 import syslog
 import random
 import re
+import fileDecoder
 
 debug = False
 
@@ -22,39 +23,45 @@ def get():
   found = False
   title = ""
   section = ""
-  with open("emily.txt") as f:
-    for line in f:
-      line = line.strip()
-      if not line:
-        continue
-      test = roman.roman_to_int(line,emilySectionRe)
+  fd = fileDecoder.fileDecoder("emily.txt")
+  while True:
+    line = fd.next()
+    if line is None:
+      break
+    if line == "":
+      continue
+    if debug: syslog.syslog("raw line:"+line)
+    test = roman.roman_to_int(line,emilySectionRe)
+    if test != 0:
+      section = test
+      test = line.strip()
+      test = test[test.find(" "):].lstrip().replace(".","")
+      if test == "LIFE":
+        series += 1
+      title = test
+      if debug: syslog.syslog("found series:"+str(series)
+                  +" section:"+str(section)
+                  +" title:"+title)
+      continue
+    if found:
+      test = roman.roman_to_int(line,emilyRe)
       if test != 0:
-        section = test
-        test = line.strip()
-        test = test[test.find(" "):].lstrip().replace(".","")
-        if test == "LIFE":
-          series += 1
-        title = test
-        if debug: syslog.syslog("found series:"+series+"section:"+section+"title:"+title)
-        continue
-      if found:
-        test = roman.roman_to_int(line,emilyRe)
-        if test != 0:
-          break
-        poem.append(line)
-        if line.isupper():
+        break
+      poem.append(line)
+      if line.isupper():
+        poem.append("+++++")
+    else:
+      test = roman.roman_to_int(line,emilyRe)
+      if debug: syslog.syslog("roman int:"+str(test))
+      if test != 0:
+        pcount += 1
+        if pcount == choice:
+          if debug: syslog.syslog( "found: "+ str(choice))
+          poem.append("Number: " + str(test))
+          poem.append("Series: "+  str(series))
+          poem.append("Subject: " + title)
           poem.append("+++++")
-      else:
-        test = roman.roman_to_int(line,emilyRe)
-        if test != 0:
-          pcount += 1
-          if pcount == choice:
-            if debug: syslog.syslog( "found: "+ choice )
-            poem.append("Number: " + str(test))
-            poem.append("Series: "+  str(series))
-            poem.append("Subject: " + title)
-            poem.append("+++++")
-            found = True
+          found = True
 
   return poem
 

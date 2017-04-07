@@ -10,6 +10,7 @@ import emily
 import browning
 
 
+
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 
 import syslog
@@ -20,7 +21,7 @@ import displayText
 import textSpeaker
 import pygame
 
-debug = True
+debug = False
 poemQueue=[]
 queueMutex=threading.Lock()
 
@@ -46,7 +47,7 @@ def compilePoem(poem):
     rval = []
   return rval
 
-poemGets = [browning.get,shakes.get,emily.get]
+poemGets = [emily.get,shakes.get,browning.get]
 
 class poemQueueThread(threading.Thread):
   def run(self):
