@@ -126,6 +126,5 @@ if __name__ == '__main__':
     try:
       time.sleep(1)
     except Exception as e:
-      syslog.syslog(os.argv[0]+":"+str(e))
-  t.join()
-  sl.join()
+      syslog.syslog(sys.argv[0]+":"+str(e))
+      break
