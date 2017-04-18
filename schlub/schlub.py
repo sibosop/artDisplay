@@ -21,7 +21,7 @@ if __name__ == '__main__':
   
   slp.start()
   slp.register("schlub")
-  sst = soundServer.soundServerThread()
+  sst = soundServer.soundServerThread(8080)
   sst.setDaemon(True)
   sst.start()
   im = master.isMaster()
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     pt.start()
   while True:
     try:
-      time.sleep(1)
+      time.sleep(5)
     except KeyboardInterrupt:
       syslog.syslog(pname+": keyboard interrupt")
       break
