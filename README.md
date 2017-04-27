@@ -137,6 +137,7 @@ Here is the current hardware used:
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
+ * `sudo mv /etc/fstab /etc/fstab.old`
  * `sudo cp /home/pi/GitProjects/artDisplay/fstab /etc/fstab`
  * check the log file daily since the directory is now smaller, change weekly to daily
  * `sudo vi /etc/logrotate.conf`
