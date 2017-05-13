@@ -22,3 +22,5 @@ sudo -H pip install pydub
 sudo apt-get -y install libav-tools
 sudo apt-get -y install espeak
 sudo apt-get -y install python-pypdf2
+sudo easy_install --upgrade pip
+sudo pip install requests==2.6.0
