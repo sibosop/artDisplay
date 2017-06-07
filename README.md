@@ -100,6 +100,8 @@ Here is the current hardware used:
 
 #### installing software
 * do a full software update
+ * `sudo apt-get -y install python-pip`
+ * `sudo apt-get -y install python-setuptools`
  * `sudo apt-get update`
  * `sudo apt-get -y upgrade`
  * `mkdir GitProjects`
@@ -111,31 +113,7 @@ Here is the current hardware used:
  * `cd artDisplay`
  * `git config --global user.email "brian@eastshore.com"`
  * `git config --global user.name "brian reinbolt"`
- * (there is a script packageSetup.sh that will do the following)
- * `sudo pip install beautifulsoup4`
- * `sudo apt-get -y install gcc python-dev`
- * `sudo pip install psutil`
- * `sudo apt-get -y install slpd`
- * `sudo service slpd stop`
- * `sudo update-rc.d -f slpd remove`
- * `sudo apt-get -y install openslp-doc`
- * `sudo apt-get -y install slptool`
- * `sudo apt-get -y install feh`
- * `sudo pip install --upgrade pyserial`
- * `sudo -H pip install py-bing-search`
- * `sudo -H pip install --upgrade google-api-python-client`
- * `sudo -H pip install schedule`
- * `sudo apt-get -y install xscreensaver`
- * `sudo apt-get -y install unclutter`
- * `sudo apt-get -y install vim`
- * `sudo apt-get -y install python-pygame`
- * `sudo -H pip install gTTS`
- * `sudo -H pip install pydub`
- * `sudo apt-get install libav-tools`
- * `sudo apt-get install espeak`
- * `sudo apt-get install python-pypdf2`
- * `sudo easy_install --upgrade pip`
- * `sudo pip install requests==2.6.0`
+ * `./packageSetup.sh`
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
