@@ -11,13 +11,13 @@ screen=None
 myFont=None
 lineLen=None
 
-#FontFile = "../fonts/Watchword_bold_demo.otf"
-#FontSize = 90
-#FilterDot = True
+FontFile = "../fonts/Watchword_bold_demo.otf"
+FilterDot = True
+FontSize = 90
 
-FontFile = "../fonts/Dry_Brush.ttf"
-FontSize = 60
-FilterDot = False
+#FontFile = "../fonts/Dry_Brush.ttf"
+#FilterDot = False
+#FontSize = 60
 
 
 def displayText(text):
