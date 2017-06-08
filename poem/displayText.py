@@ -4,29 +4,40 @@ import sys
 import syslog
 import time
 import os
+import master
 debug = False
 
 screen=None
 myFont=None
 lineLen=None
 
+#FontFile = "../fonts/Watchword_bold_demo.otf"
+#FontSize = 90
+#FilterDot = True
+
+FontFile = "../fonts/Dry_Brush.ttf"
+FontSize = 60
+FilterDot = False
+
 
 def displayText(text):
   global screen
   global myFont
   global lineLen
+  
 
   if myFont is None:
-    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-    if screen.get_width() == 800:
-        fontSize = 90
+    if master.isRaspberry:
+      screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
     else:
-        fontSize = 200
-    syslog.syslog("displayText setting fontSize:"+str(fontSize))
-    lineLen = 16
-    myFont = pygame.font.Font("../fonts/Watchword_bold_demo.otf", fontSize)
+      screen = pygame.display.set_mode([800,480]);
+      
+  syslog.syslog("displayText setting FontSize:"+str(FontSize))
+  lineLen = 16
+  myFont = pygame.font.Font(FontFile, FontSize)
 
-  text=text.replace("."," ")
+  if FilterDot:
+    text=text.replace("."," ")
   text=text.strip()
   words=text.split()
   lines = []

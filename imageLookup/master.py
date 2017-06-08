@@ -6,9 +6,9 @@ import sys
 
 debug=False
 isRaspberry=platform.uname()[1] == 'raspberrypi';
-
 if isRaspberry:
 	import RPi.GPIO as GPIO
+
 
 def isMaster():
   if isRaspberry:

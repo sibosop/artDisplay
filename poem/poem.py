@@ -13,6 +13,7 @@ import browning
 
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 
+import master
 import syslog
 import time
 import random
@@ -113,7 +114,8 @@ class poemLoop(threading.Thread):
       
 
 if __name__ == '__main__':
-  os.environ['DISPLAY']=":0.0"
+  if master.isRaspberry:
+    os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
   t = poemQueueThread()
   t.setDaemon(True)
