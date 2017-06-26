@@ -32,7 +32,7 @@ def displayText(text):
     else:
       screen = pygame.display.set_mode([800,480]);
       
-  syslog.syslog("displayText setting FontSize:"+str(FontSize))
+  if debug: syslog.syslog("displayText setting FontSize:"+str(FontSize))
   lineLen = 16
   myFont = pygame.font.Font(FontFile, FontSize)
 

@@ -7,7 +7,10 @@ import sys
 debug=False
 isRaspberry=platform.uname()[1] == 'raspberrypi';
 if isRaspberry:
-	import RPi.GPIO as GPIO
+  if debug: syslog.syslog("is raspberry");
+  import RPi.GPIO as GPIO
+else:
+  if debug: syslog.syslog("is not raspberry");
 
 
 def isMaster():
@@ -26,16 +29,17 @@ def isDispText():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     if GPIO.input(13):
-      syslog.syslog("is not disp text");
+      if debug: syslog.syslog("is not disp text");
       return False;
 
-  syslog.syslog("is disp text")
+  if debug: syslog.syslog("is disp text")
   return True;
 
 def hasAudio():
   if isRaspberry:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    if debug: syslog.syslog("gpio 5:"+str(GPIO.input(5)))
     if GPIO.input(5):
       if debug: syslog.syslog("no audio");
       return False;
