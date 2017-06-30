@@ -6,6 +6,8 @@ import unicodedata
 import codecs
 import warnings
 
+debug = False
+
 
 
 class fileDecoder:
@@ -25,7 +27,7 @@ class fileDecoder:
       detector.feed(line)
       if detector.done: break
     detector.close()
-    syslog.syslog("file is "+str(detector.result))
+    if debug: syslog.syslog("file is "+str(detector.result))
     self.encoding = detector.result['encoding']
     self.file = codecs.open(textFile,'r',self.encoding)
 

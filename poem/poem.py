@@ -31,7 +31,7 @@ queueMutex=threading.Lock()
 
 def compilePoem(poem):
   rval = []
-  syslog.syslog("compile poem")
+  if debug: syslog.syslog("compile poem")
   try:
     for l in poem:
       if l == "+++++":
