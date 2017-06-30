@@ -11,6 +11,8 @@ import master
 import syslog
 import datetime
 import time
+import schlubTrack
+import soundTrack
 
 debug = False
 if __name__ == '__main__':
@@ -24,6 +26,10 @@ if __name__ == '__main__':
   sst = soundServer.soundServerThread(8080)
   sst.setDaemon(True)
   sst.start()
+  soundTrack.setup()
+  stt = schlubTrack.schlubTrack()
+  stt.setDaemon(True)
+  stt.start()
   im = master.isMaster()
   if im:
     pt = player.playerThread()
