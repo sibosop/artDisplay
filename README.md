@@ -80,12 +80,21 @@ Here is the current hardware used:
 * began to appear on versions after 3/01/2017)
   * `sudo vi /boot/config.txt`
   * add lines
+     * `hdmi_force_hotplug=1`
+     * `hdmi_group=2`
+     * `hdmi_mode=1`
+     * `hdmi_drive=1`
+     * `hdmi_mode=87`
+     * `hdmi_cvt 800 480 60 6 0 0 0`
+* if using large screen then
+  * add lines 
     * `hdmi_force_hotplug=1`
     * `hdmi_group=2`
     * `hdmi_mode=1`
     * `hdmi_drive=1`
-    * `hdmi_mode=87`
-    * `hdmi_cvt 800 480 60 6 0 0 0`
+    * `hdmi_mode=82`
+    
+    
 * turn off screen blanking
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
