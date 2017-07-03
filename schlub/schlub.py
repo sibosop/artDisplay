@@ -15,6 +15,15 @@ import schlubTrack
 import soundTrack
 
 debug = False
+numSchlubTracks=3
+
+eventThreads=[]
+def startEventThread(t):
+  global eventThreads
+  eventThreads.append(t)
+  eventThreads[-1].setDaemon(True)
+  eventThreads[-1].start()
+
 if __name__ == '__main__':
   pname = sys.argv[0]
   os.environ['DISPLAY']=":0.0"
@@ -27,9 +36,8 @@ if __name__ == '__main__':
   sst.setDaemon(True)
   sst.start()
   soundTrack.setup()
-  stt = schlubTrack.schlubTrack()
-  stt.setDaemon(True)
-  stt.start()
+  for i in range(numSchlubTracks):
+    startEventThread(schlubTrack.schlubTrack())
   im = master.isMaster()
   if im:
     pt = player.playerThread()

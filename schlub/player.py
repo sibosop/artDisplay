@@ -16,7 +16,7 @@ class playerThread(threading.Thread):
     edir = adGlobal.eventDir
     while True:
       try:
-        time.sleep(2)
+        time.sleep(random.randint(5,10))
         hosts = []
         services = subprocess.check_output(["slptool"
                         ,"findsrvs","service:schlub.x"]).split('\n')
