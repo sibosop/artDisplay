@@ -3,6 +3,7 @@ sudo apt-get -y install python-pip
 sudo -H pip install --upgrade pip
 sudo apt-get -y install python-setuptools
 sudo -H pip install beautifulsoup4
+sudo -H pip install nmap
 sudo apt-get -y install gcc python-dev
 sudo -H pip install psutil
 sudo apt-get -y install slpd
