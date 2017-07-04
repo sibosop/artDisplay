@@ -31,14 +31,17 @@ if __name__ == '__main__':
   syslog.syslog(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   
   slp.start()
-  slp.register("schlub")
+  im = master.isMaster()
+  attr=""
+  if im:
+    attr="master=true"
+  slp.register("schlub",attr)
   sst = soundServer.soundServerThread(8080)
   sst.setDaemon(True)
   sst.start()
   soundTrack.setup()
   for i in range(numSchlubTracks):
     startEventThread(schlubTrack.schlubTrack())
-  im = master.isMaster()
   if im:
     pt = player.playerThread()
     pt.setDaemon(True)

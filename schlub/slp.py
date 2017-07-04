@@ -9,7 +9,7 @@ def start():
   test = subprocess.check_call(["sudo","service","slpd","start"])
 
 
-def register(service):
+def register(service,attr=""):
   host = subprocess.check_output(["hostname","-I"]).split();
   shost = host[0]
   subnet = "1"
@@ -25,4 +25,8 @@ def register(service):
       break
   syslog.syslog("shost ="+shost)
   regs=["slptool","register","service:"+service+".x://"+shost]
+  if debug: syslog.syslog("attr:"+attr)
+  if attr != "":
+    regs.append(attr)
+  if debug: syslog.syslog("regs:"+str(regs))
   test = subprocess.check_call(regs)
