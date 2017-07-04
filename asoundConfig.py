@@ -24,6 +24,8 @@ def getCardNum(line,key):
   
 
 def main():
+  global micNum
+  global speakerNum
   cardPath = "/proc/asound/cards"
   path = adGlobal.progDir+"/asoundrc.template"
   rcPath = home+"/.asoundrc"
