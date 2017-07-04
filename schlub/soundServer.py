@@ -32,6 +32,8 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       os._exit(3)
     if status == "reboot":
       os._exit(4)
+    if status == "stop":
+      os._exit(5)
 
   def log_message(self, format, *args):
     syslog.syslog("%s - - [%s] %s\n" %
@@ -49,11 +51,14 @@ class soundServer(BaseHTTPServer.HTTPServer):
     rval = "fail\n"
     if len(test) == 1:
       rval = "ok"
-      if test[0] == "/off":
+      if test[0] == "/poweroff":
         syslog.syslog("doing power off")
         rval = "poweroff"
       elif test[0] == "/pause":
         syslog.syslog("doing pause")
+      elif test[0] == "/stop":
+        syslog.syslog("doing stop")
+        rval = "stop"
       elif test[0] == "/reboot":
         syslog.syslog("doing reboot")
         rval = "reboot"

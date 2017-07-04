@@ -8,6 +8,8 @@ while true; do
     ;;
     4) logger doing reboot; sudo reboot
     ;;
+    5) logger doing stop; exit 0
+    ;;
     *)
     ;;
   esac
