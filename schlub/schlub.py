@@ -16,6 +16,7 @@ import soundTrack
 
 debug = False
 numSchlubTracks=3
+schlubExit = 0
 
 eventThreads=[]
 def startEventThread(t):
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     pt = player.playerThread()
     pt.setDaemon(True)
     pt.start()
-  while True:
+  while schlubExit == 0:
     try:
       time.sleep(5)
     except KeyboardInterrupt:
@@ -57,5 +58,5 @@ if __name__ == '__main__':
       break
 
   syslog.syslog(pname+" exiting")
-  exit(1)
+  exit(schlubExit)
 

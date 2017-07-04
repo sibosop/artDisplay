@@ -4,6 +4,8 @@ import threading
 import time
 import syslog
 import schlubTrack
+import schlub
+import os
 
 debug=True
 
@@ -26,6 +28,10 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # then s.path equals "/foo/bar/".
     s.wfile.write(status)
     s.wfile.write("</body></html>")
+    if status == "poweroff":
+      os._exit(3)
+    if status == "reboot":
+      os._exit(4)
 
   def log_message(self, format, *args):
     syslog.syslog("%s - - [%s] %s\n" %
@@ -41,19 +47,44 @@ class soundServer(BaseHTTPServer.HTTPServer):
   def play(self,args):
     test=args.split("?")
     rval = "fail\n"
-    if len(test) != 2:
-      if debug: syslog.syslog("soundServer ignoring:",path)
-    else:
-      cmds=test[1].split("=")
-      if cmds[0] != 'play':
-        if debug: syslog.syslog("soundServer ignoring: "+args)
+    if len(test) == 1:
+      rval = "ok"
+      if test[0] == "/off":
+        syslog.syslog("doing power off")
+        rval = "poweroff"
+      elif test[0] == "/pause":
+        syslog.syslog("doing pause")
+      elif test[0] == "/reboot":
+        syslog.syslog("doing reboot")
+        rval = "reboot"
+
       else:
-        if len(cmds) < 2:
+        syslog.syslog("ignoring:"+args)
+        rval = "fail"
+    elif len(test) == 2:
+      cmds=test[1].split("=")
+      if debug: syslog.syslog("test[0]="+test[0])
+      if test[0] == "/player":
+        if cmds[0] != 'play':
           if debug: syslog.syslog("soundServer ignoring: "+args)
         else:
-          syslog.syslog("doing "+args)
-          schlubTrack.setCurrentSound(cmds[1])
-          rval = "ok\n"
+          if len(cmds) < 2:
+            if debug: syslog.syslog("soundServer ignoring: "+args)
+          else:
+            syslog.syslog("doing "+args)
+            schlubTrack.setCurrentSound(cmds[1])
+            rval = "ok\n"
+      elif test[0] == "/vol":
+        if cmds[0] != 'val':
+          if debug: syslog.syslog("soundServer ignoring: "+args)
+        else:
+          if len(cmds) < 2:
+            if debug: syslog.syslog("soundServer ignoring: "+args)
+          else:
+            syslog.syslog("doing "+args)
+            rval = "ok\n"
+      else:
+        if debug: syslog.syslog("soundServer ignoring:"+args)
           
     return rval;
 
