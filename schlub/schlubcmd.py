@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import subprocess
 import urllib
-debug=True
+debug=False
 
 hosts = []
 def setHostList():
+  print "getting host addresses..."
   global hosts
   hosts=[]
   services = subprocess.check_output(["slptool"
@@ -37,12 +38,13 @@ def printHostList():
 
 def printCmds():
   print "SchlubCmds:"
-  print " exit - exit the program"
+  print " q - exit the program"
   print " hosts - print host list"
   print " reset - reset hosts"
   print " off - power off hosts"
   print " reboot - reboot hosts"
   print " pause - pause hosts"
+  print " stop - stop program"
   print " vol (val) - set volume to val"
   print
 
@@ -56,25 +58,14 @@ def sendCmd(ip,cmd):
   except Exception, e:
     print "sndCmd:",repr(e)
 
-def reboot():
+def sendToHosts(cmd):
   for h in hosts:
     print "sending reboot command to",h['ip']
-    sendCmd(h['ip'],"reboot")
-
-def powerOff():
-  for h in hosts:
-    print "sending power off command to",h['ip']
-    sendCmd(h['ip'],"off")
-
-def pause():
-  for h in hosts:
-    print "sending pause command to",h['ip']
-    sendCmd(h['ip'],"pause")
+    sendCmd(h['ip'],cmd)
 
 def vol(val):
-  for h in hosts:
-    print "set volume of",h['ip'],"to",val
-    sendCmd(h['ip'],"vol?val="+val)
+  cmd = "vol?val="+val
+  sendToHosts(cmd)
 
 def main():
   run=True
@@ -82,31 +73,33 @@ def main():
   printHostList()
   printCmds()
   while run:
-    inp=raw_input("schlub-> ")
-    cmd = inp.split(" ");
-    if cmd[0] == "exit":
-      run=False
-    elif cmd[0] == "reset":
-      setHostList()
-      printHostList()
-    elif cmd[0] == "hosts":
-      printHostList()
-    elif cmd[0] == "off":
-      powerOff()
-    elif cmd[0] == "reboot":
-      reboot()
-    elif cmd[0] == "pause":
-      pause()
-    elif cmd[0] == "vol":
-      if len(cmd) == 2:
-        vol(cmd[1])
-      else:
-        print "Error: no volume specified"
-    else:
-      if cmd[1] != "":
-        print "Error:",inp
-        print
-      printCmds()
+   inp=raw_input("schlub-> ")
+   cmd = inp.split(" ");
+   if cmd[0] == "q":
+     run=False
+   elif cmd[0] == "reset":
+     setHostList()
+     printHostList()
+   elif cmd[0] == "hosts":
+     printHostList()
+   elif cmd[0] == "off":
+     sendToHosts("poweroff")
+   elif cmd[0] == "reboot":
+     sendToHosts("reboot")
+   elif cmd[0] == "stop":
+     sendToHosts("stop")
+   elif cmd[0] == "pause":
+     pause()
+   elif cmd[0] == "vol":
+     if len(cmd) == 2:
+       vol(cmd[1])
+     else:
+       print "Error: no volume specified"
+   else:
+     if len(cmd) == 2 and cmd[1] != "":
+       print "Error:",inp
+       print
+     printCmds()
 
 
 main()
