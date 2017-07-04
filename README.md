@@ -136,8 +136,8 @@ Here is the current hardware used:
  * to start at boot
   * `crontab -e`
   * add these lines
-   * MAILTO=""
-   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh
+   * `MAILTO=""`
+   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh`
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display :0.0 once
  * if the subnet is not 10 then put `export SUBNET=N` in the .bashrc
