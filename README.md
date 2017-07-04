@@ -149,7 +149,8 @@ Here is the current hardware used:
  * `sudo mv vi vi.save`
  * `sudo ln -s vim vi`
  
-#### to change to a different wifi router
+####  wifi router useful into
+ * `nmap -sP 192.168.10.1/24`  (or whatever subnet you care about) 
  * use screen to connect to wifi
  * `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`  is where wifi info is store. remove old wifi info, add new etc
  * `slptool findsrvs service:artdisplay.x` will give you addresses of all connected devices
