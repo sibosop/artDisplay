@@ -159,6 +159,13 @@ Here is the current hardware used:
   * StrictHostKeyChecking no
   * UserKnownHostsFile=/dev/null
   * LogLevel=QUIET
+  
+#### Schlub Info
+ * `crontab -e`
+ * add these lines
+  * `MAILTO=""`
+  * `@reboot /home/pi/GitProjects/artDisplay/asoundConfig.py`
+  * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
 
 
