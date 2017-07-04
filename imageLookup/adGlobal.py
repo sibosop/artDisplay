@@ -8,7 +8,8 @@ from threading import Lock
 mutex = Lock()
 
 debug=False
-home="/home/pi"
+home=os.environ['HOME']
+progDir="/home/pi/GitProjects/artDisplay"
 imageDir='../Images'
 cacheDir="../ImageCache"
 fontDir="../fonts"
