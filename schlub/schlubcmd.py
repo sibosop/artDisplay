@@ -39,7 +39,7 @@ def printHostList():
   for h in hosts:
     o = h['ip']
     if h['attr']:
-      print "attr",h['attr']
+      if debug: print "attr",h['attr']
       o += " "+h['attr']
     print " ",o
   print
@@ -75,8 +75,8 @@ def sendToHosts(cmd):
       print "sending ",cmd,"command to",h['ip']
       sendCmd(h['ip'],cmd)
   if local != "":
-    print "sending ",cmd,"command to local",h['ip']
-    sendCmd(h['ip'],cmd)
+    print "sending ",cmd,"command to local",local
+    sendCmd(local,cmd)
 
 def vol(val):
   cmd = "vol?val="+val
