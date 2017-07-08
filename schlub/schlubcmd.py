@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 import subprocess
 import urllib
+import os
+home = os.environ['HOME']
+import sys
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+import adGlobal
+
 debug=False
 
 hosts = []
@@ -27,11 +33,13 @@ def setHostList():
     if debug: print("slp host",str(host))
     hosts.append(host)
 
+
 def printHostList():
   print "Host list:"
   for h in hosts:
     o = h['ip']
     if h['attr']:
+      print "attr",h['attr']
       o += " "+h['attr']
     print " ",o
   print
@@ -59,8 +67,15 @@ def sendCmd(ip,cmd):
     print "sndCmd:",repr(e)
 
 def sendToHosts(cmd):
+  local = ""
   for h in hosts:
-    print "sending reboot command to",h['ip']
+    if adGlobal.isLocalHost(h['ip']):
+      local = h['ip']
+    else:
+      print "sending ",cmd,"command to",h['ip']
+      sendCmd(h['ip'],cmd)
+  if local != "":
+    print "sending ",cmd,"command to local",h['ip']
     sendCmd(h['ip'],cmd)
 
 def vol(val):
