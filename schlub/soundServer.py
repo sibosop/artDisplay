@@ -6,6 +6,10 @@ import syslog
 import schlubTrack
 import schlub
 import os
+import sys
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/shared")
+import asoundConfig
 
 debug=True
 
@@ -87,6 +91,8 @@ class soundServer(BaseHTTPServer.HTTPServer):
             if debug: syslog.syslog("soundServer ignoring: "+args)
           else:
             syslog.syslog("doing "+args)
+            syslog.syslog("cmds[1]"+cmds[1])
+            asoundConfig.setVolume(cmds[1])
             rval = "ok\n"
       else:
         if debug: syslog.syslog("soundServer ignoring:"+args)

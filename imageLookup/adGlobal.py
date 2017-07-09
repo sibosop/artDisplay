@@ -10,6 +10,7 @@ mutex = Lock()
 debug=False
 home=os.environ['HOME']
 progDir="/home/pi/GitProjects/artDisplay"
+sharedDir=progDir+"/shared"
 imageDir='../Images'
 cacheDir="../ImageCache"
 fontDir="../fonts"
