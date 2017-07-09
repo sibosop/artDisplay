@@ -54,6 +54,7 @@ def printCmds():
   print " pause - pause hosts"
   print " stop - stop program"
   print " vol (val) - set volume to val"
+  print " upgrade - git upgrade the software and reboot"
   print
 
 def sendCmd(ip,cmd):
@@ -105,6 +106,8 @@ def main():
      sendToHosts("stop")
    elif cmd[0] == "pause":
      pause()
+   elif cmd[0] == "upgrade":
+     sendToHosts("upgrade")
    elif cmd[0] == "vol":
      if len(cmd) == 2:
        vol(cmd[1])
