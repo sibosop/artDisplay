@@ -21,20 +21,25 @@ def getCardNum(line,key):
     rval = line.split()[0].strip()
   return rval
 
+hwInit = False
+hw={}
 def getHw():
-  rval={}
-  rval['Mic']="0"
-  rval['Speaker']=0
-  cardPath = "/proc/asound/cards"
-  with open(cardPath) as f:
-    for line in f:
-      t = getCardNum(line,usbMic)
-      if t != "":
-        rval['Mic'] = t
-      t = getCardNum(line,usbSpeaker)
-      if t != "":
-        rval['Speaker'] = t
-  return rval 
+  global hwInit
+  global hw
+  if hwInit is False:
+    hw['Mic']="0"
+    hw['Speaker']=0
+    cardPath = "/proc/asound/cards"
+    with open(cardPath) as f:
+      for line in f:
+        t = getCardNum(line,usbMic)
+        if t != "":
+          hw['Mic'] = t
+        t = getCardNum(line,usbSpeaker)
+        if t != "":
+          hw['Speaker'] = t
+    hwInit = True
+  return hw 
   
 
 def makeRc():
