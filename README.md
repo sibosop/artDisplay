@@ -165,7 +165,7 @@ Here is the current hardware used:
  * `crontab -e`
  * add these lines
   * `MAILTO=""`
-  * `@reboot /home/pi/GitProjects/artDisplay/asoundConfig.py`
+  * `@reboot /home/pi/GitProjects/artDisplay/schlub/asoundConfig.py`
   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
 
