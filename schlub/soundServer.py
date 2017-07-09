@@ -10,6 +10,7 @@ import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 import asoundConfig
+import upgrade
 
 debug=True
 
@@ -66,7 +67,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
       elif test[0] == "/reboot":
         syslog.syslog("doing reboot")
         rval = "reboot"
-
+      elif test[0] == "/upgrade":
+        upgrade.upgrade()
+        rval = "reboot"
       else:
         syslog.syslog("ignoring:"+args)
         rval = "fail"
