@@ -18,7 +18,6 @@ class playerThread(threading.Thread):
     edir = adGlobal.eventDir
     while True:
       try:
-        time.sleep(random.randint(5,10))
         hosts = []
         services = subprocess.check_output(["slptool"
                         ,"findsrvs","service:schlub.x"]).split('\n')
@@ -31,7 +30,7 @@ class playerThread(threading.Thread):
           if loc[0] == '':
             continue
           if debug: syslog.syslog("loc:"+str(loc))
-          attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
+          #attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
           host={}
           host['ip']=loc[0].split("//")[1]
           if debug: syslog.syslog("slp host"+str(host))
@@ -47,5 +46,8 @@ class playerThread(threading.Thread):
           f = urllib.urlopen(request)
           test = f.read()
           if debug: syslog.syslog("got response:"+test)
+        stime = random.randint(15,40)
+        if debug: syslog.syslog("next change:"+str(stime))
+        time.sleep(stime)
       except Exception, e:
         syslog.syslog("player error: "+repr(e))
