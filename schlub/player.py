@@ -9,6 +9,8 @@ import adGlobal
 import sys
 import random
 import urllib
+import soundFile
+
 
 debug = True
 class playerThread(threading.Thread):
@@ -34,13 +36,8 @@ class playerThread(threading.Thread):
           host['ip']=loc[0].split("//")[1]
           if debug: syslog.syslog("slp host"+str(host))
           hosts.append(host)
-        files = glob.glob(edir+"/*.wav")
-        n = random.randint(0,len(files)-1)
-        choice = files[n]
-        t =choice.rfind("/")
-        if t != -1:
-          choice = choice[t+1:]
-
+        e = soundFile.getSoundEntry()
+        choice = e.name
         if debug: syslog.syslog("player choosing "+choice)
         for h in hosts:
           ip = h['ip']
