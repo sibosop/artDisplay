@@ -11,6 +11,8 @@ home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 import asoundConfig
 import upgrade
+import soundFile
+import master
 
 debug=True
 
@@ -70,6 +72,12 @@ class soundServer(BaseHTTPServer.HTTPServer):
       elif test[0] == "/upgrade":
         upgrade.upgrade()
         rval = "reboot"
+      elif test[0] == "/refresh":
+        if master.isMaster():
+          soundFile.refresh()
+          rval = "ok"
+        else:
+          rval = "not_master"
       else:
         syslog.syslog("ignoring:"+args)
         rval = "fail"

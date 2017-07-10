@@ -18,10 +18,12 @@ FileEntry=collections.namedtuple('FileEntry',rows)
 
 fileList=collections.OrderedDict();
 
-def createFileList():
+def refresh():
   global fileList
+  rval = True
   edir = adGlobal.eventDir
   eventFile = edir+"/EventCtrl.csv"
+  fileList = {}
   try:
     if debug: syslog.syslog("reading:"+eventFile)
     with open(eventFile,"r") as f:
@@ -31,6 +33,15 @@ def createFileList():
         fileList[data.name] = data
   except IOError: 
     syslog.syslog("can't open:"+eventFile);
+    rval = False
+  return rval
+
+
+def createFileList():
+  global fileList
+  edir = adGlobal.eventDir
+  eventFile = edir+"/EventCtrl.csv"
+  if refresh() is False:
     files = glob.glob(edir+"/*.wav")
     for f in files:
       n = f.split("/")[-1]
@@ -58,6 +69,10 @@ def getSoundEntry():
 
 
 if __name__ == '__main__':
+  for x in range(0,10):
+    entry = getSoundEntry()
+    print entry
+  print refresh()
   for x in range(0,10):
     entry = getSoundEntry()
     print entry
