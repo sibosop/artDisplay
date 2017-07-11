@@ -106,7 +106,7 @@ def main():
    elif cmd[0] == "stop":
      sendToHosts("stop")
    elif cmd[0] == "pause":
-     pause()
+     sendToHosts("pause")
    elif cmd[0] == "upgrade":
      sendToHosts("upgrade")
    elif cmd[0] == "refresh":
