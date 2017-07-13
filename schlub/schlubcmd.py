@@ -51,11 +51,12 @@ def printCmds():
   print " reset - reset hosts"
   print " off - power off hosts"
   print " reboot - reboot hosts"
-  print " pause - pause hosts"
+  print " probe - probe hosts"
   print " stop - stop program"
   print " vol (val) - set volume to val"
   print " upgrade - git upgrade the software and reboot"
   print " refresh - refresh sound file table on master"
+  print " rescan - rescan sound file table on master"
   print
 
 def sendCmd(ip,cmd):
@@ -105,12 +106,14 @@ def main():
      sendToHosts("reboot")
    elif cmd[0] == "stop":
      sendToHosts("stop")
-   elif cmd[0] == "pause":
-     sendToHosts("pause")
+   elif cmd[0] == "probe":
+     sendToHosts("probe")
    elif cmd[0] == "upgrade":
      sendToHosts("upgrade")
    elif cmd[0] == "refresh":
      sendToHosts("refresh")
+   elif cmd[0] == "rescan":
+     sendToHosts("rescan")
    elif cmd[0] == "vol":
      if len(cmd) == 2:
        vol(cmd[1])
