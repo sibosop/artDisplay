@@ -61,8 +61,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
       if test[0] == "/poweroff":
         syslog.syslog("doing power off")
         rval = "poweroff"
-      elif test[0] == "/pause":
-        syslog.syslog("doing pause")
+      elif test[0] == "/probe":
+        syslog.syslog("doing probe")
+        rval = "probe: is master:"+str(master.isMaster())
       elif test[0] == "/stop":
         syslog.syslog("doing stop")
         rval = "stop"
@@ -75,6 +76,12 @@ class soundServer(BaseHTTPServer.HTTPServer):
       elif test[0] == "/refresh":
         if master.isMaster():
           soundFile.refresh()
+          rval = "ok"
+        else:
+          rval = "not_master"
+      elif test[0] == "/rescan":
+        if master.isMaster():
+          soundFile.rescan()
           rval = "ok"
         else:
           rval = "not_master"
