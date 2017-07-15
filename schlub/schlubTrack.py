@@ -14,11 +14,23 @@ import time
 debug = True
 currentSoundFile = ""
 
+def findSoundFile(file):
+  dir = adGlobal.eventDir
+  path = dir+"/"+file
+  rval = ""
+  if os.path.isfile(path):
+    rval = path
+  return rval
+
 def setCurrentSound(file):
   global currentSoundFile
-  soundTrack.eventMutex.acquire()
-  currentSoundFile=file
-  soundTrack.eventMutex.release()
+  rval = "fail"
+  if findSoundFile(file) != "":
+    soundTrack.eventMutex.acquire()
+    currentSoundFile=file
+    soundTrack.eventMutex.release()
+    rval = "ok"
+  return rval
 
 class schlubTrack(threading.Thread):
   def run(self):

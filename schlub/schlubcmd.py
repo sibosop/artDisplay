@@ -7,7 +7,7 @@ import sys
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 import adGlobal
 
-debug=False
+debug=True
 
 hosts = []
 def setHostList():
@@ -24,11 +24,11 @@ def setHostList():
     if loc[0] == '':
       continue
     if debug: print("loc:",str(loc))
-    attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
-    attr=attr.strip()
-    if debug: print "attr:",attr
+    #attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
+    #attr=attr.strip()
+    #if debug: print "attr:",attr
     host={}
-    host['attr']=attr
+    #host['attr']=attr
     host['ip']=loc[0].split("//")[1]
     if debug: print("slp host",str(host))
     hosts.append(host)
@@ -38,7 +38,7 @@ def printHostList():
   print "Host list:"
   for h in hosts:
     o = h['ip']
-    if h['attr']:
+    if 'attr' in h:
       if debug: print "attr",h['attr']
       o += " "+h['attr']
     print " ",o
@@ -46,17 +46,21 @@ def printHostList():
 
 def printCmds():
   print "SchlubCmds:"
-  print " q - exit the program"
+
+  print " auto - set auto play mode"
   print " hosts - print host list"
-  print " reset - reset hosts"
+  print " manual - set manual play mode"
   print " off - power off hosts"
-  print " reboot - reboot hosts"
+  print " play (filename) - play the given wav filename (minus .wav)"
   print " probe - probe hosts"
-  print " stop - stop program"
-  print " vol (val) - set volume to val"
-  print " upgrade - git upgrade the software and reboot"
+  print " reboot - reboot hosts"
   print " refresh - refresh sound file table on master"
+  print " reset - reset hosts"
   print " rescan - rescan sound file table on master"
+  print " stop - stop program"
+  print " q - exit the program"
+  print " upgrade - git upgrade the software and reboot"
+  print " vol (val) - set volume to val"
   print
 
 def sendCmd(ip,cmd):
@@ -83,6 +87,11 @@ def sendToHosts(cmd):
 
 def vol(val):
   cmd = "vol?val="+val
+  sendToHosts(cmd)
+
+# request;http://192.168.20.104:8080/player?play=filename
+def play(filename):
+  cmd = "player?play="+filename+".wav"
   sendToHosts(cmd)
 
 def main():
@@ -114,11 +123,21 @@ def main():
      sendToHosts("refresh")
    elif cmd[0] == "rescan":
      sendToHosts("rescan")
+   elif cmd[0] == "auto":
+     sendToHosts("auto")
+   elif cmd[0] == "manual":
+     sendToHosts("manual")
+
    elif cmd[0] == "vol":
      if len(cmd) == 2:
        vol(cmd[1])
      else:
        print "Error: no volume specified"
+   elif cmd[0] == "play":
+     if len(cmd) == 2:
+       play(cmd[1])
+     else:
+       print "Error: no filename specified"
    else:
      if len(cmd) == 2 and cmd[1] != "":
        print "Error:",inp
