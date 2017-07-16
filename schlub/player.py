@@ -13,11 +13,37 @@ import soundFile
 
 
 debug = True
+enabled = True
+
+playerMutex=threading.Lock()
+
+def enable(val):
+  global enabled
+  playerMutex.acquire()
+  enabled = val
+  playerMutex.release()
+  if debug: syslog.syslog("player enabled:"+str(enabled))
+
+def isEnabled():
+  global enabled
+  playerMutex.acquire()
+  rval = enabled
+  playerMutex.release()
+  return rval
+
 class playerThread(threading.Thread):
   def run(self):
     edir = adGlobal.eventDir
+    first = True
     while True:
       try:
+        if isEnabled() is False:
+          if first:
+            first = False
+            if debug: syslog.syslog("PLAYER: DISABLING AUTO PLAYER")
+          time.sleep(2)
+          continue
+        first = True
         hosts = []
         services = subprocess.check_output(["slptool"
                         ,"findsrvs","service:schlub.x"]).split('\n')

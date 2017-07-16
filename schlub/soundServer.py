@@ -13,6 +13,7 @@ import asoundConfig
 import upgrade
 import soundFile
 import master
+import player
 
 debug=True
 
@@ -73,6 +74,18 @@ class soundServer(BaseHTTPServer.HTTPServer):
       elif test[0] == "/upgrade":
         upgrade.upgrade()
         rval = "reboot"
+      elif test[0] == "/auto":
+        if master.isMaster():
+          player.enable(True)
+          rval = "ok"
+        else:
+          rval = "not_master"
+      elif test[0] == "/manual":
+        if master.isMaster():
+          player.enable(False)
+          rval = "ok"
+        else:
+          rval = "not_master"
       elif test[0] == "/refresh":
         if master.isMaster():
           soundFile.refresh()
@@ -99,8 +112,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
             if debug: syslog.syslog("soundServer ignoring: "+args)
           else:
             syslog.syslog("doing "+args)
-            schlubTrack.setCurrentSound(cmds[1])
-            rval = "ok\n"
+            rval = schlubTrack.setCurrentSound(cmds[1]) + "\n"
       elif test[0] == "/vol":
         if cmds[0] != 'val':
           if debug: syslog.syslog("soundServer ignoring: "+args)
