@@ -4,34 +4,13 @@ import urllib
 import os
 home = os.environ['HOME']
 import sys
+import slp
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 import adGlobal
 
 debug=True
 
 hosts = []
-def setHostList():
-  print "getting host addresses..."
-  global hosts
-  hosts=[]
-  services = subprocess.check_output(["slptool"
-                  ,"findsrvs","service:schlub.x"]).split('\n')
-  if len(services) == 0:
-    if debug: print "no available services"
-  for s in services:
-    if debug: print "slp s:",s
-    loc=s.split(',');
-    if loc[0] == '':
-      continue
-    if debug: print("loc:",str(loc))
-    #attr=subprocess.check_output(["slptool","findattrs",loc[0]]);
-    #attr=attr.strip()
-    #if debug: print "attr:",attr
-    host={}
-    #host['attr']=attr
-    host['ip']=loc[0].split("//")[1]
-    if debug: print("slp host",str(host))
-    hosts.append(host)
 
 
 def printHostList():
@@ -95,8 +74,9 @@ def play(filename):
   sendToHosts(cmd)
 
 def main():
+  global hosts
   run=True
-  setHostList()
+  hosts = slp.getHosts("schlub")
   printHostList()
   printCmds()
   while run:
@@ -105,7 +85,7 @@ def main():
    if cmd[0] == "q":
      run=False
    elif cmd[0] == "reset":
-     setHostList()
+     hosts = slp.getHosts("schlub")
      printHostList()
    elif cmd[0] == "hosts":
      printHostList()
