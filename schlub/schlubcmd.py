@@ -37,6 +37,7 @@ def printCmds():
   print " reset - reset hosts"
   print " rescan - rescan sound file table on master"
   print " stop - stop program"
+  print " threads (count) - set number of player threads"
   print " q - exit the program"
   print " upgrade - git upgrade the software and reboot"
   print " vol (val) - set volume to val"
@@ -66,6 +67,10 @@ def sendToHosts(cmd):
 
 def vol(val):
   cmd = "vol?val="+val
+  sendToHosts(cmd)
+
+def threads(n):
+  cmd = "threads?n="+n
   sendToHosts(cmd)
 
 # request;http://192.168.20.104:8080/player?play=filename
@@ -114,6 +119,11 @@ def main():
        vol(cmd[1])
      else:
        print "Error: no volume specified"
+   elif cmd[0] == "threads":
+     if len(cmd) == 2:
+       threads(cmd[1])
+     else:
+       print "Error: no thread count  specified"
    elif cmd[0] == "play":
      if len(cmd) == 2:
        play(cmd[1])
