@@ -76,6 +76,7 @@ def play(filename):
 def main():
   global hosts
   run=True
+  print "getting host list"
   hosts = slp.getHosts("schlub")
   printHostList()
   printCmds()
