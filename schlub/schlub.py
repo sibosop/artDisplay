@@ -15,7 +15,7 @@ import schlubTrack
 import soundTrack
 
 debug = False
-numSchlubTracks=3
+numSchlubThreads=3
 schlubExit = 0
 
 eventThreads=[]
@@ -41,8 +41,7 @@ if __name__ == '__main__':
   sst.setDaemon(True)
   sst.start()
   soundTrack.setup()
-  for i in range(numSchlubTracks):
-    startEventThread(schlubTrack.schlubTrack())
+  schlubTrack.changeNumSchlubThreads(numSchlubThreads)
   if im:
     pt = player.playerThread()
     pt.setDaemon(True)

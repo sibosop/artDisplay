@@ -113,6 +113,16 @@ class soundServer(BaseHTTPServer.HTTPServer):
           else:
             syslog.syslog("doing "+args)
             rval = schlubTrack.setCurrentSound(cmds[1]) + "\n"
+      if test[0] == "/threads":
+        if cmds[0] != 'n':
+          if debug: syslog.syslog("soundServer ignoring: "+args)
+        else:
+          if len(cmds) < 2:
+            if debug: syslog.syslog("soundServer ignoring: "+args)
+          else:
+            syslog.syslog("doing "+args)
+            syslog.syslog("cmds[1]"+cmds[1])
+            rval = schlubTrack.changeNumSchlubThreads(int(cmds[1])) + "\n"
       elif test[0] == "/vol":
         if cmds[0] != 'val':
           if debug: syslog.syslog("soundServer ignoring: "+args)
