@@ -168,6 +168,8 @@ Here is the current hardware used:
   * `@reboot /home/pi/GitProjects/artDisplay/shared/asoundConfig.py`
   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
-
-
+#### AssAi Project
+ * https://cloud.google.com/sdk/downloads#apt-get
+ * https://cloud.google.com/speech/docs/reference/libraries#client-libraries-install-python
+ * have attempted to put necessary commands in packageSetup.py
 
