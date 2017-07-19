@@ -33,3 +33,4 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt-get update && sudo apt-get install google-cloud-sdk google-cloud-sdk-app-engine-python
 sudo pip install --upgrade google-cloud-speech
 gcloud init
+gcloud auth application-default login
