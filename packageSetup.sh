@@ -34,3 +34,4 @@ sudo apt-get update && sudo apt-get install google-cloud-sdk google-cloud-sdk-ap
 sudo pip install --upgrade google-cloud-speech
 gcloud init
 gcloud auth application-default login
+sudo apt-get install libasound2-dev
