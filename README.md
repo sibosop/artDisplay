@@ -169,7 +169,32 @@ Here is the current hardware used:
   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
 #### AssAi Project
+
+# AssAi
+#### Speech Recog info
  * https://cloud.google.com/sdk/downloads#apt-get
  * https://cloud.google.com/speech/docs/reference/libraries#client-libraries-install-python
  * have attempted to put necessary commands in packageSetup.py
 
+#### Google assistant
+starting here: https://developers.google.com/assistant/sdk/prototype/getting-started-pi-python/
+
+Setting up usb speakers/mic has the unfortunate feature of assigning usb 'cards' at random during bootup. This will need to be fixed automagically but until that happens:
+* `cat /proc/asound/cards`
+This will list the 'cards'. This is assuming you are using the adafruint usb mic/speakers recommended by google
+* USB-Audio - USB PnP Sound Device - microphone card
+* USB-Audio - USB2.0 Device - speaker card
+Once you have the card numbers you edit this file:
+* `cp ~/GitProjects/AssAi/asoundrc.template ~/.asoundrc`
+* `vi ~/.asoundrc`
+Change the `pcm: hw:<cardno>,1` to have the proper numbers for the mic and speaker.
+
+Linux uses ALSA for its audio:
+* speaker-test 
+  * `speaker-test -c2`
+* arecord
+  * `arecord --format=S16_LE --duration=5 --rate=16k --file-type=raw out.raw`
+* aplay
+  * `aplay --format=S16_LE --rate=16k out.raw`
+* alsamixer (gui) or amixer (command line)
+  * amixer -c 2 cset numid=3,name='PCM Playback Volume' 100
