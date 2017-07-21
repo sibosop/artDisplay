@@ -12,6 +12,7 @@ speakerKey="SPEAKER_CARD"
 
 usbMic="USB-Audio - USB PnP Sound Device"
 usbSpeaker="USB-Audio - USB2.0 Device"
+usbSpeakerAlt="USB-Audio - USB Audio Device"
 
 
 def getCardNum(line,key):
@@ -36,6 +37,9 @@ def getHw():
         if t != "":
           hw['Mic'] = t
         t = getCardNum(line,usbSpeaker)
+        if t != "":
+          hw['Speaker'] = t
+        t = getCardNum(line,usbSpeakerAlt)
         if t != "":
           hw['Speaker'] = t
     hwInit = True
