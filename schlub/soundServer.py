@@ -14,6 +14,7 @@ import upgrade
 import soundFile
 import master
 import player
+import json
 
 debug=True
 
@@ -35,7 +36,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # If someone went to "http://something.somewhere.net/foo/bar/",
     # then s.path equals "/foo/bar/".
     s.wfile.write(status)
-    s.wfile.write("</body></html>")
+    #s.wfile.write("</body></html>")
     if status == "poweroff":
       os._exit(3)
     if status == "reboot":
@@ -54,6 +55,15 @@ class soundServer(BaseHTTPServer.HTTPServer):
     BaseHTTPServer.HTTPServer.__init__(self,client,handler)
     self.test = "test var"
 
+  def doProbe(self):
+    state = {}
+    state['status'] = "ok"
+    state['vol'] = 666
+    state['isMaster'] = master.isMaster()
+    state['sound'] = "not yet"
+    state['phrase'] = "not yet"
+    return json.dumps(state)
+
   def play(self,args):
     test=args.split("?")
     rval = "fail\n"
@@ -64,7 +74,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
         rval = "poweroff"
       elif test[0] == "/probe":
         syslog.syslog("doing probe")
-        rval = "probe: is master:"+str(master.isMaster())
+        rval = self.doProbe();
       elif test[0] == "/stop":
         syslog.syslog("doing stop")
         rval = "stop"
