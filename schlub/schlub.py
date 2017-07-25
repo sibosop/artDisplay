@@ -15,7 +15,7 @@ import schlubTrack
 import soundTrack
 
 debug = False
-numSchlubThreads=3
+numSchlubThreads=1
 schlubExit = 0
 
 eventThreads=[]
