@@ -152,5 +152,5 @@ def getVolume():
 if __name__ == '__main__':
   makeRc()
   #setVolume(sys.argv[1])
-  print getVolume()
+  #print getVolume()
 
