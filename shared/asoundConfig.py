@@ -94,7 +94,7 @@ def setVolume(vol):
   syslog.syslog("max volume:"+hw['max'])
   volRat = int(hw['max'])/100.0
   setVol = float(vol) * volRat
-  setVol = int(setVol)
+  setVol = int(round(setVol))
   syslog.syslog("max volume:"
     +hw['max']
     +" Rat:"
@@ -123,8 +123,34 @@ def setVolume(vol):
   except CalledProcessError as e:
     syslog.syslog(e.output)
 
+def getVolume():
+  vol = 666
+  hw=getHw()
+  syslog.syslog("max volume:"+hw['max'])
+  volRat = int(hw['max'])/100.0
+  syslog.syslog("max volume:"
+    +hw['max']
+    +" Rat:"
+    +str(volRat)
+    )
+  cmdHdr = ["amixer", "-c",hw['Speaker'],"cget","numid=3"]
+  try:
+    cmd = cmdHdr[:]
+    output = check_output(cmd)
+    lines = output.split("\n");
+    for l in lines:
+      if l.find(": values=") != -1: 
+        var = l.split("=")
+        var = var[1].split(",")
+        vol=int(round(float(var[0])/volRat))
+
+  except CalledProcessError as e:
+    syslog.syslog(e.output)
+
+  return vol
 
 if __name__ == '__main__':
   makeRc()
   #setVolume(sys.argv[1])
+  print getVolume()
 
