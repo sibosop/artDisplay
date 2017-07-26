@@ -127,7 +127,7 @@ def getVolume():
   vol = 666
   hw=getHw()
   syslog.syslog("max volume:"+hw['max'])
-  volRat = int(hw['max'])/100.0
+  volRat = float(hw['max'])/100.0
   syslog.syslog("max volume:"
     +hw['max']
     +" Rat:"
