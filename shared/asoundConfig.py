@@ -24,6 +24,24 @@ def getCardNum(line,key):
 
 hwInit = False
 hw={}
+def setSpeakerInfo(hw):
+  cmdHdr = ["amixer", "-c",hw['Speaker']]
+  try:
+    cmd = cmdHdr[:]
+    output = check_output(cmd)
+    lines = output.split("\n");
+    for l in lines:
+      n = l.find("Limits: Playback") 
+      if n != -1:
+        vars = l.split()
+        hw['min'] = vars[2]
+        hw['max'] = vars[4]
+
+  except CalledProcessError as e:
+    syslog.syslog(e.output)
+
+
+
 def getHw():
   global hwInit
   global hw
@@ -39,9 +57,14 @@ def getHw():
         t = getCardNum(line,usbSpeaker)
         if t != "":
           hw['Speaker'] = t
+          hw['SpeakerBrand']= "HONK"
         t = getCardNum(line,usbSpeakerAlt)
         if t != "":
           hw['Speaker'] = t
+          hw['SpeakerBrand'] = "JLAB"
+
+    #retrieve info about speaker
+    setSpeakerInfo(hw)
     hwInit = True
   return hw 
   
@@ -65,7 +88,22 @@ def makeRc():
 
 # amixer -c 2 cset numid=3,name='PCM Playback Volume' 100
 def setVolume(vol):
+  if int(vol) >= 100 :
+    vol = "100"
   hw=getHw()
+  syslog.syslog("max volume:"+hw['max'])
+  volRat = int(hw['max'])/100.0
+  setVol = float(vol) * volRat
+  setVol = int(setVol)
+  syslog.syslog("max volume:"
+    +hw['max']
+    +" Rat:"
+    +str(volRat)
+    +" Vol:"
+    +str(vol)
+    +" SetVol:"
+    +str(setVol)
+    )
   cmdHdr = ["amixer", "-c",hw['Speaker']]
   try:
     cmd = cmdHdr[:]
@@ -78,15 +116,12 @@ def setVolume(vol):
         cmd = cmdHdr[:]
         cmd.append("cset")  
         cmd.append(vars[0]+","+vars[2])
-        cmd.append(str(vol)) 
+        cmd.append(str(setVol)) 
         if debug: syslog.syslog("vol:"+str(cmd))
         output = check_output(cmd)
 
   except CalledProcessError as e:
     syslog.syslog(e.output)
-
-
-
 
 
 if __name__ == '__main__':
