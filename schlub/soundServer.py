@@ -58,10 +58,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
   def doProbe(self):
     state = {}
     state['status'] = "ok"
-    state['vol'] = 666
+    state['vol'] = asoundConfig.getVolume()
     state['isMaster'] = master.isMaster()
-    state['sound'] = "not yet"
-    state['phrase'] = "not yet"
+    state['sound'] = schlubTrack.getCurrentSound()
+    state['phrase'] = schlubTrack.getCurrentPhrase()
     return json.dumps(state)
 
   def play(self,args):

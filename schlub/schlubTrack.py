@@ -32,6 +32,17 @@ def setCurrentSound(file):
     rval = "ok"
   return rval
 
+def getCurrentSound():
+  global currentSoundFile
+  soundTrack.eventMutex.acquire()
+  rval = currentSoundFile
+  soundTrack.eventMutex.release()
+  n = currentSoundFile.rfind(".")
+  return rval[0:n]
+
+def getCurrentPhrase():
+  return "current phrase"
+
 class schlubTrack(threading.Thread):
   def __init__(self,name):
     super(schlubTrack,self).__init__()
