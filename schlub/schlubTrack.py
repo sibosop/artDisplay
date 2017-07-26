@@ -10,6 +10,7 @@ import pygame
 import syslog
 import random
 import time
+import soundServer
 
 debug = True
 currentSoundFile = ""
@@ -30,7 +31,7 @@ def setCurrentSound(file):
     currentSoundFile=file
     soundTrack.eventMutex.release()
     rval = "ok"
-  return rval
+  return soundServer.jsonStatus(rval)
 
 def getCurrentSound():
   global currentSoundFile
@@ -130,4 +131,4 @@ def changeNumSchlubThreads(n):
       startEventThread()
     elif len(eventThreads) > n:
       stopEventThread()
-  return "ok"
+  return soundServer.jsonStatus("ok")

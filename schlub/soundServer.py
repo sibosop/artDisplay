@@ -18,6 +18,10 @@ import json
 
 debug=True
 
+def jsonStatus(s):
+  d = {}
+  d['status'] = s
+  return json.dumps(d)
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   def do_HEAD(s):
@@ -37,11 +41,13 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # then s.path equals "/foo/bar/".
     s.wfile.write(status)
     #s.wfile.write("</body></html>")
-    if status == "poweroff":
+    if debug: syslog.syslog("status:"+status)
+    s = json.loads(status)
+    if s['status'] == "poweroff":
       os._exit(3)
-    if status == "reboot":
+    if s['status'] == "reboot":
       os._exit(4)
-    if status == "stop":
+    if s['status'] == "stop":
       os._exit(5)
 
   def log_message(self, format, *args):
@@ -66,51 +72,50 @@ class soundServer(BaseHTTPServer.HTTPServer):
 
   def play(self,args):
     test=args.split("?")
-    rval = "fail\n"
+    rval = jsonStatus("fail")
     if len(test) == 1:
-      rval = "ok"
       if test[0] == "/poweroff":
         syslog.syslog("doing power off")
-        rval = "poweroff"
+        rval = jsonStatus("poweroff")
       elif test[0] == "/probe":
         syslog.syslog("doing probe")
         rval = self.doProbe();
       elif test[0] == "/stop":
         syslog.syslog("doing stop")
-        rval = "stop"
+        rval = jsonStatus("stop")
       elif test[0] == "/reboot":
         syslog.syslog("doing reboot")
-        rval = "reboot"
+        rval = jsonStatus("reboot")
       elif test[0] == "/upgrade":
         upgrade.upgrade()
-        rval = "reboot"
+        rval = jsonStatus("reboot")
       elif test[0] == "/auto":
         if master.isMaster():
           player.enable(True)
-          rval = "ok"
+          rval = jsonStatus("ok")
         else:
-          rval = "not_master"
+          rval = jsonStatus("not_master")
       elif test[0] == "/manual":
         if master.isMaster():
           player.enable(False)
-          rval = "ok"
+          rval = jsonStatus("ok")
         else:
-          rval = "not_master"
+          rval = jsonStatus("not_master")
       elif test[0] == "/refresh":
         if master.isMaster():
           soundFile.refresh()
-          rval = "ok"
+          rval = jsonStatus("ok")
         else:
-          rval = "not_master"
+          rval = jsonStatus("not_master")
       elif test[0] == "/rescan":
         if master.isMaster():
           soundFile.rescan()
-          rval = "ok"
+          rval = jsonStatus("ok")
         else:
-          rval = "not_master"
+          rval = jsonStatus("not_master")
       else:
         syslog.syslog("ignoring:"+args)
-        rval = "fail"
+        rval = jsonStatus("fail")
     elif len(test) == 2:
       cmds=test[1].split("=")
       if debug: syslog.syslog("test[0]="+test[0])
@@ -122,7 +127,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
             if debug: syslog.syslog("soundServer ignoring: "+args)
           else:
             syslog.syslog("doing "+args)
-            rval = schlubTrack.setCurrentSound(cmds[1]) + "\n"
+            rval = schlubTrack.setCurrentSound(cmds[1])
       if test[0] == "/threads":
         if cmds[0] != 'n':
           if debug: syslog.syslog("soundServer ignoring: "+args)
@@ -132,7 +137,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
           else:
             syslog.syslog("doing "+args)
             syslog.syslog("cmds[1]"+cmds[1])
-            rval = schlubTrack.changeNumSchlubThreads(int(cmds[1])) + "\n"
+            rval = schlubTrack.changeNumSchlubThreads(int(cmds[1]))
       elif test[0] == "/vol":
         if cmds[0] != 'val':
           if debug: syslog.syslog("soundServer ignoring: "+args)
@@ -143,7 +148,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
             syslog.syslog("doing "+args)
             syslog.syslog("cmds[1]"+cmds[1])
             asoundConfig.setVolume(cmds[1])
-            rval = "ok\n"
+          rval = jsonStatus("ok")
       else:
         if debug: syslog.syslog("soundServer ignoring:"+args)
           
