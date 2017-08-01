@@ -68,6 +68,8 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['isMaster'] = master.isMaster()
     state['sound'] = schlubTrack.getCurrentSound()
     state['phrase'] = schlubTrack.getCurrentPhrase()
+    state['threads'] = len(schlubTrack.eventThreads)
+    state['speaker'] = asoundConfig.getHw()['SpeakerBrand'];
     return json.dumps(state)
 
   def play(self,args):
