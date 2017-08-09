@@ -15,6 +15,7 @@ import soundServer
 debug = True
 currentSoundFile = ""
 soundMaxVol = 1.0
+soundMinVol = 0.1
 
 def findSoundFile(file):
   dir = adGlobal.eventDir
@@ -89,8 +90,7 @@ class schlubTrack(threading.Thread):
         nsound = soundTrack.speedx(sound,factor)
         if nsound is not None:
           sound = nsound
-        l = random.random() * soundMaxVol
-        #r = random.random() * soundMaxVol
+        l = random.uniform(soundMinVol,soundMaxVol);
         r = l
         soundTrack.playSound(sound,l,r)
       except Exception as e:
