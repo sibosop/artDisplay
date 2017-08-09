@@ -36,6 +36,7 @@ soundDir="/media/pi/SOUND/"
 backgroundDir=soundDir+"background/"
 rythmnDir=soundDir+"rythmn/"
 eventDir=soundDir+"events/"
+hasAudio=False
 
 def internetOn():
   try:

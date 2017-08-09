@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import os
 home = os.environ['HOME']
 import sys
@@ -43,8 +43,6 @@ def getCurrentSound():
   n = currentSoundFile.rfind(".")
   return rval[0:n]
 
-def getCurrentPhrase():
-  return "current phrase"
 
 class schlubTrack(threading.Thread):
   def __init__(self,name):

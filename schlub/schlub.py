@@ -13,6 +13,8 @@ import datetime
 import time
 import schlubTrack
 import soundTrack
+import schlubSpeak
+import adGlobal
 
 debug = False
 numSchlubThreads=1
@@ -26,6 +28,7 @@ def startEventThread(t):
   eventThreads[-1].start()
 
 if __name__ == '__main__':
+  adGlobal.hasAudio=True
   pname = sys.argv[0]
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
@@ -42,6 +45,9 @@ if __name__ == '__main__':
   sst.start()
   soundTrack.setup()
   schlubTrack.changeNumSchlubThreads(numSchlubThreads)
+  speakThread = schlubSpeak.schlubSpeakThread()
+  speakThread.setDaemon(True)
+  speakThread.start()
   if im:
     pt = player.playerThread()
     pt.setDaemon(True)

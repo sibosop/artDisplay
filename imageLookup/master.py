@@ -3,6 +3,7 @@ import time
 import platform
 import syslog
 import sys
+import adGlobal
 
 debug=False
 isRaspberry=platform.uname()[1] == 'raspberrypi';
@@ -26,6 +27,8 @@ def isMaster():
 
 def isDispText():
   if isRaspberry:
+    if adGlobal.hasAudio:
+      return True
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     if GPIO.input(13):
@@ -37,6 +40,8 @@ def isDispText():
 
 def hasAudio():
   if isRaspberry:
+    if adGlobal.hasAudio:
+      return True
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     if debug: syslog.syslog("gpio 5:"+str(GPIO.input(5)))
