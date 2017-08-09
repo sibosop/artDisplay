@@ -14,6 +14,7 @@ import soundServer
 
 debug = True
 currentSoundFile = ""
+soundMaxVol = 1.0
 
 def findSoundFile(file):
   dir = adGlobal.eventDir
@@ -88,8 +89,9 @@ class schlubTrack(threading.Thread):
         nsound = soundTrack.speedx(sound,factor)
         if nsound is not None:
           sound = nsound
-        l = random.random() * soundTrack.eventMaxVol
-        r = random.random() * soundTrack.eventMaxVol
+        l = random.random() * soundMaxVol
+        #r = random.random() * soundMaxVol
+        r = l
         soundTrack.playSound(sound,l,r)
       except Exception as e:
         syslog.syslog(self.name+": error on "+path+":"+str(e))
