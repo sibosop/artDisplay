@@ -29,8 +29,8 @@ def setCurrentPhrase(line):
     if debug: syslog.syslog("set sound max volume to 1.0")
     schlubTrack.setSoundMaxVolume(1.0)
   else:
-    if debug: syslog.syslog("set sound max volume to 0.7")
-    schlubTrack.setSoundMaxVolume(0.7)
+    if debug: syslog.syslog("set sound max volume to 0.5")
+    schlubTrack.setSoundMaxVolume(0.5)
   return soundServer.jsonStatus("ok")
 
 def getCurrentPhrase():
