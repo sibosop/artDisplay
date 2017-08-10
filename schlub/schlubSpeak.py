@@ -12,6 +12,7 @@ import syslog
 import time
 import random
 import soundServer
+import schlubTrack
 
 currentPhrase=""
 phraseMutex=threading.Lock()
@@ -24,6 +25,12 @@ def setCurrentPhrase(line):
   phraseMutex.acquire()
   currentPhrase=line
   phraseMutex.release()
+  if currentPhrase == "":
+    if debug: syslog.syslog("set sound max volume to 1.0")
+    schlubTrack.setSoundMaxVolume(1.0)
+  else:
+    if debug: syslog.syslog("set sound max volume to 0.7")
+    schlubTrack.setSoundMaxVolume(0.7)
   return soundServer.jsonStatus("ok")
 
 def getCurrentPhrase():
@@ -56,6 +63,8 @@ class schlubSpeakThread(threading.Thread):
     global currentPhrase
     if debug: syslog.syslog(self.name+": starting")
     dir = adGlobal.eventDir
+    oldPhrase = ""
+    sound = None
     while self.isRunning():
       try:
         phrase = getCurrentPhrase();
@@ -67,13 +76,16 @@ class schlubSpeakThread(threading.Thread):
           time.sleep(1)
           continue
         phrase = phrase.replace("-"," ")
-        path = textSpeaker.makeSpeakFile(phrase)
-        if path is None:
-          syslog.syslog("conversion of "+phrase+" failed")
-          time.sleep(1)
-          continue
-        if debug: syslog.syslog(self.name+": playing "+path)
-        sound = pygame.mixer.Sound(file=path)
+        if oldPhrase != phrase:
+          oldPhrase = phrase
+          path = textSpeaker.makeSpeakFile(phrase)
+          if path is None:
+            syslog.syslog("conversion of "+phrase+" failed")
+            time.sleep(1)
+            continue
+          if debug: syslog.syslog(self.name+": playing "+path)
+          sound = pygame.mixer.Sound(file=path)
+          os.unlink(path)
         l = random.uniform(phraseMinVol,phraseMaxVol);
         r = l
         soundTrack.playSound(sound,l,r)

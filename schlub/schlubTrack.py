@@ -17,6 +17,11 @@ currentSoundFile = ""
 soundMaxVol = 1.0
 soundMinVol = 0.1
 
+def setSoundMaxVolume(vol):
+  global soundMaxVol
+  soundMaxVol = vol
+  
+
 def findSoundFile(file):
   dir = adGlobal.eventDir
   path = dir+"/"+file

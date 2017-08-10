@@ -68,7 +68,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['vol'] = asoundConfig.getVolume()
     state['isMaster'] = master.isMaster()
     state['sound'] = schlubTrack.getCurrentSound()
-    state['phrase'] = schlubTrack.getCurrentPhrase()
+    phrase = schlubSpeak.getCurrentPhrase()
+    phrase = phrase.replace("-"," ");
+    state['phrase'] = phrase
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
