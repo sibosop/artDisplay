@@ -30,6 +30,7 @@ def printCmds():
   print " hosts - print host list"
   print " manual - set manual play mode"
   print " off - power off hosts"
+  print " phrase (line) - speak the give line"
   print " play (filename) - play the given wav filename (minus .wav)"
   print " probe - probe hosts"
   print " reboot - reboot hosts"
@@ -76,6 +77,13 @@ def threads(n):
 # request;http://192.168.20.104:8080/player?play=filename
 def play(filename):
   cmd = "player?play="+filename+".wav"
+  sendToHosts(cmd)
+
+def phrase(line):
+  line.pop(0)
+  cmd = "phrase?p="
+  for l in line:
+    cmd += l + "-"
   sendToHosts(cmd)
 
 def main():
@@ -127,6 +135,11 @@ def main():
    elif cmd[0] == "play":
      if len(cmd) == 2:
        play(cmd[1])
+     else:
+       print "Error: no filename specified"
+   elif cmd[0] == "phrase":
+     if len(cmd) >= 2:
+       phrase(cmd)
      else:
        print "Error: no filename specified"
    else:
