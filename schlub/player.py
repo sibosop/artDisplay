@@ -8,9 +8,10 @@ import glob
 import adGlobal
 import sys
 import random
-import urllib
+import urllib2
 import soundFile
 import slp
+import json
 
 
 debug = True
@@ -52,9 +53,12 @@ class playerThread(threading.Thread):
         for h in hosts:
           ip = h['ip']
           if debug: syslog.syslog("sending request to "+ip)
-          request = "http://"+ip+":8080/player?play="+choice
-          if debug: syslog.syslog("request;"+request)
-          f = urllib.urlopen(request)
+          url = "http://"+ip+":8080"
+          if debug: syslog.syslog("url:"+url)
+          cmd = { 'cmd' : "Sound" , 'args' : [choice] }
+          req = urllib2.Request(url
+                    ,json.dumps(cmd),{'Content-Type': 'application/json'})
+          f = urllib2.urlopen(req)
           test = f.read()
           if debug: syslog.syslog("got response:"+test)
         stime = random.randint(15,40)
