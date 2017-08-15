@@ -12,6 +12,7 @@ import random
 import syslog
 import copy
 import threading
+import json
 
 debug=True
 listMutex=threading.Lock()
@@ -70,6 +71,20 @@ def createFileList():
   if refresh() is False:
     rescan()
       
+def getSoundList():
+  global fileList
+  flen = len(fileList)
+  if flen == 0:
+    createFileList()
+    flen = len(fileList)
+
+  keys = fileList.keys()
+  status = { 'status' : 'ok' , 'sounds' : keys }
+  rval = json.dumps(status)
+  #if debug: syslog.syslog("getSoundList():"+rval)
+  return rval 
+
+
 
 def getSoundEntry():
   global fileList

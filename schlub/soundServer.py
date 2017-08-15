@@ -73,7 +73,11 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Manual'   : self.setPlayMode
       ,'Refresh'  : self.doRefresh
       ,'Rescan'   : self.doRescan
+      ,'SoundList': self.doSoundList
     }
+  def doSoundList(self,cmd):
+    return soundFile.getSoundList();
+
   def doSound(self,cmd):
     return schlubTrack.setCurrentSound(cmd['args'][0])
 
