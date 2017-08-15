@@ -3,10 +3,11 @@ import os
 home = os.environ['HOME']
 import sys
 import syslog
-import slp
 import soundServer
 import player
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
+import slp
 import master
 import syslog
 import datetime

@@ -82,6 +82,7 @@ def makeRc():
           line = line.replace(micKey,hw['Mic'])
         elif line.find(speakerKey) != -1:
           line = line.replace(speakerKey,hw['Speaker'])
+        if debug: syslog.syslog("writing line:"+line);
         rc.write(line)
   except Exception, e:
     syslog.syslog("player error: "+repr(e))
