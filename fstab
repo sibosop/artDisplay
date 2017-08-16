@@ -4,7 +4,7 @@ proc            /proc           proc    defaults          0       0
 # a swapfile is not a swap partition, no line here
 #   use  dphys-swapfile swap[on|off]  for that
 tmpfs    /home/pi/GitProjects/artDisplay/tmp    tmpfs    defaults,uid=pi,gid=pi,noatime,nosuid,mode=0755,size=1m    0 0
-tmpfs    /home/pi/GitProjects/artDisplay/Images    tmpfs    defaults,uid=pi,gid=pi,noatime,nosuid,mode=0755,size=10m    0 0
+tmpfs    /home/pi/GitProjects/artDisplay/Images    tmpfs    defaults,uid=pi,gid=pi,noatime,nosuid,mode=0755,size=50m    0 0
 tmpfs    /home/pi/GitProjects/artDisplay/ImageCache    tmpfs    defaults,uid=pi,gid=pi,noatime,nosuid,mode=0755,size=50m    0 0
 tmpfs    /home/pi/GitProjects/artDisplay/archiveCache    tmpfs    defaults,uid=pi,gid=pi,noatime,nosuid,mode=0755,size=50m    0 0
 #tmpfs    /tmp    tmpfs    defaults,noatime,nosuid,size=100m    0 0

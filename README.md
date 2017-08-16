@@ -80,12 +80,21 @@ Here is the current hardware used:
 * began to appear on versions after 3/01/2017)
   * `sudo vi /boot/config.txt`
   * add lines
+     * `hdmi_force_hotplug=1`
+     * `hdmi_group=2`
+     * `hdmi_mode=1`
+     * `hdmi_drive=1`
+     * `hdmi_mode=87`
+     * `hdmi_cvt 800 480 60 6 0 0 0`
+* if using large screen then
+  * add lines 
     * `hdmi_force_hotplug=1`
     * `hdmi_group=2`
     * `hdmi_mode=1`
     * `hdmi_drive=1`
-    * `hdmi_mode=87`
-    * `hdmi_cvt 800 480 60 6 0 0 0`
+    * `hdmi_mode=82`
+    
+    
 * turn off screen blanking
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
@@ -100,6 +109,8 @@ Here is the current hardware used:
 
 #### installing software
 * do a full software update
+ * `sudo apt-get -y install python-pip`
+ * `sudo apt-get -y install python-setuptools`
  * `sudo apt-get update`
  * `sudo apt-get -y upgrade`
  * `mkdir GitProjects`
@@ -111,40 +122,22 @@ Here is the current hardware used:
  * `cd artDisplay`
  * `git config --global user.email "brian@eastshore.com"`
  * `git config --global user.name "brian reinbolt"`
- * (there is a script packageSetup.sh that will do the following)
- * `sudo pip install beautifulsoup4`
- * `sudo apt-get -y install gcc python-dev`
- * `sudo pip install psutil`
- * `sudo apt-get -y install slpd`
- * `sudo service slpd stop`
- * `sudo update-rc.d -f slpd remove`
- * `sudo apt-get -y install openslp-doc`
- * `sudo apt-get -y install slptool`
- * `sudo apt-get -y install feh`
- * `sudo pip install --upgrade pyserial`
- * `sudo -H pip install py-bing-search`
- * `sudo -H pip install --upgrade google-api-python-client`
- * `sudo -H pip install schedule`
- * `sudo apt-get -y install xscreensaver`
- * `sudo apt-get -y install unclutter`
- * `sudo apt-get -y install vim`
- * `sudo apt-get -y install python-pygame`
- * `sudo -H pip install gTTS`
- * `sudo -H pip install pydub`
- * `sudo apt-get install libav-tools`
- * `sudo apt-get install espeak`
+ * `./packageSetup.sh`
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
+ * `sudo mv /etc/fstab /etc/fstab.old`
  * `sudo cp /home/pi/GitProjects/artDisplay/fstab /etc/fstab`
+ * check the log file daily since the directory is now smaller, change weekly to daily
+ * `sudo vi /etc/logrotate.conf`
  * the master needs the jumper mentioned above
  * also the a master ssh key needs to be generated and put in the authorized keys files of the slaves (see above)
  * ssh from master to slave once to get the host configuration set up
  * to start at boot
   * `crontab -e`
   * add these lines
-   * MAILTO=""
-   * @reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh
+   * `MAILTO=""`
+   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/imageLookup/adWrap.sh`
  * with any luck the system will start after reboot
  * unclutter removes cursor. You may need to run unclutter -display :0.0 once
  * if the subnet is not 10 then put `export SUBNET=N` in the .bashrc
@@ -156,7 +149,8 @@ Here is the current hardware used:
  * `sudo mv vi vi.save`
  * `sudo ln -s vim vi`
  
-#### to change to a different wifi router
+####  wifi router useful into
+ * `nmap -sP 192.168.10.1/24`  (or whatever subnet you care about) 
  * use screen to connect to wifi
  * `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`  is where wifi info is store. remove old wifi info, add new etc
  * `slptool findsrvs service:artdisplay.x` will give you addresses of all connected devices
@@ -166,7 +160,41 @@ Here is the current hardware used:
   * StrictHostKeyChecking no
   * UserKnownHostsFile=/dev/null
   * LogLevel=QUIET
+  
+#### Schlub Info
+ * `crontab -e`
+ * add these lines
+  * `MAILTO=""`
+  * `@reboot /home/pi/GitProjects/artDisplay/shared/asoundConfig.py`
+  * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
+#### AssAi Project
 
+# AssAi
+#### Speech Recog info
+ * https://cloud.google.com/sdk/downloads#apt-get
+ * https://cloud.google.com/speech/docs/reference/libraries#client-libraries-install-python
+ * have attempted to put necessary commands in packageSetup.py
 
+#### Google assistant
+starting here: https://developers.google.com/assistant/sdk/prototype/getting-started-pi-python/
 
+Setting up usb speakers/mic has the unfortunate feature of assigning usb 'cards' at random during bootup. This will need to be fixed automagically but until that happens:
+* `cat /proc/asound/cards`
+This will list the 'cards'. This is assuming you are using the adafruint usb mic/speakers recommended by google
+* USB-Audio - USB PnP Sound Device - microphone card
+* USB-Audio - USB2.0 Device - speaker card
+Once you have the card numbers you edit this file:
+* `cp ~/GitProjects/AssAi/asoundrc.template ~/.asoundrc`
+* `vi ~/.asoundrc`
+Change the `pcm: hw:<cardno>,1` to have the proper numbers for the mic and speaker.
+
+Linux uses ALSA for its audio:
+* speaker-test 
+  * `speaker-test -c2`
+* arecord
+  * `arecord --format=S16_LE --duration=5 --rate=16k --file-type=raw out.raw`
+* aplay
+  * `aplay --format=S16_LE --rate=16k out.raw`
+* alsamixer (gui) or amixer (command line)
+  * amixer -c 2 cset numid=3,name='PCM Playback Volume' 100

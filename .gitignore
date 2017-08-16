@@ -7,5 +7,6 @@
 *.png
 *.lkp
 *.mp3
+*.swp
 .DS_Store
 Action_*

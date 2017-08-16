@@ -158,8 +158,8 @@ def dispTextChecker():
   syslog.syslog("disp text checker started successfully")
   startEventThread(checkText())
   if master.hasAudio():
-  #  for i in range(maxEventThreads):
-  #    startEventThread(st.playEvent())
+    for i in range(maxEventThreads):
+      startEventThread(st.playEvent())
     startEventThread(checkVoice())
   while True:
     for t in eventThreads:
