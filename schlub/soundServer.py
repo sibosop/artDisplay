@@ -42,7 +42,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     post_body = self.rfile.read(content_len)
     
     if debug: syslog.syslog("Post:"+str(post_body))
-    status = self.server.handleSchludCmd(json.loads(post_body))
+    status = self.server.handleSchlubCmd(json.loads(post_body))
 
     self.send_response(200)
     self.end_headers()
@@ -74,7 +74,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Refresh'  : self.doRefresh
       ,'Rescan'   : self.doRescan
       ,'SoundList': self.doSoundList
+      ,'SoundEnable' : self.doSoundEnable
     }
+  def doSoundEnable(self,cmd):
+    return soundFile.setSoundEnable(cmd['args'][0],cmd['args'][1])
   def doSoundList(self,cmd):
     return soundFile.getSoundList();
 
@@ -137,7 +140,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return json.dumps(state)
 
 
-  def handleSchludCmd(self,cmd):
+  def handleSchlubCmd(self,cmd):
     if debug: syslog.syslog("handling cmd:"+cmd['cmd']);
     return self.cmds[cmd['cmd']](cmd)
 

@@ -13,6 +13,8 @@ import syslog
 import copy
 import threading
 import json
+import soundServer
+import shutil
 
 debug=True
 listMutex=threading.Lock()
@@ -54,7 +56,7 @@ def rescan():
     if n in fileList:
       newList[n]=fileList[n]
     else:
-      fe = FileEntry(name=n, enabled=1, maxVol=soundTrack.eventMaxVol)
+      fe = FileEntry(name=n, enabled="1", maxVol=soundTrack.eventMaxVol)
       newList[n] = fe
   fileList = copy.deepcopy(newList)
   try:
@@ -73,17 +75,51 @@ def createFileList():
       
 def getSoundList():
   global fileList
+  if debug: syslog.syslog("getSoundList")
   flen = len(fileList)
   if flen == 0:
     createFileList()
     flen = len(fileList)
-
-  keys = fileList.keys()
-  status = { 'status' : 'ok' , 'sounds' : keys }
+  sounds = [];
+  for k in fileList.keys():
+    if fileList[k].enabled == "1":
+      sounds.append(k)
+  status = { 'status' : 'ok' , 'sounds' : sounds }
   rval = json.dumps(status)
-  #if debug: syslog.syslog("getSoundList():"+rval)
+  if debug: syslog.syslog("getSoundList():"+rval)
   return rval 
 
+def saveFileList():
+  global fileList
+  global eventFile
+  global edir
+  global rows
+
+  tmpFile = edir + "/tmpfile.csv"
+  try:
+    with open(tmpFile,'w') as f:
+      w = csv.writer(f)
+      w.writerow(rows)
+      w.writerows([(d.name, d.enabled, d.maxVol) for d in fileList.values()])
+    shutil.move(tmpFile,eventFile)
+  except Exception, e: 
+    syslog.syslog("saveFile error"+repr(str(e)));
+
+
+def setSoundEnable(name,v):
+  global fileList
+  status = "fail"
+  val = "0"
+  if debug: syslog.syslog("setSoundEnable:"+name+" "+v)
+  if name in fileList:
+    if v == "True":
+      val = "1"
+    if debug: syslog.syslog("current:"+name+":"+str(fileList[name].enabled))
+    item = fileList[name]
+    fileList[name] = FileEntry(item.name,val,item.maxVol)
+    saveFileList();
+    status = "ok"
+  return soundServer.jsonStatus(status)
 
 
 def getSoundEntry():
