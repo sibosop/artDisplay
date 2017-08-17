@@ -82,11 +82,13 @@ def getSoundList():
     flen = len(fileList)
   sounds = [];
   for k in fileList.keys():
-    if fileList[k].enabled == "1":
-      sounds.append(k)
+      s = { 'name' : fileList[k].name 
+          , 'enabled' : fileList[k].enabled
+          , 'maxVol' : fileList[k].maxVol }
+      sounds.append(s)
   status = { 'status' : 'ok' , 'sounds' : sounds }
   rval = json.dumps(status)
-  if debug: syslog.syslog("getSoundList():"+rval)
+  #if debug: syslog.syslog("getSoundList():"+rval)
   return rval 
 
 def saveFileList():
@@ -129,7 +131,12 @@ def getSoundEntry():
     createFileList()
     flen = len(fileList)
   keys = fileList.keys()
-  choice = random.randint(0,len(keys)-1)
+  done = False
+  choice = 0
+  while not done:
+    choice = random.randint(0,len(keys)-1)
+    if fileList[keys[choice]].enabled == "1":
+      done = True
   return fileList[keys[choice]]
 
 

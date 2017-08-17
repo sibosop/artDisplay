@@ -48,7 +48,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(status)
     s = json.loads(status)
-    if debug: syslog.syslog("handle cmd:"+str(s));
+    #if debug: syslog.syslog("handle cmd:"+str(s));
     if s['status'] == "poweroff":
       os._exit(3)
     if s['status'] == "reboot":
