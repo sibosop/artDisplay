@@ -123,7 +123,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
   def doRescan(self,cmd):
     rval = jsonStatus("not_master")
     if master.isMaster():
-      soundFile.Rescan()
+      soundFile.rescan()
       rval = jsonStatus("ok")
     return rval
 

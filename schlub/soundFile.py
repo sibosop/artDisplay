@@ -64,7 +64,7 @@ def rescan():
     with open(eventFile,'w') as f:
       w = csv.writer(f)
       w.writerow(rows)
-      w.writerows([(d.name, d.enabled, d.maxVol) for d in fileList.values()])
+      w.writerows([(d.name, d.enabled, d.maxVol) for d in sorted(fileList.values())])
   except IOError: 
     syslog.syslog("can't open for write:"+eventFile);
   listMutex.release()
@@ -81,7 +81,7 @@ def getSoundList():
     createFileList()
     flen = len(fileList)
   sounds = [];
-  for k in fileList.keys():
+  for k in sorted(fileList.keys()):
       s = { 'name' : fileList[k].name 
           , 'enabled' : fileList[k].enabled
           , 'maxVol' : fileList[k].maxVol }
