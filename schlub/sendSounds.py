@@ -59,9 +59,11 @@ for a in sys.argv:
       cmd = ["scp",a,"pi@"+h['ip']+":/media/pi/SOUND/events/"]
       print cmd
       output = subprocess.check_output(cmd)
-
-    doRescan()
   except Exception, e:
     print str(e)
 
+try:
+  doRescan()
+except Exception, e:
+  print str(e)
 
