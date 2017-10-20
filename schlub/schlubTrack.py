@@ -58,6 +58,8 @@ tunings = {
   'jpent' : [1.0,32.0/27.0,4.0/3.0,3.0/2.0,16.0/9.0]
 }
 
+octaves = [0.25,0.5,1.0,2.0,4.0]
+
 def getFactor(path):
   rval = 1.0
   try:
@@ -73,7 +75,7 @@ def getFactor(path):
     if tuning not in tunings:
       syslog.syslog("bad tuning:"+tuning)
       raise NameError
-    rval = random.choice(tunings[tuning])
+    rval = random.choice(tunings[tuning]) * random.choice(octaves)
   except NameError as exp:
     syslog.syslog("default tuning for path:"+path)
     rval = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
