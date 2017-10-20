@@ -48,6 +48,39 @@ def getCurrentSound():
   n = currentSoundFile.rfind(".")
   return rval[0:n]
 
+def doJpent():
+  rval = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
+                        * random.random()) + soundTrack.speedChangeMin
+  syslog.syslog("doJpent")
+  return rval
+
+tunings = {
+  'jpent' : [1.0,32.0/27.0,4.0/3.0,3.0/2.0,16.0/9.0]
+}
+
+def getFactor(path):
+  rval = 1.0
+  try:
+    pos = path.find("__");
+    if pos == -1:
+      raise NameError
+    epos = path.find(".",pos)
+    if pos == -1:
+      raise NameError
+
+    tuning = path[pos+2:epos]
+    syslog.syslog("tuning:"+tuning);
+    if tuning not in tunings:
+      syslog.syslog("bad tuning:"+tuning)
+      raise NameError
+    rval = random.choice(tunings[tuning])
+  except NameError as exp:
+    syslog.syslog("default tuning for path:"+path)
+    rval = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
+                      * random.random()) + soundTrack.speedChangeMin
+  syslog.syslog("factor:"+str(rval))
+  return rval
+
 
 class schlubTrack(threading.Thread):
   def __init__(self,name):
@@ -87,9 +120,8 @@ class schlubTrack(threading.Thread):
         path = dir+"/"+file
         if debug: syslog.syslog(self.name+": playing:"+path);
         sound = pygame.mixer.Sound(file=path)
-
-        factor = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
-                      * random.random()) + soundTrack.speedChangeMin
+	
+        factor = getFactor(path);
         nsound = soundTrack.speedx(sound,factor)
         if nsound is not None:
           sound = nsound
