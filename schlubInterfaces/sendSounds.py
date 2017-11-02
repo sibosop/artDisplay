@@ -1,5 +1,9 @@
 #!/usr/bin/env python 
+import os
+home = os.environ['HOME']
 import sys
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import slp
 import subprocess
 import urllib2
@@ -47,7 +51,6 @@ for h in hosts:
   doProbe(h)
 
 print ("master:",master)
-exit
 
 first = True
 for a in sys.argv:
