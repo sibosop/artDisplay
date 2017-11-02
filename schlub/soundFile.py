@@ -19,12 +19,69 @@ import shutil
 debug=True
 listMutex=threading.Lock()
 
+
 rows = ['name','enabled','maxVol']
 FileEntry=collections.namedtuple('FileEntry',rows)
 
+fileCollections = {}
 fileList=collections.OrderedDict();
 edir = adGlobal.eventDir
-eventFile = edir + "/EventCtrl.csv"
+eventKey = "EventCtrl.csv"
+eventFile = edir + "/" + eventKey
+currentCollection = eventKey
+def getFileCollections():
+  global fileCollections
+  global fileList
+  csvFiles = glob.glob(edir+"/*.csv")
+  for cf in csvFiles:
+    n = cf.split("/")[-1]
+    if debug: syslog.syslog("collection file:"+n)
+    if ( cf == eventFile ):
+      fileCollections[n] = fileList
+    else:
+      try:
+        if debug: syslog.syslog("reading:"+cf)
+        with open(cf,"r") as f:
+          reader = csv.reader(f)
+          fList=collections.OrderedDict();
+          e = collections.namedtuple("FileEntry",next(reader))
+          for data in map(e._make, reader):
+            fList[data.name] = data
+          fileCollections[n] = fList;
+      except IOError: 
+        syslog.syslog("can't open:"+cf);
+      
+
+def getCollectionList():
+  global fileList
+  global fileCollections
+  if debug: syslog.syslog("getCollectionList")
+  flen = len(fileList)
+  if flen == 0:
+    createFileList()
+    flen = len(fileList)
+  collections = [];
+  for k in sorted(fileCollections.keys()):
+      if debug: syslog.syslog("found collection:"+str(k))
+      collections.append(k)
+  status = { 'status' : 'ok' , 'collections' : collections }
+  rval = json.dumps(status)
+  #if debug: syslog.syslog("getSoundList():"+rval)
+  return rval 
+
+def setCurrentCollection(col):
+  global currentCollection
+  global filecollections
+  syslog.syslog("setting current collection to:"+col);
+  status = { 'status' : 'ok' }
+  if col in fileCollections.keys():
+    currentCollection = col
+  else:
+    status['status'] = "fail"
+  rval = json.dumps(status)
+  if debug: syslog.syslog("setCurrentCollection():"+rval)
+  return rval 
+
 
 def refresh():
   global fileList
@@ -72,6 +129,8 @@ def rescan():
 def createFileList():
   if refresh() is False:
     rescan()
+  getFileCollections()
+
       
 def getSoundList():
   global fileList
@@ -126,18 +185,21 @@ def setSoundEnable(name,v):
 
 def getSoundEntry():
   global fileList
+  global currentCollection
+  global fileCollections
   flen = len(fileList)
   if flen == 0:
     createFileList()
     flen = len(fileList)
-  keys = fileList.keys()
+  keys = fileCollections[currentCollection].keys()
+  if debug: syslog.syslog("currentCollection:"+currentCollection+" number of keys:"+str(len(keys)))
   done = False
   choice = 0
   while not done:
     choice = random.randint(0,len(keys)-1)
-    if fileList[keys[choice]].enabled == "1":
+    if fileCollections[currentCollection][keys[choice]].enabled == "1":
       done = True
-  return fileList[keys[choice]]
+  return fileCollections[currentCollection][keys[choice]]
 
 
 if __name__ == '__main__':
@@ -148,3 +210,11 @@ if __name__ == '__main__':
   for x in range(0,10):
     entry = getSoundEntry()
     print entry
+  getFileCollections()
+  fcKeys = fileCollections.keys()
+  for f in fcKeys:
+    print f
+    ekeys = fileCollections[f].keys()
+    for k in ekeys:
+      print fileCollections[f][k]
+

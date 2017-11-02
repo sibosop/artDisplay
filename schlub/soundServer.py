@@ -76,14 +76,22 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Rescan'   : self.doRescan
       ,'SoundList': self.doSoundList
       ,'SoundEnable' : self.doSoundEnable
+      ,'CollectionList': self.doCollectionList
+      ,'Collection' : self.doCollection
     }
   def doSoundEnable(self,cmd):
     return soundFile.setSoundEnable(cmd['args'][0],cmd['args'][1])
   def doSoundList(self,cmd):
     return soundFile.getSoundList();
-
   def doSound(self,cmd):
     return schlubTrack.setCurrentSound(cmd['args'][0])
+
+  def doCollectionList(self,cmd):
+    return soundFile.getCollectionList()
+  def doCollection(self,cmd):
+    syslog.syslog(str(cmd))
+    return soundFile.setCurrentCollection(cmd['args'][0])
+
 
   def doVolume(self,cmd):
     asoundConfig.setVolume(cmd['args'][0])
