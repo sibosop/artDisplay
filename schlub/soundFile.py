@@ -29,6 +29,10 @@ edir = adGlobal.eventDir
 eventKey = "EventCtrl.csv"
 eventFile = edir + "/" + eventKey
 currentCollection = eventKey
+
+def getCurrentCollection():
+  return currentCollection
+
 def getFileCollections():
   global fileCollections
   global fileList

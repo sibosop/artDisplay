@@ -147,6 +147,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
+    if master.isMaster():
+      state['collection'] = soundFile.getCurrentCollection()
+    else:
+      state['collection'] = ""
     return json.dumps(state)
 
 
