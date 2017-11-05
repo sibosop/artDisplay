@@ -93,6 +93,9 @@ Here is the current hardware used:
     * `hdmi_mode=1`
     * `hdmi_drive=1`
     * `hdmi_mode=82`
+* if the HDMI screen does not fill out to the edges then
+* uncomment this line
+  * disable_overscan=1
     
     
 * turn off screen blanking
