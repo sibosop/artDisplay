@@ -129,11 +129,13 @@ def rescan():
   except IOError: 
     syslog.syslog("can't open for write:"+eventFile);
   listMutex.release()
+  getFileCollections()
 
 def createFileList():
   if refresh() is False:
     rescan()
-  getFileCollections()
+  else:
+    getFileCollections()
 
       
 def getSoundList():
