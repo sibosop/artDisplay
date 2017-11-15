@@ -48,11 +48,11 @@ class playerThread(threading.Thread):
         first = True
         hosts = slp.getHosts("schlub")
         e = soundFile.getSoundEntry()
-        choice = e.name
-        if debug: syslog.syslog("player choosing "+choice)
+        if debug: syslog.syslog("player choosing "+str(e))
         for h in hosts:
+          choice = random.choice(e)
           ip = h['ip']
-          if debug: syslog.syslog("sending request to "+ip)
+          if debug: syslog.syslog("sending "+choice+" request to "+ip)
           url = "http://"+ip+":8080"
           if debug: syslog.syslog("url:"+url)
           cmd = { 'cmd' : "Sound" , 'args' : [choice] }

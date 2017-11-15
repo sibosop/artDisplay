@@ -205,7 +205,8 @@ def getSoundEntry():
     choice = random.randint(0,len(keys)-1)
     if fileCollections[currentCollection][keys[choice]].enabled == "1":
       done = True
-  return fileCollections[currentCollection][keys[choice]]
+  return fileCollections[currentCollection][keys[choice]].name.split('&')
+  
 
 
 if __name__ == '__main__':
