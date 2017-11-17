@@ -78,7 +78,12 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'SoundEnable' : self.doSoundEnable
       ,'CollectionList': self.doCollectionList
       ,'Collection' : self.doCollection
+      ,'PhraseScatter' : self.doPhraseScatter
     }
+
+  def doPhraseScatter(self,cmd):
+    return schlubSpeak.setPhraseScatter(cmd['args'][0])
+
   def doSoundEnable(self,cmd):
     return soundFile.setSoundEnable(cmd['args'][0],cmd['args'][1])
   def doSoundList(self,cmd):
@@ -144,6 +149,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     phrase = schlubSpeak.getCurrentPhrase()
     phrase = phrase.replace("-"," ");
     state['phrase'] = phrase
+    state['phraseScatter'] = schlubSpeak.phraseScatter
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 

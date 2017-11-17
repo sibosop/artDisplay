@@ -14,11 +14,18 @@ import random
 import soundServer
 import schlubTrack
 
+phraseScatter = True;
 currentPhrase=""
 phraseMutex=threading.Lock()
 debug=True
 phraseMinVol = 0.7
 phraseMaxVol = 1.0
+
+def setPhraseScatter(flag):
+  global phraseScatter
+  phraseScatter = (flag == "true")
+  return soundServer.jsonStatus("ok")
+
 
 def setCurrentPhrase(line):
   global currentPhrase
@@ -61,6 +68,7 @@ class schlubSpeakThread(threading.Thread):
     
   def run(self):
     global currentPhrase
+    global phraseScatter
     if debug: syslog.syslog(self.name+": starting")
     dir = adGlobal.eventDir
     oldPhrase = ""
@@ -76,6 +84,9 @@ class schlubSpeakThread(threading.Thread):
           time.sleep(1)
           continue
         phrase = phrase.replace("-"," ")
+        if debug: syslog.syslog("PhraseScatter:"+str(phraseScatter))
+        if phraseScatter:
+          phrase = random.choice(phrase.split())
         if oldPhrase != phrase:
           oldPhrase = phrase
           path = textSpeaker.makeSpeakFile(phrase)
