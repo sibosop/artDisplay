@@ -14,12 +14,21 @@ def emilySectionRe():
 def emilyRe():
   return re.compile('^[IVXLCDM]+\.$')
 
-def get():
+def getId():
+  return "emily"
+
+maxPoem = 448
+#maxPoem=2
+def getNumPoems():
+  return maxPoem
+
+def getMinPoem():
+  return 345
+
+def create(choice):
   series = 0
   pcount = 0
-  maxPoem = 448
   poem = ["Emily Dickenson"]
-  choice = random.randint(1,maxPoem)
   found = False
   title = ""
   section = ""
