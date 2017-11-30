@@ -21,7 +21,7 @@ import textSpeaker
 import pygame
 import glob
 import json
-debug = True
+debug = False
 
 poemDir = "/media/parallels/POEMDATA"
 candidates = glob.glob(poemDir+"/*/*/*.txt")
