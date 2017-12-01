@@ -16,6 +16,8 @@ debug = True
 currentSoundFile = ""
 soundMaxVol = 1.0
 soundMinVol = 0.1
+speedChangeMax = 4.0
+speedChangeMin = .25
 
 def setSoundMaxVolume(vol):
   global soundMaxVol
@@ -49,8 +51,8 @@ def getCurrentSound():
   return rval[0:n]
 
 def doJpent():
-  rval = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
-                        * random.random()) + soundTrack.speedChangeMin
+  rval = ((speedChangeMax-speedChangeMin) 
+                        * random.random()) + speedChangeMin
   syslog.syslog("doJpent")
   return rval
 
@@ -81,8 +83,7 @@ def getFactor(path):
     rval = random.choice(tunings[tuning]) * random.choice(octaves)
   except NameError as exp:
     syslog.syslog("default tuning for path:"+path)
-    rval = ((soundTrack.speedChangeMax-soundTrack.speedChangeMin) 
-                      * random.random()) + soundTrack.speedChangeMin
+    rval = ((speedChangeMax-speedChangeMin) * random.random()) + speedChangeMin
   syslog.syslog("factor:"+str(rval))
   return rval
 
