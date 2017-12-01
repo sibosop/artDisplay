@@ -24,7 +24,7 @@ import json
 debug = False
 
 poemDir = "/media/parallels/POEMDATA"
-candidates = glob.glob(poemDir+"/*/*/*.txt")
+candidates = []
 
 def playText(sound):
   chan = pygame.mixer.find_channel()
@@ -78,8 +78,9 @@ class poemLoop(threading.Thread):
 if __name__ == '__main__':
   random.seed()
   if master.isRaspberry:
-    os.environ['DISPLAY']=":0.0"
     poemDir = "/media/pi/POEMDATA"
+    candidates = glob.glob(poemDir+"/*/*/*.txt")
+    os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
   sl = poemLoop()
   sl.setDaemon(True)
