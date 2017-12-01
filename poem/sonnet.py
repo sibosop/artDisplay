@@ -5,9 +5,8 @@ import random
 import fileDecoder
 debug = True
 
-def get(author,maxSonnet,textFile):
-  choice = random.randint(1,maxSonnet)
-  if debug: syslog.syslog("Get Sonnet:"+str(choice))
+def get(author,choice,textFile):
+  print("Get Sonnet:",str(choice))
 
   found=False
   sonnet = []
