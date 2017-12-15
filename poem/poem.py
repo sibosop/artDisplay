@@ -21,6 +21,7 @@ import textSpeaker
 import pygame
 import glob
 import json
+import butmon
 debug = False
 
 poemDir = "/media/parallels/POEMDATA"
@@ -85,6 +86,9 @@ if __name__ == '__main__':
   sl = poemLoop()
   sl.setDaemon(True)
   sl.start()
+  bt = butmon.ButMonThread()
+  bt.setDaemon(True)
+  bt.start()
 
   while True:
     try:
