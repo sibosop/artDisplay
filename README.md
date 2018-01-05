@@ -126,6 +126,8 @@ Here is the current hardware used:
  * `git config --global user.email "brian@eastshore.com"`
  * `git config --global user.name "brian reinbolt"`
  * `./packageSetup.sh`
+ * If you want the speech recog stuff
+ * `./speakSetup.sh`
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
