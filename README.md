@@ -99,6 +99,11 @@ Here is the current hardware used:
     
     
 * turn off screen blanking
+ * vi /home/pi/.config/lxsession/LXDE-pi/autostart 
+ * add lines
+   * @xset s noblank
+   * @xset s off 
+   * @xset -dpms
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
  * set `POWERDOWN_TIME=0`
