@@ -18,6 +18,7 @@ import shutil
 
 debug=True
 listMutex=threading.Lock()
+maxEvents = 2
 
 
 rows = ['name','enabled','maxVol']
@@ -26,9 +27,20 @@ FileEntry=collections.namedtuple('FileEntry',rows)
 fileCollections = {}
 fileList=collections.OrderedDict();
 edir = adGlobal.eventDir
-eventKey = "EventCtrl.csv"
+defaultKey = "EventCtrl.csv"
+eventKey = defaultKey
 eventFile = edir + "/" + eventKey
 currentCollection = eventKey
+
+def setMaxEvents(m):
+  global maxEvents
+  test = int(m)
+  if test > 0:
+    maxEvents = test
+  if debug: syslog.syslog("setMaxEvents maxEvents:"+str(maxEvents))
+  status = { 'status' : 'ok' }
+  rval = json.dumps(status)
+  return rval 
 
 def getCurrentCollection():
   return currentCollection
@@ -191,6 +203,7 @@ def setSoundEnable(name,v):
 
 def getSoundEntry():
   global fileList
+  global defaultKey
   global currentCollection
   global fileCollections
   flen = len(fileList)
@@ -201,6 +214,18 @@ def getSoundEntry():
   if debug: syslog.syslog("currentCollection:"+currentCollection+" number of keys:"+str(len(keys)))
   done = False
   choice = 0
+  if currentCollection == defaultKey:
+    choices = 0
+    numChoices = random.randint(1,maxEvents)
+    if debug: syslog.syslog("default collection:"+currentCollection+" number of choices:"+str(numChoices)+" max Events:"+str(maxEvents))
+    rval = []
+    while choices < numChoices:
+      choice = random.randint(0,len(keys)-1)
+      if fileCollections[currentCollection][keys[choice]].enabled == "1":
+        choices += 1
+        rval.append(fileCollections[currentCollection][keys[choice]].name)
+        if debug: syslog.syslog("default collection rval:"+str(rval))
+    return rval
   while not done:
     choice = random.randint(0,len(keys)-1)
     if fileCollections[currentCollection][keys[choice]].enabled == "1":

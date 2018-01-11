@@ -79,7 +79,11 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'CollectionList': self.doCollectionList
       ,'Collection' : self.doCollection
       ,'PhraseScatter' : self.doPhraseScatter
+      ,'MaxEvents' : self.doMaxEvents
     }
+  
+  def doMaxEvents(self,cmd):
+    return soundFile.setMaxEvents(cmd['args'][0])
 
   def doPhraseScatter(self,cmd):
     return schlubSpeak.setPhraseScatter(cmd['args'][0])
@@ -155,8 +159,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['auto'] = player.isEnabled() 
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
+      state['maxEvents'] = soundFile.maxEvents
     else:
       state['collection'] = ""
+      state['maxEvents'] = 0
     return json.dumps(state)
 
 
