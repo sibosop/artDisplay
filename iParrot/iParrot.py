@@ -38,9 +38,11 @@ if __name__ == '__main__':
       time.sleep(2)
     except KeyboardInterrupt:
       syslog.syslog(pname+": keyboard interrupt")
+      it.close()
       break
     except Exception as e:
       syslog.syslog(pname+":"+str(e))
+      it.close()
       break
 
   syslog.syslog(pname+" exiting")
