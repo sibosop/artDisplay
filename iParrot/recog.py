@@ -66,10 +66,9 @@ class recogThread(threading.Thread):
               alternatives = result.alternatives
               # The alternatives are ordered from most likely to least.
               for alternative in alternatives:
-                  if debug: syslog.syslog('Confidence: {}'.format(alternative.confidence))
-                  if debug: syslog.syslog('Transcript: {}'.format(alternative.transcript))
-                  
-                  self.queue.put(alternative.transcript)
+                #syslog.syslog('Confidence: {}'.format(alternative.confidence))
+                syslog.syslog('Transcript: {}'.format(alternative.transcript))
+                self.queue.put(alternative.transcript)
 
       except grpc.RpcError, e:
         if e.code() not in (grpc.StatusCode.INVALID_ARGUMENT,

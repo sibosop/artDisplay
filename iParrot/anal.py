@@ -4,6 +4,8 @@ import queue
 import time
 import syslog
 
+chooseLen=6
+debug=False
 class analThread(threading.Thread):
   def __init__(self,i):
     super(analThread,self).__init__()
@@ -15,9 +17,12 @@ class analThread(threading.Thread):
     syslog.syslog("starting: "+self.name)
     while True:
       input = self.source.get()
-      syslog.syslog(self.name+" got "+ input)
-      self.queue.put(input)
-
+      if debug: syslog.syslog(self.name+" got "+ input)
+      for w in input.split():
+        if debug: syslog.syslog(self.name+"test:"+w)
+        if len(w) > chooseLen:
+          if debug: syslog.syslog(self.name+"CHOSE: "+w)
+          self.queue.put(w)
 
   def get(self):
     return self.queue.get()
