@@ -6,11 +6,13 @@ import sys
 import time
 import os
 import alsaaudio
+import grpc
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 import asoundConfig
 
 loopCount = 1000
+debug = False
 
 class inputThread(threading.Thread):
   def __init__(self):
@@ -40,12 +42,14 @@ class inputThread(threading.Thread):
         time.sleep(.001)
       loops = loopCount
       self.queue.put(buff)
-      syslog.syslog(self.name+" sending: "+str(len(buff)))
+      if debug: syslog.syslog(self.name+" sending: "+str(len(buff)))
 
   def close(self):
     return
 
   def get(self):
-    return self.queue.get()
-
+    if debug: syslog.syslog(self.name+"get()")
+    buff = self.queue.get()
+    if debug: syslog.syslog(self.name+"return buff sized:"+str(len(buff)))
+    return buff 
   

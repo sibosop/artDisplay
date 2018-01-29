@@ -5,10 +5,13 @@ import time
 import syslog
 import os
 import io
+import grpc
 
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+
+debug=False
 
 class recogThread(threading.Thread):
   def __init__(self,i):
@@ -17,24 +20,72 @@ class recogThread(threading.Thread):
     self.queue = queue.Queue()
     self.source = i
 
+  class dataStream(object):
+    def __init__(self,r):
+      self.recog = r
+      if debug: syslog.syslog(self.recog.name+" in dataStream init")
+    def __iter__(self):
+      if debug: syslog.syslog(self.recog.name+" in dataStream iter")
+      return self
+    def next(self):
+      if debug: syslog.syslog(self.recog.name+" in dataStream next")
+      chunk = self.recog.source.get()
+      if debug: syslog.syslog(self.recog.name+" got:" + str(len(chunk)))
+      return chunk
+
   def run(self):
     syslog.syslog("starting: "+self.name)
     self.client = speech.SpeechClient()
-    self.config = types.RecognitionConfig(
-          encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-          sample_rate_hertz=44100,
-          language_code='en-US')
     while True:
-      content = self.source.get()
-      syslog.syslog(self.name+" got "+ str(len(content)))
-      audio = types.RecognitionAudio(content=content)
-      response = self.client.recognize(self.config,audio)
-      syslog.syslog("response num results:"+str(len(response.results)))
-      for result in response.results:
-        alternatives = result.alternatives
-        for alternative in alternatives:
-            syslog.syslog('Transcript: {}'.format(alternative.transcript))
-            self.queue.put(alternative.transcript)
+      stream = self.dataStream(self)
+      #syslog.syslog(self.name+"for chunk in stream")
+      #for chunk in stream:
+      #  syslog.syslog(self.name+" chunk size:"+str(len(chunk)))
+      requests = (types.StreamingRecognizeRequest(audio_content=chunk)
+                  for chunk in stream)
+      config = types.RecognitionConfig(
+          encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16
+          ,sample_rate_hertz=44100
+          ,language_code='en-US'
+          )
+      streaming_config = types.StreamingRecognitionConfig(
+                config=config
+                ,interim_results=True
+                )
+
+      # streaming_recognize returns a generator.
+      try:
+        responses = self.client.streaming_recognize(streaming_config, requests)
+        for response in responses:
+          # Once the transcription has settled, the first result will contain the
+          # is_final result. The other results will be for subsequent portions of
+          # the audio.
+          for result in response.results:
+              if debug: syslog.syslog('Finished: {}'.format(result.is_final))
+              if debug: syslog.syslog('Stability: {}'.format(result.stability))
+              alternatives = result.alternatives
+              # The alternatives are ordered from most likely to least.
+              for alternative in alternatives:
+                  if debug: syslog.syslog('Confidence: {}'.format(alternative.confidence))
+                  if debug: syslog.syslog('Transcript: {}'.format(alternative.transcript))
+                  
+                  self.queue.put(alternative.transcript)
+
+      except grpc.RpcError, e:
+        if e.code() not in (grpc.StatusCode.INVALID_ARGUMENT,
+                              grpc.StatusCode.OUT_OF_RANGE):
+          raise
+        details = e.details()
+        if e.code() == grpc.StatusCode.INVALID_ARGUMENT:
+          #if 'deadline too short' not in details:
+          #  raise
+          #else:
+          #  if 'maximum allowed stream duration' not in details:
+          #      raise
+
+          syslog.syslog(self.name +": "+ details + ' Resuming..')
+
+
 
   def get(self):
     return self.queue.get()
