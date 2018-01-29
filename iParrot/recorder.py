@@ -10,10 +10,7 @@ home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 import asoundConfig
 
-audioFileTmpPath = home + "/GitProjects/artDisplay/tmp"
-tmpRoot = audioFileTmpPath + "/audio"
 loopCount = 1000
-
 
 class inputThread(threading.Thread):
   def __init__(self):
@@ -30,10 +27,8 @@ class inputThread(threading.Thread):
   def run(self):
     syslog.syslog("starting: "+self.name)
     while True:
-      self.fname = tmpRoot + str(self.fileCount) + ".raw"
-      self.f = open(self.fname,'wb')
       loops = loopCount
-      self.fileCount += 1
+      buff = bytes()
       while loops > 0:
         loops -= 1
         l, data = self.inp.read()
@@ -41,16 +36,14 @@ class inputThread(threading.Thread):
           syslog.syslog(self.name+" pipe error")
           continue
         if l:
-          self.f.write(data)
+          buff += data
         time.sleep(.001)
       loops = loopCount
-      self.f.close()
-      self.queue.put(self.fname)
-      syslog.syslog(self.name+" sending: "+self.fname)
+      self.queue.put(buff)
+      syslog.syslog(self.name+" sending: "+str(len(buff)))
 
   def close(self):
-    self.f.close()
-    os.remove(self.fname)
+    return
 
   def get(self):
     return self.queue.get()

@@ -208,3 +208,4 @@ Linux uses ALSA for its audio:
   * `aplay --format=S16_LE --rate=16k out.raw`
 * alsamixer (gui) or amixer (command line)
   * amixer -c 2 cset numid=3,name='PCM Playback Volume' 100
+* aplay --format=S16_LE --rate=44100  audio3.raw

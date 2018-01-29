@@ -25,12 +25,9 @@ class recogThread(threading.Thread):
           sample_rate_hertz=44100,
           language_code='en-US')
     while True:
-      input = self.source.get()
-      syslog.syslog(self.name+" got "+ input + ":" + str(os.stat(input).st_size))
-      with io.open(input,'rb') as audio_file:
-        content = audio_file.read()
-        audio = types.RecognitionAudio(content=content)
-        audio_file.close()
+      content = self.source.get()
+      syslog.syslog(self.name+" got "+ str(len(content)))
+      audio = types.RecognitionAudio(content=content)
       response = self.client.recognize(self.config,audio)
       syslog.syslog("response num results:"+str(len(response.results)))
       for result in response.results:
@@ -38,9 +35,6 @@ class recogThread(threading.Thread):
         for alternative in alternatives:
             syslog.syslog('Transcript: {}'.format(alternative.transcript))
             self.queue.put(alternative.transcript)
-      
-
-      os.remove(input)
 
   def get(self):
     return self.queue.get()
