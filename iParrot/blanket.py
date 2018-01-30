@@ -8,13 +8,25 @@ import sys
 import os
 import master
 import time
+import urllib2
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/shared")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
+import slp
+import words
+import random
+import json
 
-debug = False
+
+debug = True
 
 
 screen=None
 myFont=None
 lineLen=None
+noLines=6
+lineLen = 25
 choke = 0
 
 FontFile = "../fonts/Watchword_bold_demo.otf"
@@ -25,7 +37,7 @@ FontSize = 90
 #FilterDot = False
 #FontSize = 60
 
-listMax = 20
+listMax = 10
 os.environ['DISPLAY']=":0.0"
 
 class phraseSender(threading.Thread):
@@ -44,7 +56,6 @@ class phraseSender(threading.Thread):
       screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 
     if debug: syslog.syslog("displayText setting FontSize:"+str(FontSize))
-    lineLen = 30
     myFont = pygame.font.Font(FontFile, FontSize)
 
     if FilterDot:
@@ -60,7 +71,7 @@ class phraseSender(threading.Thread):
         lines.append(r)
         r = w + " "
     lines.append(r)
-    lines = lines[0:8]
+    lines = lines[0:noLines]
     i = 0
     screen.fill((0,0,0))
     labels = []
@@ -93,24 +104,43 @@ class phraseSender(threading.Thread):
     syslog.syslog("starting: "+self.name)
     list = []
     changed = False
+    hosts = slp.getHosts("schlub")
+    seq = []
+    for h in hosts:
+      if debug: syslog.syslog(self.name+" found:"+h['ip'])
+      seq.append(h['ip'])
     while True:
-      input = self.source.get()
-      if debug: syslog.syslog(self.name+" got "+ input)
-      if input not in list:
-        list.append(input)
-        if len(list) > listMax:
-          del list[0]
-        changed = True
+      try:
+        input = self.source.get()
+        if debug: syslog.syslog(self.name+" got "+ input)
+        if input not in list:
+          list.append(input)
+          if len(list) > listMax:
+            del list[0]
+          changed = True
 
+        if changed:
+          changed = False
+          syslog.syslog(self.name+": "+str(list))
+          sendString = ""
+          for w in list:
+            sendString += " " + w
+          self.displayText(sendString)
+          for ip in seq:
+            if debug: syslog.syslog(self.name+"sending request to "+ip)
+            url = "http://"+ip+":8080"
+            if debug: syslog.syslog(self.name+"url:"+url)
+            cmd = { 'cmd' : "Phrase", 'args' : [sendString] }
+            if debug: syslog.syslog(self.name+"json: "+ json.dumps(cmd))
+            req = urllib2.Request(url
+                        ,json.dumps(cmd),{'Content-Type': 'application/json'})
+            f = urllib2.urlopen(req)
+            test = f.read()
+            if debug: syslog.syslog(self.name+"got response:"+test)
 
-      if changed:
-        changed = False
-        syslog.syslog(self.name+": "+str(list))
-        sendString = ""
-        for w in list:
-          sendString += " " + w
-        self.displayText(sendString)
         time.sleep(choke)
+      except Exception, e:
+         syslog.syslog(self.name+"phrasePlayerError:"+repr(e));
           
 
   def get(self):
