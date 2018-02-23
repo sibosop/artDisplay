@@ -50,7 +50,7 @@ class recogThread(threading.Thread):
           )
       streaming_config = types.StreamingRecognitionConfig(
                 config=config
-                ,interim_results=True
+                ,interim_results=False
                 )
 
       # streaming_recognize returns a generator.
@@ -66,7 +66,7 @@ class recogThread(threading.Thread):
               alternatives = result.alternatives
               # The alternatives are ordered from most likely to least.
               for alternative in alternatives:
-                #syslog.syslog('Confidence: {}'.format(alternative.confidence))
+                syslog.syslog('Confidence: {}'.format(alternative.confidence))
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
                 self.queue.put(alternative.transcript)
 

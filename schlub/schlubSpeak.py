@@ -14,7 +14,7 @@ import random
 import soundServer
 import schlubTrack
 
-phraseScatter = True;
+phraseScatter = False;
 currentPhrase=""
 phraseMutex=threading.Lock()
 debug=True

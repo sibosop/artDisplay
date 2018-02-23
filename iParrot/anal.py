@@ -4,7 +4,7 @@ import queue
 import time
 import syslog
 
-chooseLen=6
+chooseLen=4
 debug=False
 class analThread(threading.Thread):
   def __init__(self,i):
