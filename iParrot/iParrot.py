@@ -23,15 +23,15 @@ if __name__ == '__main__':
   rt = recog.recogThread(it)
   rt.setDaemon(True)
 
-  analt = anal.analThread(rt)
-  analt.setDaemon(True)
+#  analt = anal.analThread(rt)
+#  analt.setDaemon(True)
 
-  pst = blanket.phraseSender(analt)
+  pst = blanket.phraseSender(rt)
   pst.setDaemon(True)
 
   it.start()
   rt.start()
-  analt.start()
+#  analt.start()
   pst.start()
   while True:
     try:
