@@ -9,6 +9,9 @@ import recog
 import recorder
 import anal
 import blanket
+import transServer
+
+defaultPort = 8085
 
 
 if __name__ == '__main__':
@@ -25,7 +28,7 @@ if __name__ == '__main__':
 
 #  analt = anal.analThread(rt)
 #  analt.setDaemon(True)
-
+  
   pst = blanket.phraseSender(rt)
   pst.setDaemon(True)
 
@@ -33,6 +36,9 @@ if __name__ == '__main__':
   rt.start()
 #  analt.start()
   pst.start()
+  transServer = transServer.transServerThread(defaultPort)
+  transServer.setDaemon(True)
+  transServer.start()
   while True:
     try:
       time.sleep(2)
