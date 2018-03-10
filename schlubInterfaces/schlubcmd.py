@@ -26,11 +26,10 @@ def printHostList():
     print " ",o
   print
 
-def sendToHost(ip,cmd,args):
-  print "send to host:",ip,cmd,args
+def sendToHost(ip,cmd):
+  print "send to host:",ip,cmd
   url = "http://"+ip+":8080"
   print("url:"+url)
-  cmd = { 'cmd' : cmd , 'args' : args }
   print("cmd json:"+json.dumps(cmd))
   req = urllib2.Request(url
               ,json.dumps(cmd),{'Content-Type': 'application/json'})
@@ -38,9 +37,9 @@ def sendToHost(ip,cmd,args):
   test = f.read()
   print("got response:"+test)
 
-def sendToHosts(cmd,args):
+def sendToHosts(cmd):
   for h in hosts:
-    sendToHost(h['ip'],cmd,args)
+    sendToHost(h['ip'],cmd)
 
 def printCmds():
   print "SchlubCmds:"
@@ -49,11 +48,16 @@ def printCmds():
   print
 
 def doCmd(cmd): 
-  sendToHosts(cmd[0],[""])
+  sendToHosts({'cmd' : cmd[0], 'args' : [""] })
+  return 0
+
+def doSound(cmd):
+  print "doSound"
+  sendToHosts({'cmd' : cmd[0], 'file' : cmd[1]})
   return 0
 
 def doNum(cmd):
-  sendToHosts(cmd[0],[cmd[1]])
+  sendToHosts({'cmd' : cmd[0],'args' : [cmd[1]]})
   return 0
 
 def doPhrase(cmd):
@@ -62,9 +66,8 @@ def doPhrase(cmd):
     arg += c + " "
 
     
-  sendToHosts(cmd[0],[arg[:-1]])
+  sendToHosts({'cmd' : cmd[0], 'args' : [arg[:-1]]})
   return 0
-
 
 
 def doQuit(cmd):
@@ -73,6 +76,7 @@ def doQuit(cmd):
 
 cmds = {
       'Probe'     : doCmd
+      ,'Sound'    : doSound
       ,'Volume'   : doNum
       ,'Phrase'   : doPhrase
       ,'Threads'  : doNum
@@ -88,7 +92,8 @@ cmds = {
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  hosts = slp.getHosts("schlub")
+#  hosts = slp.getHosts("schlub")
+  hosts = [{'ip' : '192.168.20.109'}]
   printHostList()
   printCmds()
   while run:
