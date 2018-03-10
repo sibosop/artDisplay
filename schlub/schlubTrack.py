@@ -13,7 +13,7 @@ import time
 import soundServer
 
 debug = True
-currentSoundFile = ""
+currentSound = {'file':""}
 soundMaxVol = 1.0
 soundMinVol = 0.1
 speedChangeMax = 4.0
@@ -32,22 +32,26 @@ def findSoundFile(file):
     rval = path
   return rval
 
-def setCurrentSound(file):
-  global currentSoundFile
+def setCurrentSound(cmd):
+  global currentSound
   rval = "fail"
-  if findSoundFile(file) != "":
+  if debug: syslog.syslog("cmd:" + str(cmd))
+
+  if findSoundFile(cmd['file']) != "":
+    if debug: syslog.syslog("mutex")
     soundTrack.eventMutex.acquire()
-    currentSoundFile=file
+    currentSound=cmd
+    if debug: syslog.syslog("currentSound:" + str(currentSound))
     soundTrack.eventMutex.release()
     rval = "ok"
   return soundServer.jsonStatus(rval)
 
 def getCurrentSound():
-  global currentSoundFile
+  global currentSound
   soundTrack.eventMutex.acquire()
-  rval = currentSoundFile
+  rval = currentSound
+  n = currentSound['file'].rfind(".")
   soundTrack.eventMutex.release()
-  n = currentSoundFile.rfind(".")
   return rval[0:n]
 
 def doJpent():
@@ -108,7 +112,7 @@ class schlubTrack(threading.Thread):
     self.runMutex.release()
     
   def run(self):
-    global currentSoundFile
+    global currentSound
     syslog.syslog("Schlub Track:"+self.name)
     dir = adGlobal.eventDir
     while self.isRunning():
@@ -117,7 +121,7 @@ class schlubTrack(threading.Thread):
       try:
         file=""
         soundTrack.eventMutex.acquire()
-        file = currentSoundFile
+        file = currentSound['file']
         soundTrack.eventMutex.release()
         if file == "":
           if debug: syslog.syslog(self.name+": waiting for currentSoundFile");

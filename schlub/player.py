@@ -55,7 +55,7 @@ class playerThread(threading.Thread):
           ip = h['ip']
           if adGlobal.isLocalHost(ip):
             if debug: syslog.syslog("sending "+choice+" request to localhost("+ip+")")
-            schlubTrack.setCurrentSound(choice)
+            schlubTrack.setCurrentSound({'file' : choice})
           else:
             if debug: syslog.syslog("sending "+choice+" request to "+ip)
             url = "http://"+ip+":8080"

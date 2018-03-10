@@ -93,7 +93,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
   def doSoundList(self,cmd):
     return soundFile.getSoundList();
   def doSound(self,cmd):
-    return schlubTrack.setCurrentSound(cmd['args'][0])
+    return schlubTrack.setCurrentSound(cmd)
 
   def doCollectionList(self,cmd):
     return soundFile.getCollectionList()
