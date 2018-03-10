@@ -60,7 +60,7 @@ class playerThread(threading.Thread):
             if debug: syslog.syslog("sending "+choice+" request to "+ip)
             url = "http://"+ip+":8080"
             if debug: syslog.syslog("url:"+url)
-            cmd = { 'cmd' : "Sound" , 'args' : [choice] }
+            cmd = { 'cmd' : "Sound" , 'file' : choice }
             req = urllib2.Request(url
                       ,json.dumps(cmd),{'Content-Type': 'application/json'})
             f = urllib2.urlopen(req)
