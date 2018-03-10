@@ -92,8 +92,8 @@ cmds = {
 if __name__ == '__main__':
   run=True
   print "getting host list"
-#  hosts = slp.getHosts("schlub")
-  hosts = [{'ip' : '192.168.20.109'}]
+  hosts = slp.getHosts("schlub")
+#  hosts = [{'ip' : '192.168.20.109'}]
   printHostList()
   printCmds()
   while run:
