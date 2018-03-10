@@ -49,7 +49,7 @@ def setCurrentSound(cmd):
 def getCurrentSound():
   global currentSound
   soundTrack.eventMutex.acquire()
-  rval = currentSound
+  rval = currentSound['file']
   n = currentSound['file'].rfind(".")
   soundTrack.eventMutex.release()
   return rval[0:n]
