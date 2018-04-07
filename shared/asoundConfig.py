@@ -11,8 +11,13 @@ micKey="MIC_CARD"
 speakerKey="SPEAKER_CARD"
 
 usbMic="USB-Audio - USB PnP Sound Device"
-usbSpeaker="USB-Audio - USB2.0 Device"
-usbSpeakerAlt="USB-Audio - USB Audio Device"
+
+defaultSpeaker = {'search' : "bcm2835 - bcm2835 ALSA", 'name' : "MINI" }
+
+speakerLookup = [ 
+  {'search' : "USB-Audio - USB2.0 Device", 'name' : "HONK" }
+  ,{'search' : "USB-Audio - USB Audio Device", 'name' : "JLAB" }
+]
 
 
 def getCardNum(line,key):
@@ -25,6 +30,7 @@ def getCardNum(line,key):
 hwInit = False
 hw={}
 def setSpeakerInfo(hw):
+  if debug: syslog.syslog("set speak info:"+str(hw['Speaker'])+" " + hw['SpeakerBrand'])
   cmdHdr = ["amixer", "-c",hw['Speaker']]
   try:
     cmd = cmdHdr[:]
@@ -47,21 +53,26 @@ def getHw():
   global hw
   if hwInit is False:
     hw['Mic']="0"
-    hw['Speaker']=0
+    hw['Speaker']=-1
     cardPath = "/proc/asound/cards"
     with open(cardPath) as f:
       for line in f:
         t = getCardNum(line,usbMic)
         if t != "":
           hw['Mic'] = t
-        t = getCardNum(line,usbSpeaker)
-        if t != "":
-          hw['Speaker'] = t
-          hw['SpeakerBrand']= "HONK"
-        t = getCardNum(line,usbSpeakerAlt)
-        if t != "":
-          hw['Speaker'] = t
-          hw['SpeakerBrand'] = "JLAB"
+        for s in speakerLookup:
+          t = getCardNum(line,s['search'])
+          if t != "":
+            hw['Speaker'] = t
+            hw['SpeakerBrand']= s['name']
+
+    if hw['Speaker'] == -1:
+      with open(cardPath) as f:
+        for line in f:
+          t = getCardNum(line,defaultSpeaker['search'])
+          if t != "":
+            hw['Speaker'] = t
+            hw['SpeakerBrand'] = defaultSpeaker['name']
 
     #retrieve info about speaker
     setSpeakerInfo(hw)

@@ -80,7 +80,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Collection' : self.doCollection
       ,'PhraseScatter' : self.doPhraseScatter
       ,'MaxEvents' : self.doMaxEvents
+      ,'DisplayPhrase' : self.displayPhrase
     }
+  def displayPhrase(self,cmd):
+    
   
   def doMaxEvents(self,cmd):
     return soundFile.setMaxEvents(cmd['args'][0])
