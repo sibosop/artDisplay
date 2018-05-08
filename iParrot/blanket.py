@@ -17,6 +17,7 @@ import slp
 import words
 import random
 import json
+import transServer
 
 
 debug = True
@@ -28,6 +29,37 @@ lineLen=None
 noLines=6
 lineLen = 25
 choke = 0
+
+transMutex = threading.Lock()
+
+
+
+bufferSize=50
+currentTranscript=[]
+
+def setCurrentTranscript(trans):
+  global currentTranscript
+  global bufferSize
+
+  transMutex.acquire()
+  entry={}
+  entry['trans'] = trans
+  entry['timestamp'] = time.time()
+  currentTranscript.append(entry)
+  if len(currentTranscript) > bufferSize:
+    currentTranscript.pop(0)
+  transMutex.release()
+  rval = "ok"
+  return transServer.jsonStatus(rval)
+
+def getCurrentTranscript():
+  global currentTranscript
+  rval = {}
+  rval['status'] = "ok"
+  transMutex.acquire()
+  rval['transcript'] = currentTranscript
+  transMutex.release()
+  return json.dumps(rval)
 
 FontFile = "../fonts/Watchword_bold_demo.otf"
 FilterDot = True
@@ -104,41 +136,12 @@ class phraseSender(threading.Thread):
     syslog.syslog("starting: "+self.name)
     list = []
     changed = False
-    hosts = slp.getHosts("schlub")
-    seq = []
-    for h in hosts:
-      if debug: syslog.syslog(self.name+" found:"+h['ip'])
-      seq.append(h['ip'])
     while True:
       try:
         input = self.source.get()
         if debug: syslog.syslog(self.name+" got "+ input)
-        if input not in list:
-          list.append(input)
-          if len(list) > listMax:
-            del list[0]
-          changed = True
-
-        if changed:
-          changed = False
-          syslog.syslog(self.name+": "+str(list))
-          sendString = ""
-          for w in list:
-            sendString += " " + w
-          self.displayText(sendString)
-          for ip in seq:
-            if debug: syslog.syslog(self.name+"sending request to "+ip)
-            url = "http://"+ip+":8080"
-            if debug: syslog.syslog(self.name+"url:"+url)
-            cmd = { 'cmd' : "Phrase", 'args' : [sendString] }
-            if debug: syslog.syslog(self.name+"json: "+ json.dumps(cmd))
-            req = urllib2.Request(url
-                        ,json.dumps(cmd),{'Content-Type': 'application/json'})
-            f = urllib2.urlopen(req)
-            test = f.read()
-            if debug: syslog.syslog(self.name+"got response:"+test)
-
-        time.sleep(choke)
+        self.displayText(input)
+        setCurrentTranscript(input)
       except Exception, e:
          syslog.syslog(self.name+"phrasePlayerError:"+repr(e));
           
