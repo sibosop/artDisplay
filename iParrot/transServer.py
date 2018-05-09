@@ -19,6 +19,7 @@ import json
 import schlubSpeak
 import blanket
 import subprocess
+import urlparse
 from SocketServer import ThreadingMixIn
 
 debug=True
@@ -44,8 +45,14 @@ class MyHandler(BaseHTTPRequestHandler):
                           self.log_date_time_string(),
                           format%args))
   def do_GET(self):
-    if debug: syslog.syslog("Get:")
-    status =  blanket.getCurrentTranscript()
+    if debug: syslog.syslog(self.path)
+    parse = urlparse.urlparse(self.path)
+    if debug: syslog.syslog(parse.path)
+    status = ""
+    if (parse.path == "/data" ) :
+      status =  blanket.getCurrentTranscript()
+    else:
+      status = jsonStatus("illegal CMD:"+parse.path)
 
     self.send_response(200)
     self.send_header("Content-type", "application/json")
