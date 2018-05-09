@@ -41,14 +41,16 @@ def setCurrentTranscript(trans):
   global currentTranscript
   global bufferSize
 
-  transMutex.acquire()
+  #transMutex.acquire()
   entry={}
   entry['trans'] = trans
   entry['timestamp'] = time.time()
-  currentTranscript.append(entry)
+  #currentTranscript.append(entry)
+  currentTranscript.insert(0,entry)
   if len(currentTranscript) > bufferSize:
-    currentTranscript.pop(0)
-  transMutex.release()
+    #currentTranscript.pop(0)
+    currentTranscript.pop()
+  #transMutex.release()
   rval = "ok"
   return transServer.jsonStatus(rval)
 
@@ -56,9 +58,9 @@ def getCurrentTranscript():
   global currentTranscript
   rval = {}
   rval['status'] = "ok"
-  transMutex.acquire()
+  #transMutex.acquire()
   rval['transcript'] = currentTranscript
-  transMutex.release()
+  #transMutex.release()
   return json.dumps(rval)
 
 FontFile = "../fonts/Watchword_bold_demo.otf"

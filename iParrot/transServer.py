@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import BaseHTTPServer
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from SocketServer import ThreadingMixIn
 import threading
 import time
 import syslog
@@ -17,15 +18,21 @@ import player
 import json
 import schlubSpeak
 import blanket
+import subprocess
+from SocketServer import ThreadingMixIn
 
 debug=True
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """ This class allows to handle requests in separated threads.
+            No further content needed, don't touch this. """
 
 def jsonStatus(s):
   d = {}
   d['status'] = s
   return json.dumps(d)
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class MyHandler(BaseHTTPRequestHandler):
   def do_HEAD(s):
     s.send_response(200)
     s.send_header("Content-type", "text/html")
@@ -67,7 +74,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       os._exit(5)
     return
 
-class soundServer(BaseHTTPServer.HTTPServer):
+class soundServer(HTTPServer):
   def __init__(self,client,handler):
     BaseHTTPServer.HTTPServer.__init__(self,client,handler)
     self.test = "test var"
@@ -145,12 +152,17 @@ class soundServer(BaseHTTPServer.HTTPServer):
 class transServerThread(threading.Thread):
   def __init__(self,port):
     super(transServerThread,self).__init__()
+    host = subprocess.check_output(["hostname","-I"]).split();
+    self.host = host[0]
     self.port = port
-    syslog.syslog("sound server:"+str(self.port))
+    syslog.syslog("trans server:"+str(self.host)+":"+str(self.port))
     #self.server_class = BaseHTTPServer.HTTPServer
-    self.server_class = soundServer
-    self.httpd = self.server_class(('', self.port), MyHandler)
+    #self.server_class = soundServer
+    #self.httpd = self.server_class(('', self.port), MyHandler)
+    self.server = ThreadedHTTPServer((self.host, self.port), MyHandler)
 
   def run(self):
-    self.httpd.serve_forever()
+    syslog.syslog("starting server")
+    self.server.serve_forever()
+    syslog.syslog("shouldn't get here");
 
