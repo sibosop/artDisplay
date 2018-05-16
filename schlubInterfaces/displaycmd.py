@@ -76,15 +76,10 @@ def doQuit(cmd):
 
 cmds = {
       'Probe'     : doCmd
-      ,'Sound'    : doSound
-      ,'Volume'   : doNum
       ,'Phrase'   : doPhrase
-      ,'Threads'  : doNum
       ,'Poweroff' : doCmd
       ,'Reboot'   : doCmd
       ,'Upgrade'  : doCmd
-      ,'PhraseScatter' : doPhrase
-      ,'MaxEvents' : doNum
       ,'Quit' : doQuit
     }
 
@@ -92,7 +87,7 @@ cmds = {
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  hosts = slp.getHosts("schlub")
+  hosts = slp.getHosts("display")
 #  hosts = [{'ip' : '192.168.20.112'}]
   printHostList()
   printCmds()
