@@ -19,6 +19,7 @@ class recogThread(threading.Thread):
     self.name = "Recog Thread"
     self.queue = queue.Queue()
     self.source = i
+    self.interim = False
 
   class dataStream(object):
     def __init__(self,r):
@@ -50,7 +51,7 @@ class recogThread(threading.Thread):
           )
       streaming_config = types.StreamingRecognitionConfig(
                 config=config
-                ,interim_results=False
+                ,interim_results=self.interim
                 )
 
       # streaming_recognize returns a generator.
@@ -68,7 +69,11 @@ class recogThread(threading.Thread):
               for alternative in alternatives:
                 syslog.syslog('Confidence: {}'.format(alternative.confidence))
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
-                self.queue.put(alternative.transcript)
+                out={}
+                out['trans'] = alternative.transcript
+                out['interim'] = self.interim
+                out['confidence'] = alternative.confidence
+                self.queue.put(out)
 
       except grpc.RpcError, e:
         if e.code() not in (grpc.StatusCode.INVALID_ARGUMENT,
