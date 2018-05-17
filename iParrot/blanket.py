@@ -31,11 +31,10 @@ lineLen = 25
 choke = 0
 
 transMutex = threading.Lock()
-interim = False;
 
 
 
-bufferSize=50
+bufferSize=100
 currentTranscript=[]
 
 def setCurrentTranscript(trans):
@@ -44,7 +43,6 @@ def setCurrentTranscript(trans):
 
   #transMutex.acquire()
   entry={}
-  interim = trans['interim']
   entry['trans'] = trans['trans']
   entry['confidence'] = trans['confidence']
   entry['timestamp'] = time.time()
@@ -57,13 +55,16 @@ def setCurrentTranscript(trans):
   rval = "ok"
   return transServer.jsonStatus(rval)
 
-def getCurrentTranscript():
+def getCurrentTranscript(confThres):
   global currentTranscript
   rval = {}
   rval['status'] = "ok"
-  rval['interim'] = interim
   #transMutex.acquire()
-  rval['transcript'] = currentTranscript
+  transcript = []
+  for e in currentTranscript:
+    if e['confidence'] >= int(confThres)/10.0:
+      transcript.insert(0,e)
+  rval['transcript'] = transcript
   #transMutex.release()
   return json.dumps(rval)
 

@@ -19,7 +19,7 @@ class recogThread(threading.Thread):
     self.name = "Recog Thread"
     self.queue = queue.Queue()
     self.source = i
-    self.interim = False
+    self.interim = True
 
   class dataStream(object):
     def __init__(self,r):
@@ -71,7 +71,6 @@ class recogThread(threading.Thread):
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
                 out={}
                 out['trans'] = alternative.transcript
-                out['interim'] = self.interim
                 out['confidence'] = alternative.confidence
                 self.queue.put(out)
 

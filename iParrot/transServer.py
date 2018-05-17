@@ -50,7 +50,17 @@ class MyHandler(BaseHTTPRequestHandler):
     if debug: syslog.syslog(parse.path)
     status = ""
     if (parse.path == "/data" ) :
-      status =  blanket.getCurrentTranscript()
+      conf = "5"
+      syslog.syslog("query = "+parse.query)
+      if parse.query != '':
+        q = parse.query.split('=')
+        if q[0] == 'ct':
+          conf = q[1]
+        else:
+          syslog.syslog("unknown query")
+      status =  blanket.getCurrentTranscript(conf)
+
+        
     else:
       status = jsonStatus("illegal CMD:"+parse.path)
 
