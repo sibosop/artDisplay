@@ -34,7 +34,7 @@ transMutex = threading.Lock()
 
 
 
-bufferSize=100
+bufferSize=1000
 currentTranscript=[]
 
 def setCurrentTranscript(trans):
@@ -63,7 +63,7 @@ def getCurrentTranscript(confThres):
   transcript = []
   for e in currentTranscript:
     if e['confidence'] >= int(confThres)/10.0:
-      transcript.insert(0,e)
+      transcript.append(e)
   rval['transcript'] = transcript
   #transMutex.release()
   return json.dumps(rval)
