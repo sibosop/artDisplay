@@ -82,13 +82,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Collection' : self.doCollection
       ,'PhraseScatter' : self.doPhraseScatter
       ,'MaxEvents' : self.doMaxEvents
-      ,'Display' : self.display
     }
-  def display(self,cmd):
-    if not master.isDispText():
-      return soundServer.status("ok")
-    return displayText.displayText(cmd['args'][0])
-    
 
   def doMaxEvents(self,cmd):
     return soundFile.setMaxEvents(cmd['args'][0])
@@ -115,6 +109,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return jsonStatus("ok")
 
   def doPhrase(self,cmd):
+    if master.isDispText:
+      displayText.displayText(cmd['args']['phrase'])
+      
     return schlubSpeak.setCurrentPhrase(cmd['args'])
 
   def doThreads(self,cmd):
