@@ -68,7 +68,7 @@ def doPhrase(cmd):
   args = {}
   args['phrase'] = phrase
   args['reps'] = 0
-  args['scatter'] = True
+  args['scatter'] = False
 
   sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
