@@ -5,7 +5,7 @@ import syslog
 import sys
 import adGlobal
 
-debug=False
+debug=True
 isRaspberry=platform.uname()[1] == 'raspberrypi';
 if isRaspberry:
   if debug: syslog.syslog("is raspberry");
