@@ -94,11 +94,15 @@ cmds = {
       ,'Quit' : doQuit
     }
 
+def getHostList():
+  global hosts
+  hosts = slp.getHosts("schlub")
 
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  hosts = slp.getHosts("schlub")
+  getHostList()
+  
 #  hosts = [{'ip' : '192.168.20.121'}]
   printHostList()
   printCmds()
