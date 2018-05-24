@@ -109,7 +109,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return jsonStatus("ok")
 
   def doPhrase(self,cmd):
-    if master.isDispText:
+    if master.displayEnabled():
       displayText.displayText(cmd['args']['phrase'])
       
     return schlubSpeak.setCurrentPhrase(cmd['args'])
@@ -162,7 +162,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
-    state['dispText'] = master.hasDisplay()
+    state['displayEnabled'] = master.displayEnabled()
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents

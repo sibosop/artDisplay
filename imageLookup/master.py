@@ -25,7 +25,7 @@ def isMaster():
   syslog.syslog("is master")
   return True;
 
-def hasDisplay():
+def displayEnabled():
   GPIO.setmode(GPIO.BCM)
   GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
   if GPIO.input(13):
