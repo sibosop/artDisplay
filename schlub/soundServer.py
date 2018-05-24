@@ -162,7 +162,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
-    state['dispText'] = master.isDispText()
+    state['dispText'] = master.hasDisplay()
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents
