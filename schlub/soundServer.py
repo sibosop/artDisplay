@@ -9,6 +9,7 @@ import os
 import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
+sys.path.append(home+"/GitProjects/artDisplay/poem")
 import asoundConfig
 import upgrade
 import soundFile
@@ -16,6 +17,7 @@ import master
 import player
 import json
 import schlubSpeak
+import displayText
 
 debug=True
 
@@ -81,6 +83,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'PhraseScatter' : self.doPhraseScatter
       ,'MaxEvents' : self.doMaxEvents
     }
+
   def doMaxEvents(self,cmd):
     return soundFile.setMaxEvents(cmd['args'][0])
 
@@ -106,7 +109,10 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return jsonStatus("ok")
 
   def doPhrase(self,cmd):
-    return schlubSpeak.setCurrentPhrase(cmd['args'][0])
+    if master.displayEnabled():
+      displayText.displayText(cmd['args']['phrase'])
+      
+    return schlubSpeak.setCurrentPhrase(cmd['args'])
 
   def doThreads(self,cmd):
     return schlubTrack.changeNumSchlubThreads(int(cmd['args'][0]))
@@ -156,6 +162,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
+    state['displayEnabled'] = master.displayEnabled()
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents

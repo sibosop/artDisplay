@@ -8,7 +8,9 @@ import os
 import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import master
+import soundServer
 debug = False
 
 screen=None
@@ -81,6 +83,7 @@ def displayText(text):
   sy = (screen.get_height() - wordRect.get_height()) / 2
   screen.blit(wordRect,(sx,sy))
   pygame.display.flip() 
+  return soundServer.jsonStatus("ok")
 
 if __name__ == '__main__':
   if master.isRaspberry:

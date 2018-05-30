@@ -61,18 +61,24 @@ def doNum(cmd):
   return 0
 
 def doPhrase(cmd):
-  arg = ""
+  phrase = ""
   for c in cmd[1:]:
-    arg += c + " "
+    phrase += c + " "
+  phrase = phrase[:-1]
+  args = {}
+  args['phrase'] = phrase
+  args['reps'] = 0
+  args['scatter'] = False
 
-    
-  sendToHosts({'cmd' : cmd[0], 'args' : [arg[:-1]]})
+  sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
+
 
 
 def doQuit(cmd):
   print cmd
   return -1
+
 
 cmds = {
       'Probe'     : doCmd
@@ -88,12 +94,16 @@ cmds = {
       ,'Quit' : doQuit
     }
 
+def getHostList():
+  global hosts
+  hosts = slp.getHosts("schlub")
 
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  hosts = slp.getHosts("schlub")
-#  hosts = [{'ip' : '192.168.20.112'}]
+  getHostList()
+  
+#  hosts = [{'ip' : '192.168.20.121'}]
   printHostList()
   printCmds()
   while run:
