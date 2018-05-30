@@ -29,3 +29,5 @@ sudo apt-get -y install espeak
 sudo apt-get -y install python-pypdf2
 sudo pip3 install pyalsaaudio
 sudo apt-get -y install python-pyaudio
+sudo -H pip install textblob
+
