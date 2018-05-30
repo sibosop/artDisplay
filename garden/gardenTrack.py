@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import pygame
 import os
-
+import threading
+import random
+import time
 
 eventMin=100
 eventMax=10000
@@ -36,24 +38,24 @@ def playFile(path):
   playSound(sound,.5,.5)
   
   
-class schlubTrack(threading.Thread):
-  def __init__(self,name,dir):
-    super(schlubTrack,self).__init__()
+class gardenTrack(threading.Thread):
+  def __init__(self,name):
+    super(gardenTrack,self).__init__()
     self.runState = True
     self.name = name
     self.currentSound={'file' : ""}
-    self.currentDir = 
-    self.soundDir= os.getcwd()
+    self.currentDir = os.getcwd()
+    
     self.soundMutex = threading.Lock()
     self.runMutex = threading.Lock()
-    self.dirMutex = threading,Lock()
+    self.dirMutex = threading.Lock()
     
   def setCurrentDir(self,dir):
     self.dirMutex.acquire()
     self.soundDir = dir
     self.dirMutex.release()
   
-  def getCurrentDir(self,dir):
+  def getCurrentDir(self):
     self.dirMutex.acquire()
     dir = self.soundDir
     self.dirMutex.release()
@@ -64,7 +66,7 @@ class schlubTrack(threading.Thread):
     self.currentSound = cs
     self.soundMutex.release()
   
-  def getCurrentSound(self,cs):
+  def getCurrentSound(self):
     self.soundMutex.acquire()
     cs = self.currentSound 
     self.soundMutex.release()
@@ -95,7 +97,8 @@ class schlubTrack(threading.Thread):
           if debug: print(self.name+": waiting for currentSoundFile");
           time.sleep(2)
           continue
-        path = self.getCurrentDir()+"/"+file
+        path = self.getCurrentDir()+file
+        path = "/Users/brian/sibosopLocal/music/Music20161008/Clips/schlubFull/a1.wav"
         if debug: print(self.name+": playing:"+path);
         sound = pygame.mixer.Sound(file=path)
 
@@ -107,7 +110,7 @@ class schlubTrack(threading.Thread):
         r = l
         soundTrack.playSound(sound,l,r)
       except Exception as e:
-        syslog.syslog(self.name+": error on "+path+":"+str(e))
+        print(self.name+": error on "+path+":"+str(e))
 
       if debug: print(self.name+": next play:"+str(nt))
       time.sleep(nt)
@@ -116,8 +119,8 @@ class schlubTrack(threading.Thread):
     
 ecount = 0
 eventThreads=[]
-def startGardenThread():
-  if debug: syslog.syslog("startGardenThread")
+def startEventThread():
+  if debug: print("startEventThread")
   global eventThreads
   global ecount
   ecount += 1
@@ -138,7 +141,7 @@ def stopEventThread():
 
 def changeNumGardenThreads(n):
   global eventThreads
-  syslog.syslog("changing number of threads from "
+  print("changing number of threads from "
                     +str(len(eventThreads))+ " to "+str(n))
   while len(eventThreads) != n:
     if len(eventThreads) < n:
