@@ -51,6 +51,7 @@ if __name__ == '__main__':
   print
 
   while run:
+    print "url:",url
     response = urllib2.urlopen(url)
     html = response.read()
     data = json.loads(html)
@@ -77,8 +78,6 @@ if __name__ == '__main__':
       index += 1
       
       
-      
-
     time.sleep(3)
 
 

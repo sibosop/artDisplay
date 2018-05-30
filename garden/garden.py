@@ -11,6 +11,7 @@ if __name__ == '__main__':
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
   print(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+  gardenTrack.setup()
   gardenTrack.changeNumGardenThreads(1)
   threads = gardenTrack.eventThreads
   for t in threads:
