@@ -80,10 +80,11 @@ listMax = 10
 os.environ['DISPLAY']=":0.0"
 
 class phraseSender(threading.Thread):
-  def __init__(self,i):
+  def __init__(self,i,de):
     super(phraseSender,self).__init__()
     self.name = "phraseSender"
     self.source = i
+    self.displayEnabled=de
 
   def displayText(self,text):
     global screen
@@ -147,7 +148,8 @@ class phraseSender(threading.Thread):
       #try:
         input = self.source.get()
         if debug: syslog.syslog(self.name+" got "+ str(input))
-        self.displayText(input['trans'])
+        if self.displayEnabled:
+          self.displayText(input['trans'])
         setCurrentTranscript(input)
       #except Exception, e:
          #syslog.syslog(self.name+"phrasePlayerError:"+repr(e));

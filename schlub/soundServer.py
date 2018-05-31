@@ -68,6 +68,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Sound'    : self.doSound
       ,'Volume'   : self.doVolume
       ,'Phrase'   : self.doPhrase
+      ,'Show' : self.doShow
       ,'Threads'  : self.doThreads
       ,'Poweroff' : self.doPoweroff
       ,'Reboot'   : self.doReboot
@@ -108,10 +109,11 @@ class soundServer(BaseHTTPServer.HTTPServer):
     asoundConfig.setVolume(cmd['args'][0])
     return jsonStatus("ok")
 
+  def doShow(self,cmd):
+    displayText.displayText(cmd['args']['phrase'])
+    return jsonStatus("ok")
+
   def doPhrase(self,cmd):
-    if master.displayEnabled():
-      displayText.displayText(cmd['args']['phrase'])
-      
     return schlubSpeak.setCurrentPhrase(cmd['args'])
 
   def doThreads(self,cmd):

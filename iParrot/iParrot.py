@@ -16,6 +16,11 @@ defaultPort = 8085
 
 if __name__ == '__main__':
   pname = sys.argv[0]
+  displayEnabled = False
+  if len(sys.argv) > 1:
+    if sys.argv[1] == '-d':
+      displayEnabled = True
+      
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
   syslog.syslog(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
@@ -29,7 +34,7 @@ if __name__ == '__main__':
 #  analt = anal.analThread(rt)
 #  analt.setDaemon(True)
   
-  pst = blanket.phraseSender(rt)
+  pst = blanket.phraseSender(rt,displayEnabled)
   pst.setDaemon(True)
 
   it.start()

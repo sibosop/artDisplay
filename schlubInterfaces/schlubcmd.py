@@ -60,6 +60,19 @@ def doNum(cmd):
   sendToHosts({'cmd' : cmd[0],'args' : [cmd[1]]})
   return 0
 
+def doShow(cmd):
+  phrase = ""
+  for c in cmd[1:]:
+    phrase += c + " "
+  phrase = phrase[:-1]
+  args = {}
+  args['phrase'] = phrase
+  args['reps'] = 0
+  args['scatter'] = False
+
+  sendToHosts({'cmd' : cmd[0], 'args' : args})
+  return 0
+
 def doPhrase(cmd):
   phrase = ""
   for c in cmd[1:]:
@@ -83,6 +96,7 @@ def doQuit(cmd):
 cmds = {
       'Probe'     : doCmd
       ,'Sound'    : doSound
+      ,'Show'     : doShow
       ,'Volume'   : doNum
       ,'Phrase'   : doPhrase
       ,'Threads'  : doNum
