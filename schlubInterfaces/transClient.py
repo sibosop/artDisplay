@@ -81,11 +81,11 @@ if __name__ == '__main__':
         phrase = dataBuf[index]['trans']
         args = {}
         args['phrase'] = phrase
-        resp = sendToHost(ip,{'cmd' : 'Phrase', 'args' : args })
+        resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
       index += 1
       
       
-    time.sleep(3)
+    time.sleep(1)
 
 
 
