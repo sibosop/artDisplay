@@ -40,13 +40,10 @@ if __name__ == '__main__':
   url = "http://"+transServerIp+"/data?ct=0"
   print "url",url 
   for h in schlubcmd.hosts:
-#    resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
- #   if resp['displayEnabled']:
-  #    print "ip:",h['ip'],"display enabled"
-   #   displayList.insert(0,h['ip'])
-     displayList.insert(0,h['ip'])
+    resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
+    print "ip:",h['ip'],"display enabled"
+    displayList.insert(0,h['ip'])
   print
-  print "enabled display:"
   for d in displayList:
     print d
   print
