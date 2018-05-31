@@ -31,6 +31,10 @@ def sendToHost(ip,cmd):
 
 if __name__ == '__main__':
   run=True
+  checkDisplay = False
+  if len(sys.argv) > 2:
+    if sys.argv[2] == "-d":
+      checkDisplay = True
   print "getting host list"
   schlubcmd.getHostList()
   schlubcmd.printHostList()
@@ -41,8 +45,13 @@ if __name__ == '__main__':
   print "url",url 
   for h in schlubcmd.hosts:
     resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
-    print "ip:",h['ip'],"display enabled"
-    displayList.insert(0,h['ip'])
+    if checkDisplay:
+      if resp['displayEnabled']:
+        print "ip:",h['ip'],"display enabled"
+        displayList.insert(0,h['ip'])
+    else:
+      print "ip:",h['ip'],"display enabled"
+      displayList.insert(0,h['ip'])
   print
   for d in displayList:
     print d
