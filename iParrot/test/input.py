@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # mode.
     inp.setperiodsize(160)
     
-    loops = 3000
+    loops = 5000
     while loops > 0:
         loops -= 1
         # Read data from device

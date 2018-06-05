@@ -4,7 +4,13 @@ import sys
 import syslog
 import time
 import os
+import os
+import sys
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import master
+import soundServer
 debug = False
 
 screen=None
@@ -77,6 +83,13 @@ def displayText(text):
   sy = (screen.get_height() - wordRect.get_height()) / 2
   screen.blit(wordRect,(sx,sy))
   pygame.display.flip() 
+  return soundServer.jsonStatus("ok")
 
 if __name__ == '__main__':
+  if master.isRaspberry:
+    os.environ['DISPLAY']=":0.0"
+  pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
+  pygame.init()
+  pygame.mouse.set_visible(False)
   displayText(sys.argv[1])
+  time.sleep(5)

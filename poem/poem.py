@@ -23,8 +23,9 @@ if useVoice:
 import pygame
 import glob
 import json
-import butmon
 debug = True
+if master.isRasberry:
+  import butmon
 
 poemDir = "/media/parallels/POEMDATA"
 candidates = []
@@ -92,7 +93,8 @@ if __name__ == '__main__':
   sl = poemLoop()
   sl.setDaemon(True)
   sl.start()
-  bt = butmon.ButMonThread()
+  if master.idRaspberry:
+    bt = butmon.ButMonThread()
   bt.setDaemon(True)
   bt.start()
 

@@ -60,64 +60,35 @@ def doNum(cmd):
   sendToHosts({'cmd' : cmd[0],'args' : [cmd[1]]})
   return 0
 
-def doShow(cmd):
-  phrase = ""
-  for c in cmd[1:]:
-    phrase += c + " "
-  phrase = phrase[:-1]
-  args = {}
-  args['phrase'] = phrase
-  args['reps'] = 0
-  args['scatter'] = False
-
-  sendToHosts({'cmd' : cmd[0], 'args' : args})
-  return 0
-
 def doPhrase(cmd):
-  phrase = ""
+  arg = ""
   for c in cmd[1:]:
-    phrase += c + " "
-  phrase = phrase[:-1]
-  args = {}
-  args['phrase'] = phrase
-  args['reps'] = 0
-  args['scatter'] = False
+    arg += c + " "
 
-  sendToHosts({'cmd' : cmd[0], 'args' : args})
+    
+  sendToHosts({'cmd' : cmd[0], 'args' : [arg[:-1]]})
   return 0
-
 
 
 def doQuit(cmd):
   print cmd
   return -1
 
-
 cmds = {
       'Probe'     : doCmd
-      ,'Sound'    : doSound
-      ,'Show'     : doShow
-      ,'Volume'   : doNum
       ,'Phrase'   : doPhrase
-      ,'Threads'  : doNum
       ,'Poweroff' : doCmd
       ,'Reboot'   : doCmd
       ,'Upgrade'  : doCmd
-      ,'PhraseScatter' : doPhrase
-      ,'MaxEvents' : doNum
       ,'Quit' : doQuit
     }
 
-def getHostList():
-  global hosts
-  hosts = slp.getHosts("schlub")
 
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  getHostList()
-  
-#  hosts = [{'ip' : '192.168.20.121'}]
+  hosts = slp.getHosts("display")
+#  hosts = [{'ip' : '192.168.20.112'}]
   printHostList()
   printCmds()
   while run:

@@ -12,6 +12,7 @@ import urllib2
 import soundFile
 import slp
 import json
+import schlubTrack
 
 
 debug = True
@@ -52,15 +53,19 @@ class playerThread(threading.Thread):
         for h in hosts:
           choice = random.choice(e)
           ip = h['ip']
-          if debug: syslog.syslog("sending "+choice+" request to "+ip)
-          url = "http://"+ip+":8080"
-          if debug: syslog.syslog("url:"+url)
-          cmd = { 'cmd' : "Sound" , 'args' : [choice] }
-          req = urllib2.Request(url
-                    ,json.dumps(cmd),{'Content-Type': 'application/json'})
-          f = urllib2.urlopen(req)
-          test = f.read()
-          if debug: syslog.syslog("got response:"+test)
+          if adGlobal.isLocalHost(ip):
+            if debug: syslog.syslog("sending "+choice+" request to localhost("+ip+")")
+            schlubTrack.setCurrentSound({'file' : choice})
+          else:
+            if debug: syslog.syslog("sending "+choice+" request to "+ip)
+            url = "http://"+ip+":8080"
+            if debug: syslog.syslog("url:"+url)
+            cmd = { 'cmd' : "Sound" , 'file' : choice }
+            req = urllib2.Request(url
+                      ,json.dumps(cmd),{'Content-Type': 'application/json'})
+            f = urllib2.urlopen(req)
+            test = f.read()
+            if debug: syslog.syslog("got response:"+test)
         stime = random.randint(15,40)
         if debug: syslog.syslog("next change:"+str(stime))
         time.sleep(stime)

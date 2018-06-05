@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import BaseHTTPServer
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from SocketServer import ThreadingMixIn
 import threading
 import time
 import syslog
@@ -9,7 +10,6 @@ import os
 import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
-sys.path.append(home+"/GitProjects/artDisplay/poem")
 import asoundConfig
 import upgrade
 import soundFile
@@ -17,16 +17,23 @@ import master
 import player
 import json
 import schlubSpeak
-import displayText
+import blanket
+import subprocess
+import urlparse
+from SocketServer import ThreadingMixIn
 
 debug=True
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """ This class allows to handle requests in separated threads.
+            No further content needed, don't touch this. """
 
 def jsonStatus(s):
   d = {}
   d['status'] = s
   return json.dumps(d)
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class MyHandler(BaseHTTPRequestHandler):
   def do_HEAD(s):
     s.send_response(200)
     s.send_header("Content-type", "text/html")
@@ -37,6 +44,31 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                          (self.address_string(),
                           self.log_date_time_string(),
                           format%args))
+  def do_GET(self):
+    if debug: syslog.syslog(self.path)
+    parse = urlparse.urlparse(self.path)
+    if debug: syslog.syslog(parse.path)
+    status = ""
+    if (parse.path == "/data" ) :
+      conf = "5"
+      syslog.syslog("query = "+parse.query)
+      if parse.query != '':
+        q = parse.query.split('=')
+        if q[0] == 'ct':
+          conf = q[1]
+        else:
+          syslog.syslog("unknown query")
+      status =  blanket.getCurrentTranscript(conf)
+
+        
+    else:
+      status = jsonStatus("illegal CMD:"+parse.path)
+
+    self.send_response(200)
+    self.send_header("Content-type", "application/json")
+    self.end_headers()
+    self.wfile.write(status)
+    
 
   def do_POST(self):
     # Begin the response
@@ -59,62 +91,19 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       os._exit(5)
     return
 
-class soundServer(BaseHTTPServer.HTTPServer):
+class soundServer(HTTPServer):
   def __init__(self,client,handler):
     BaseHTTPServer.HTTPServer.__init__(self,client,handler)
     self.test = "test var"
     self.cmds = {
-      'Probe'     : self.doProbe
-      ,'Sound'    : self.doSound
-      ,'Volume'   : self.doVolume
-      ,'Phrase'   : self.doPhrase
-      ,'Show' : self.doShow
-      ,'Threads'  : self.doThreads
+      'Trans'   : self.doTrans
       ,'Poweroff' : self.doPoweroff
       ,'Reboot'   : self.doReboot
       ,'Upgrade'  : self.doUpgrade
-      ,'Auto'     : self.setPlayMode
-      ,'Manual'   : self.setPlayMode
-      ,'Refresh'  : self.doRefresh
-      ,'Rescan'   : self.doRescan
-      ,'SoundList': self.doSoundList
-      ,'SoundEnable' : self.doSoundEnable
-      ,'CollectionList': self.doCollectionList
-      ,'Collection' : self.doCollection
-      ,'PhraseScatter' : self.doPhraseScatter
-      ,'MaxEvents' : self.doMaxEvents
     }
-
-  def doMaxEvents(self,cmd):
-    return soundFile.setMaxEvents(cmd['args'][0])
-
-  def doPhraseScatter(self,cmd):
-    return schlubSpeak.setPhraseScatter(cmd['args'][0])
-
-  def doSoundEnable(self,cmd):
-    return soundFile.setSoundEnable(cmd['args'][0],cmd['args'][1])
-  def doSoundList(self,cmd):
-    return soundFile.getSoundList();
-  def doSound(self,cmd):
-    return schlubTrack.setCurrentSound(cmd)
-
-  def doCollectionList(self,cmd):
-    return soundFile.getCollectionList()
-  def doCollection(self,cmd):
-    syslog.syslog(str(cmd))
-    return soundFile.setCurrentCollection(cmd['args'][0])
-
-
-  def doVolume(self,cmd):
-    asoundConfig.setVolume(cmd['args'][0])
-    return jsonStatus("ok")
-
-  def doShow(self,cmd):
-    displayText.displayText(cmd['args']['phrase'])
-    return jsonStatus("ok")
-
-  def doPhrase(self,cmd):
-    return schlubSpeak.setCurrentPhrase(cmd['args'])
+  
+  def doTrans(self,cmd):
+    return blanket.getCurrentTranscript()
 
   def doThreads(self,cmd):
     return schlubTrack.changeNumSchlubThreads(int(cmd['args'][0]))
@@ -164,7 +153,6 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
-    state['displayEnabled'] = master.displayEnabled()
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents
@@ -178,15 +166,20 @@ class soundServer(BaseHTTPServer.HTTPServer):
     if debug: syslog.syslog("handling cmd:"+cmd['cmd']);
     return self.cmds[cmd['cmd']](cmd)
 
-class soundServerThread(threading.Thread):
+class transServerThread(threading.Thread):
   def __init__(self,port):
-    super(soundServerThread,self).__init__()
+    super(transServerThread,self).__init__()
+    host = subprocess.check_output(["hostname","-I"]).split();
+    self.host = host[0]
     self.port = port
-    syslog.syslog("sound server:"+str(self.port))
+    syslog.syslog("trans server:"+str(self.host)+":"+str(self.port))
     #self.server_class = BaseHTTPServer.HTTPServer
-    self.server_class = soundServer
-    self.httpd = self.server_class(('', self.port), MyHandler)
+    #self.server_class = soundServer
+    #self.httpd = self.server_class(('', self.port), MyHandler)
+    self.server = ThreadedHTTPServer((self.host, self.port), MyHandler)
 
   def run(self):
-    self.httpd.serve_forever()
+    syslog.syslog("starting server")
+    self.server.serve_forever()
+    syslog.syslog("shouldn't get here");
 

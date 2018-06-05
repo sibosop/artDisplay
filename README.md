@@ -99,6 +99,11 @@ Here is the current hardware used:
     
     
 * turn off screen blanking
+ * vi /home/pi/.config/lxsession/LXDE-pi/autostart 
+ * add lines
+   * @xset s noblank
+   * @xset s off 
+   * @xset -dpms
  * `sudo vi /etc/kbd/config` 
  * set `BLANK_TIME=0`
  * set `POWERDOWN_TIME=0`
@@ -126,6 +131,8 @@ Here is the current hardware used:
  * `git config --global user.email "brian@eastshore.com"`
  * `git config --global user.name "brian reinbolt"`
  * `./packageSetup.sh`
+ * If you want the speech recog stuff
+ * `./speakSetup.sh`
  
 #### setting up unit for run
  * To minimize the writes to the sd card, the image directories are being mounted tmpfs:
@@ -201,3 +208,4 @@ Linux uses ALSA for its audio:
   * `aplay --format=S16_LE --rate=16k out.raw`
 * alsamixer (gui) or amixer (command line)
   * amixer -c 2 cset numid=3,name='PCM Playback Volume' 100
+* aplay --format=S16_LE --rate=44100  audio3.raw

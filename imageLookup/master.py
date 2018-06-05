@@ -5,7 +5,7 @@ import syslog
 import sys
 import adGlobal
 
-debug=False
+debug=True
 isRaspberry=platform.uname()[1] == 'raspberrypi';
 if isRaspberry:
   if debug: syslog.syslog("is raspberry");
@@ -25,6 +25,15 @@ def isMaster():
   syslog.syslog("is master")
   return True;
 
+def displayEnabled():
+  GPIO.setmode(GPIO.BCM)
+  GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+  if GPIO.input(13):
+    if debug: syslog.syslog("Display disabled");
+    return False;
+  if debug: syslog.syslog("Display enabled");
+  return True
+  
 def isDispText():
   if isRaspberry:
     if adGlobal.hasAudio:
@@ -32,10 +41,10 @@ def isDispText():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     if GPIO.input(13):
-      if debug: syslog.syslog("is not disp text");
+      if debug: syslog.syslog("does not have display enabled");
       return False;
 
-  if debug: syslog.syslog("is disp text")
+  if debug: syslog.syslog("has display enable")
   return True;
 
 def hasAudio():

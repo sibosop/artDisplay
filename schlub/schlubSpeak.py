@@ -14,7 +14,7 @@ import random
 import soundServer
 import schlubTrack
 
-phraseScatter = True;
+phraseScatter = False;
 currentPhrase=""
 phraseMutex=threading.Lock()
 debug=True
@@ -27,11 +27,12 @@ def setPhraseScatter(flag):
   return soundServer.jsonStatus("ok")
 
 
-def setCurrentPhrase(line):
+def setCurrentPhrase(args):
   global currentPhrase
   phraseMutex.acquire()
-  currentPhrase=line
+  currentPhrase=args['phrase']
   phraseMutex.release()
+  syslog.syslog("current phrase:"+currentPhrase)
   if currentPhrase == "":
     if debug: syslog.syslog("set sound max volume to 1.0")
     schlubTrack.setSoundMaxVolume(1.0)
