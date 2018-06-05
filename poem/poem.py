@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+useVoice=False
 import os
 import roman
 home = os.environ['HOME']
@@ -17,12 +18,13 @@ import time
 import random
 import re
 import displayText
-import textSpeaker
+if useVoice:
+  import textSpeaker
 import pygame
 import glob
 import json
 import butmon
-debug = False
+debug = True
 
 poemDir = "/media/parallels/POEMDATA"
 candidates = []
@@ -43,32 +45,33 @@ def getPoem():
   poem = json.loads(jsonStr)
   for e in poem:
     if debug: syslog.syslog("text:"+e['text'])
-    w = e['file']
-    if debug: syslog.syslog("file:"+w)
-    if ( w == "None" ):
-      time.sleep(2)
+    if useVoice:
+      w = e['file']
+      if debug: syslog.syslog("file:"+w)
+      if ( w == "None" ):
+        time.sleep(2)
+      else:
+        displayText.displayText(e['text'])
+        sound = pygame.mixer.Sound(dirPath+"/"+w)
+        chan = pygame.mixer.find_channel()
+        chan.set_volume(.5)
+        chan.play(sound)
+        while ( chan.get_busy() ):
+          time.sleep(0)
     else:
-      displayText.displayText(e['text'])
-      sound = pygame.mixer.Sound(dirPath+"/"+w)
-      chan = pygame.mixer.find_channel()
-      chan.set_volume(.5)
-      chan.play(sound)
-      while ( chan.get_busy() ):
-        time.sleep(0)
+      if  e['text'] == '+++++':
+        time.sleep(2)
+      else:
+        t = random.random() + 2.0
+        displayText.displayText(e['text'])
+        syslog.syslog("next line in:"+str(t))
+        time.sleep(t)
 
 
-
-      
-
-  
-    
-    
-  
-
-  
 class poemLoop(threading.Thread):
   def run(self):
-    pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
+    if useVoice:
+      pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
     pygame.init()
     pygame.mouse.set_visible(False)
     while True:
@@ -79,7 +82,10 @@ class poemLoop(threading.Thread):
 if __name__ == '__main__':
   random.seed()
   if master.isRaspberry:
-    poemDir = "/media/pi/POEMDATA"
+    if useVoice:
+      poemDir = "/media/pi/POEMDATA"
+    else:
+      poemDir = os.environ['HOME']+'/GitProjects/artDisplay/poem/POEMDATA'
     candidates = glob.glob(poemDir+"/*/*/*.txt")
     os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))

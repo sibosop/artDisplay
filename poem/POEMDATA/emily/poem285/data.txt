@@ -1,0 +1,1 @@
+[{"text": "Emily Dickenson", "file": "line1.wav"}, {"text": "Number: 4", "file": "line2.wav"}, {"text": "Series: 3", "file": "line3.wav"}, {"text": "Subject: LIFE", "file": "line4.wav"}, {"text": "+++++", "file": "None"}, {"text": "FORBIDDEN FRUIT.", "file": "line6.wav"}, {"text": "+++++", "file": "None"}]

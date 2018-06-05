@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 import time
+import poem
 import platform
 import syslog
 import sys
 import threading
 import os
 home = os.environ['HOME']
-sys.path.append(home+"/GitProjects/artDisplay/shared")
-import asoundConfig
+if poem.useVoice:
+  sys.path.append(home+"/GitProjects/artDisplay/shared")
+  import asoundConfig
 
 debug=True
 
@@ -49,10 +51,11 @@ class ButMonThread(threading.Thread):
     GPIO.setmode(GPIO.BCM)
     for k in self.buts.keys():
       GPIO.setup(self.buts[k]['pin'],GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    self.currentVol = asoundConfig.getVolume()
+    if poem.useVoice:
+      self.currentVol = asoundConfig.getVolume()
+      self.setCallback("greenBut",self.testGreen)
+      self.setCallback("redBut",self.testRed)
     self.setCallback("blackBut",self.testBlack)
-    self.setCallback("greenBut",self.testGreen)
-    self.setCallback("redBut",self.testRed)
 
 
   def run(self):
