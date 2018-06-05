@@ -24,7 +24,7 @@ import pygame
 import glob
 import json
 debug = True
-if master.isRasberry:
+if master.isRaspberry:
   import butmon
 
 poemDir = "/media/parallels/POEMDATA"
@@ -93,7 +93,7 @@ if __name__ == '__main__':
   sl = poemLoop()
   sl.setDaemon(True)
   sl.start()
-  if master.idRaspberry:
+  if master.isRaspberry:
     bt = butmon.ButMonThread()
   bt.setDaemon(True)
   bt.start()
