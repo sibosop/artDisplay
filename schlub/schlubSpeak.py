@@ -14,8 +14,7 @@ import random
 import soundServer
 import schlubTrack
 
-phraseScatter = False;
-currentPhrase=""
+currentPhrase={}
 phraseMutex=threading.Lock()
 debug=True
 phraseMinVol = 0.7
@@ -23,17 +22,29 @@ phraseMaxVol = 1.0
 
 def setPhraseScatter(flag):
   global phraseScatter
-  phraseScatter = (flag == "true")
-  return soundServer.jsonStatus("ok")
+  return soundServer.jsonStatus("depreciated")
+
+def setFirst(f):
+  global currentPhrase
+  phraseMutex.acquire()
+  currentPhrase['first'] = f
+  phraseMutex.release()
+
+def clearCurrentPhrase():
+  global currentPhrase
+  phraseMutex.acquire()
+  currentPhrase={}
+  phraseMutex.release()
 
 
 def setCurrentPhrase(args):
   global currentPhrase
+  args['first'] = True
   phraseMutex.acquire()
-  currentPhrase=args['phrase']
+  currentPhrase=args
   phraseMutex.release()
-  syslog.syslog("current phrase:"+currentPhrase)
-  if currentPhrase == "":
+  syslog.syslog("current phrase:"+str(currentPhrase))
+  if currentPhrase['phrase'] == "":
     if debug: syslog.syslog("set sound max volume to 1.0")
     schlubTrack.setSoundMaxVolume(1.0)
   else:
@@ -69,28 +80,59 @@ class schlubSpeakThread(threading.Thread):
     
   def run(self):
     global currentPhrase
-    global phraseScatter
     if debug: syslog.syslog(self.name+": starting")
     dir = adGlobal.eventDir
     oldPhrase = ""
     sound = None
+    reps = 0
+    phrase = ""
+    scatter = False
+    lang = ''
     while self.isRunning():
       try:
-        phrase = getCurrentPhrase();
-        if phrase == "":
+        phraseArgs = getCurrentPhrase();
+        if not phraseArgs:
+          syslog.syslog("waiting for phrase")
           time.sleep(1)
+          continue;
+
+        if phraseArgs['first']:
+          phrase = phraseArgs['phrase']
+          if 'reps' in phraseArgs:
+            reps = phraseArgs['reps']
+            if reps == 0:
+              reps = -1
+          else:
+            reps = -1
+          if 'scatter' in phraseArgs:
+            scatter = phraseArgs['scatter']
+          else:
+            scatter = False
+
+          if 'lang' in phraseArgs:
+            lang = phraseArgs['lang']
+          else:
+            lang = ''
+          phrase = phraseArgs['phrase']
+          setFirst(False)
+
+        if debug: syslog.syslog("reps:"+str(reps)+" scatter:"+str(scatter))
+
+        if phrase == "":
+          clearCurrentPhrase()
           continue
+
         if phrase == "--":
-          setCurrentPhrase("");
+          clearCurrentPhrase();
           time.sleep(1)
           continue
         phrase = phrase.replace("-"," ")
-        if debug: syslog.syslog("PhraseScatter:"+str(phraseScatter))
-        if phraseScatter:
+        if debug: syslog.syslog("PhraseScatter:"+str(scatter))
+        if scatter:
           phrase = random.choice(phrase.split())
         if oldPhrase != phrase:
           oldPhrase = phrase
-          path = textSpeaker.makeSpeakFile(phrase)
+          path = textSpeaker.makeSpeakFile(phrase,lang)
           if path is None:
             syslog.syslog("conversion of "+phrase+" failed")
             time.sleep(1)
@@ -100,12 +142,18 @@ class schlubSpeakThread(threading.Thread):
           os.unlink(path)
         l = random.uniform(phraseMinVol,phraseMaxVol);
         r = l
-        soundTrack.playSound(sound,l,r)
+        if reps != 0:
+          soundTrack.playSound(sound,l,r)
+          if reps != -1:
+            reps -= 1
       except Exception as e:
-        syslog.syslog(self.name+": error on "+phrase+":"+str(e))
+        syslog.syslog(self.name+": error on "+str(phrase)+":"+str(e))
       nt = random.randint(soundTrack.eventMin,soundTrack.eventMax)/1000.0;
-      syslog.syslog(self.name+": next phrase: "+str(nt))
-      time.sleep(nt)
+      syslog.syslog(self.name+": next phrase: "+str(nt)+" reps:"+str(reps))
+      if reps == 0:
+        clearCurrentPhrase()
+      else:
+        time.sleep(nt)
 
 
 

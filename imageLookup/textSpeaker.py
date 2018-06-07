@@ -36,9 +36,12 @@ def convertSampleRate(fname):
   wf.close()
 
 
-def makeSpeakFile(line):
+def makeSpeakFile(line,language=''):
   rval = None 
-  if debug: syslog.syslog("speak:"+line);
+  if language == '':
+    language  = 'en-us'
+  if debug: syslog.syslog("speak:"+line," language:"+language);
+
   try:
     if master.hasAudio() is False:
       if debug: syslog.syslog("speak: no audio");
@@ -49,7 +52,7 @@ def makeSpeakFile(line):
       if debug: syslog.syslog("playText line:"+line)
       fname = fnameRoot + ".mp3"
       if debug: syslog.syslog("speak:"+fname)
-      tts1=gTTS(text=line,lang='en-us')
+      tts1=gTTS(text=line,lang=language)
       tts1.save(fname)
       if debug: syslog.syslog("speak:"+fname)
       sound = AudioSegment.from_mp3(fname)

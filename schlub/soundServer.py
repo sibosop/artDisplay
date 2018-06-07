@@ -157,7 +157,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['vol'] = asoundConfig.getVolume()
     state['isMaster'] = master.isMaster()
     state['sound'] = schlubTrack.getCurrentSound()
-    phrase = schlubSpeak.getCurrentPhrase()
+    phrase = schlubSpeak.getCurrentPhrase()['phrase']
     phrase = phrase.replace("-"," ");
     state['phrase'] = phrase
     state['phraseScatter'] = schlubSpeak.phraseScatter
