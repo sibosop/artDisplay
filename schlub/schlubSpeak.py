@@ -114,6 +114,7 @@ class schlubSpeakThread(threading.Thread):
           else:
             lang = ''
           phrase = phraseArgs['phrase']
+          oldPhrase = ""
           setFirst(False)
 
         if debug: syslog.syslog("reps:"+str(reps)+" scatter:"+str(scatter))
