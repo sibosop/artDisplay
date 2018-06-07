@@ -117,9 +117,9 @@ def getHostList():
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  #getHostList()
+  getHostList()
   
-  hosts = [{'ip' : '192.168.20.120'}]
+  #hosts = [{'ip' : '192.168.20.120'}]
   printHostList()
   printCmds()
   while run:
