@@ -67,7 +67,7 @@ def doShow(cmd):
   phrase = phrase[:-1]
   args = {}
   args['phrase'] = phrase
-  args['reps'] = 0
+  args['reps'] = 2
   args['scatter'] = False
 
   sendToHosts({'cmd' : cmd[0], 'args' : args})
@@ -75,13 +75,15 @@ def doShow(cmd):
 
 def doPhrase(cmd):
   phrase = ""
-  for c in cmd[1:]:
+  reps = int(cmd[1:][0])
+  for c in cmd[2:]:
     phrase += c + " "
   phrase = phrase[:-1]
   args = {}
   args['phrase'] = phrase
-  args['reps'] = 0
+  args['reps'] = reps
   args['scatter'] = False
+  args['lang'] = 'en-uk'
 
   sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
@@ -115,9 +117,9 @@ def getHostList():
 if __name__ == '__main__':
   run=True
   print "getting host list"
-  getHostList()
+  #getHostList()
   
-#  hosts = [{'ip' : '192.168.20.121'}]
+  hosts = [{'ip' : '192.168.20.120'}]
   printHostList()
   printCmds()
   while run:

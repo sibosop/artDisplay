@@ -2,9 +2,12 @@
 import os
 import datetime
 import gardenTrack
-home = os.environ['HOME']
+import gardenPlayer
 import sys
+
+
 import time
+import gardenPlayer
 
 if __name__ == '__main__':
   pname = sys.argv[0]
@@ -14,10 +17,10 @@ if __name__ == '__main__':
   gardenTrack.setup()
   gardenTrack.changeNumGardenThreads(1)
   threads = gardenTrack.eventThreads
-  for t in threads:
-    t.setCurrentDir(sys.argv[1])
-    ct ={ 'file':'a1.wav'}
-    t.setCurrentSound(ct)
+  adGlobal.eventDir = sys.argv[1]
+  pt = gardenPlayer.playerThread(threads)
+  pt.setDaemon(True)
+  pt.start()
   while True:
     time.sleep(1)
 
