@@ -92,7 +92,7 @@ class schlubSpeakThread(threading.Thread):
       try:
         phraseArgs = getCurrentPhrase();
         if not phraseArgs:
-          syslog.syslog("waiting for phrase")
+          #syslog.syslog("waiting for phrase")
           time.sleep(1)
           continue;
 
