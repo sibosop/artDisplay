@@ -88,6 +88,11 @@ def doPhrase(cmd):
   sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
 
+langFile = home+"/GitProjects/artDisplay/lists/lang_codes.json"
+def doSetLang(cmd):
+  with open(langFile, 'r') as myfile:
+    data = myfile.read()
+  print data
 
 
 def doQuit(cmd):
@@ -107,8 +112,12 @@ cmds = {
       ,'Upgrade'  : doCmd
       ,'PhraseScatter' : doPhrase
       ,'MaxEvents' : doNum
+      ,'SetLang' : doSetLang
       ,'Quit' : doQuit
     }
+
+
+  
 
 def getHostList():
   global hosts
@@ -119,7 +128,6 @@ if __name__ == '__main__':
   print "getting host list"
   getHostList()
   
-  #hosts = [{'ip' : '192.168.20.120'}]
   printHostList()
   printCmds()
   while run:

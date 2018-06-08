@@ -45,7 +45,7 @@ class playerThread(threading.Thread):
           time.sleep(2)
           continue
         first = True
-        e = soundFile.getSoundEntry()
+        e = gardenSoundFile.getSoundEntry()
         if debug: print("player choosing "+str(e))
         for t in self.tList:
           choice = random.choice(e)

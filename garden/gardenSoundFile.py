@@ -10,6 +10,7 @@ import copy
 import threading
 import json
 import shutil
+import gardenTrack
 
 debug=True
 listMutex=threading.Lock()
@@ -26,6 +27,20 @@ defaultKey = "EventCtrl.csv"
 eventKey = defaultKey
 eventFile = edir + "/" + eventKey
 currentCollection = eventKey
+
+def setEdir(d):
+  global edir
+  global eventFile
+  global eventKey
+  global currentCollection
+  edir = d
+  defaultKey = "EventCtrl.csv"
+  eventKey = defaultKey
+  eventFile = edir + "/" + eventKey
+  currentCollection = eventKey
+
+  
+
 
 def setMaxEvents(m):
   global maxEvents
@@ -124,7 +139,7 @@ def rescan():
     if n in fileList:
       newList[n]=fileList[n]
     else:
-      fe = FileEntry(name=n, enabled="1", maxVol=soundTrack.eventMaxVol)
+      fe = FileEntry(name=n, enabled="1", maxVol=gardenTrack.eventMaxVol)
       newList[n] = fe
   fileList = copy.deepcopy(newList)
   try:

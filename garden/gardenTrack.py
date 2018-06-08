@@ -5,10 +5,11 @@ import threading
 import random
 import time
 import numpy as np
+import gardenSoundFile
 
 debug = True
 currentSound = {'file':""}
-soundMaxVol = 1.0
+soundMaxVol = .65
 soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
@@ -99,7 +100,7 @@ class gardenTrack(threading.Thread):
   def __init__(self,name):
     super(gardenTrack,self).__init__()
     self.runState = True
-    self.name = name
+    self.name = "GardenTrack-"+name
     self.currentSound={'file' : ""}
     self.currentDir = os.getcwd()
     
@@ -157,7 +158,7 @@ class gardenTrack(threading.Thread):
           if debug: print(self.name+": waiting for currentSoundFile");
           time.sleep(2)
           continue
-        path = self.getCurrentDir()+file
+        path = gardenSoundFile.edir+file
         #path = "/Users/brian/sibosopLocal/music/Music20161008/Clips/schlubFull/a1.wav"
         if debug: print(self.name+": playing:"+path);
         sound = pygame.mixer.Sound(file=path)
