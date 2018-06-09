@@ -9,13 +9,14 @@ import gardenSoundFile
 
 debug = True
 currentSound = {'file':""}
-soundMaxVol = .65
+soundMaxVol = .3
 soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
 eventMin=100
 eventMax=10000
 debug=True
+numEvents=0
 
 def setup():
   pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
@@ -97,12 +98,16 @@ def getFactor(path):
   
   
 class gardenTrack(threading.Thread):
-  def __init__(self,name):
+  def __init__(self,c):
+    global numEvents
     super(gardenTrack,self).__init__()
     self.runState = True
-    self.name = "GardenTrack-"+name
+    self.name = "GardenTrack-"+str(c)
     self.currentSound={'file' : ""}
     self.currentDir = os.getcwd()
+    self.rRatio = float(c) / float(numEvents)
+    self.lRatio = 1.0 - self.rRatio  
+    if debug: print self.name,"starting with lRatio:",self.lRatio, "rRatio",self.rRatio
     
     self.soundMutex = threading.Lock()
     self.runMutex = threading.Lock()
@@ -167,9 +172,11 @@ class gardenTrack(threading.Thread):
         nsound = speedx(sound,factor)
         if nsound is not None:
           sound = nsound
-        l = random.uniform(soundMinVol,soundMaxVol);
-        r = l
-        playSound(sound,l,r)
+        v = random.uniform(soundMinVol,soundMaxVol);
+        lVol = v * self.lRatio
+        rVol = v * self.rRatio
+        if debug: print self.name,"lVol",lVol,"rVol",rVol,"lRatio",self.lRatio,"rRatio",self.rRatio
+        playSound(sound,lVol,rVol)
       except Exception as e:
         print(self.name+": error on "+path+":"+str(e))
 
@@ -185,7 +192,7 @@ def startEventThread():
   global eventThreads
   global ecount
   ecount += 1
-  t=gardenTrack(str(ecount))
+  t=gardenTrack(ecount)
   eventThreads.append(t)
   eventThreads[-1].setDaemon(True)
   eventThreads[-1].start()
@@ -202,6 +209,8 @@ def stopEventThread():
 
 def changeNumGardenThreads(n):
   global eventThreads
+  global numEvents
+  numEvents = n
   print("changing number of threads from "
                     +str(len(eventThreads))+ " to "+str(n))
   while len(eventThreads) != n:
@@ -209,6 +218,7 @@ def changeNumGardenThreads(n):
       startEventThread()
     elif len(eventThreads) > n:
       stopEventThread()
+  
   return True
 
   

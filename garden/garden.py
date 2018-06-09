@@ -17,7 +17,7 @@ if __name__ == '__main__':
   print(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   gardenSoundFile.setEdir(sys.argv[1])
   print gardenSoundFile.getCollectionList()
-  gardenSoundFile.setCurrentCollection( "full_joy.csv")
+  #gardenSoundFile.setCurrentCollection( "full_joy.csv")
   gardenTrack.setup()
   gardenTrack.changeNumGardenThreads(4)
   threads = gardenTrack.eventThreads
