@@ -163,10 +163,8 @@ class gardenTrack(threading.Thread):
           if debug: print(self.name+": waiting for currentSoundFile");
           time.sleep(2)
           continue
-        path = gardenSoundFile.edir+file
-        #path = "/Users/brian/sibosopLocal/music/Music20161008/Clips/schlubFull/a1.wav"
-        if debug: print(self.name+": playing:"+path);
-        sound = pygame.mixer.Sound(file=path)
+        if debug: print self.name,": playing:",file
+        sound = pygame.mixer.Sound(file=file)
 
         factor = getFactor(path);
         nsound = speedx(sound,factor)

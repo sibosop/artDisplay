@@ -14,10 +14,8 @@ if __name__ == '__main__':
   pname = sys.argv[0]
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
-  print(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
-  gardenSoundFile.setEdir(sys.argv[1])
-  print gardenSoundFile.getCollectionList()
-  #gardenSoundFile.setCurrentCollection( "full_joy.csv")
+  print(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))  
+  print gardenSoundFile.getFileCollections()
   gardenTrack.setup()
   gardenTrack.changeNumGardenThreads(4)
   threads = gardenTrack.eventThreads
