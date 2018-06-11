@@ -60,12 +60,17 @@ def setMaxEvents(m):
 def testBumpCollection():
   global timeout
   global currentCollection
+  if debug: print "testBumpCollection time",time.time(),"timeout",timeout
   if time.time() > timeout:
+    if debug: print "timeout passed"
     if len(collectionOrder['dirs']) == 0:
       return False
-    timeout = time.time() + currentCollection['time']
+    
+    
     currentCollection = collectionOrder['dirs'].pop(0)
-    print "new current collection",currentCollection
+    if debug: print "new current collection",currentCollection
+    timeout = time.time() + currentCollection['time']
+    if debug: print "new timeout",timeout
   return True
     
   
@@ -84,11 +89,13 @@ def getSoundEntry():
   if debug: print "currentCollection:",currentCollection,"number of keys:",len(keys)
   done = False
   choices = 0
-  numChoices = random.randint(1,maxEvents)
+  numChoices = maxEvents
   if debug: print "collection:",currentCollection," number of choices:",numChoices," max Events:",maxEvents
   rval = []
   for choices in range(numChoices):
     choice = random.randint(0,len(keys)-1)
+    if choice in rval:
+      continue
     rval.append(keys[choice])
   return rval
   

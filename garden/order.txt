@@ -1,0 +1,7 @@
+{ "dirs" : [ 
+  {"name" : "walk","time" : 20 }
+  ,{"name" : "just","time" : 120 }
+  ,{"name" : "justDrum","time" : 120 }
+  ,{"name" : "walk","time" : 20 }
+  ] }
+  

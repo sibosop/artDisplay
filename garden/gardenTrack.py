@@ -7,7 +7,7 @@ import time
 import numpy as np
 import gardenSoundFile
 
-debug = True
+debug = False
 currentSound = {'file':""}
 soundMaxVol = .3
 soundMinVol = 0.1
@@ -15,7 +15,7 @@ speedChangeMax = 4.0
 speedChangeMin = .25
 eventMin=100
 eventMax=10000
-debug=True
+debug=False
 numEvents=0
 
 def setup():
@@ -25,7 +25,7 @@ def setup():
 def speedx(sound, factor):
   rval = None
   try:
-    print("speedx factor:"+str(factor))
+    if debug: print("speedx factor:"+str(factor))
     sound_array = pygame.sndarray.array(sound)
     """ Multiplies the sound's speed by some `factor` """
     indices = np.round( np.arange(0, len(sound_array), factor) )
@@ -41,8 +41,8 @@ def playSound(sound,l,r):
   if eventChan is None:
     pygame.mixer.set_num_channels(pygame.mixer.get_num_channels()+1);
     eventChan=pygame.mixer.find_channel()
-  print("busy channels:"+str(getBusyChannels()))
-  print("l: "+str(l) + " r:"+str(r))
+  if debug: print("busy channels:"+str(getBusyChannels()))
+  if debug: print("l: "+str(l) + " r:"+str(r))
   eventChan.set_volume(l,r)
   eventChan.play(sound)
   eventChan.set_endevent()
@@ -55,14 +55,14 @@ def getBusyChannels():
   return count
 
 def playFile(path):
-  print "playing",path
+  if debug: print "playing",path
   sound = pygame.mixer.Sound(file=path)
   playSound(sound,.5,.5)
 
 def doJpent():
   rval = ((speedChangeMax-speedChangeMin) 
                         * random.random()) + speedChangeMin
-  print("doJpent")
+  if debug: print("doJpent")
   return rval
 
 tunings = {
@@ -88,15 +88,15 @@ def getFactor(path):
       raise NameError
 
     tuning = path[pos+2:epos]
-    print("tuning:"+tuning);
+    if debug: print("tuning:"+tuning);
     if tuning not in tunings:
-      print("bad tuning:"+tuning)
+      if debug: print("bad tuning:"+tuning)
       raise NameError
     rval = random.choice(tunings[tuning]) * random.choice(octaves)
   except NameError as exp:
-    print("default tuning for path:"+path)
+    if debug: print("default tuning for path:"+path)
     rval = ((speedChangeMax-speedChangeMin) * random.random()) + speedChangeMin
-  print("factor:"+str(rval))
+  if debug: print("factor:"+str(rval))
   return rval
   
   
@@ -156,7 +156,7 @@ class gardenTrack(threading.Thread):
   def run(self):
     print("Garden Track:"+self.name)
     while self.isRunning():
-      nt = random.randint(eventMin,eventMax)/1000.0;
+      
       try:
         cs = self.getCurrentSound()
         file=""
@@ -177,8 +177,8 @@ class gardenTrack(threading.Thread):
         if debug: print self.name,"lVol",lVol,"rVol",rVol,"lRatio",self.lRatio,"rRatio",self.rRatio
         playSound(sound,lVol,rVol)
       except Exception as e:
-        print(self.name+": error on "+path+":"+str(e))
-
+        print(self.name+": error on "+file+":"+str(e))
+      nt = random.randint(eventMin,eventMax)/1000.0;
       if debug: print(self.name+": next play:"+str(nt))
       time.sleep(nt)
       if debug: print(self.name+":back from sleep")

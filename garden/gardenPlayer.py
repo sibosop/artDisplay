@@ -34,20 +34,28 @@ class playerThread(threading.Thread):
     super(playerThread,self).__init__()
     self.tList = tList
     self.done = False
+    self.name= "Player"
     
   def run(self):
+    stime = time.time()
     while gardenSoundFile.testBumpCollection():
       try:
-        e = gardenSoundFile.getSoundEntry()
-        if debug: print("player choosing "+str(e))
-        for t in self.tList:
-          choice = random.choice(e)
-          if debug: print("sending "+choice+" request to "+t.name)
-          t.setCurrentSound({'file' : choice})
-        stime = random.randint(15,40)
-        if debug: print("next change:"+str(stime))
-        time.sleep(stime)
-      except Exception, e:
+        print self.name,"time",time.time(),"stime",stime
+        if time.time() > stime:
+          entry = gardenSoundFile.getSoundEntry()
+          if debug: print("player choosing "+str(entry))
+          count = 0
+          for t in self.tList:
+            choice = entry[count]
+            count += 1
+            if count == len(entry):
+              count = 0
+            if debug: print("sending "+choice+" request to "+t.name)
+            t.setCurrentSound({'file' : choice})
+          stime = time.time() + random.randint(5,20)
+          if debug: print"next change:",str(stime)
+        time.sleep(1)
+      except Exception as e:
         print("player error: "+repr(e))
         os._exit(3)
     for t in self.tList:
