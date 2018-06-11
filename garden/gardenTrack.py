@@ -78,12 +78,12 @@ def getFactor(path):
   rval = 1.0
   try:
     pos = path.find("__");
-    if debug: print "pos for __",pos," from path",path
+    
     if pos == -1:
       raise NameError
     
     epos = path.find(".",pos)
-    if debug: print "pos for .",epos
+    
     if epos == -1:
       raise NameError
 
@@ -151,7 +151,7 @@ class gardenTrack(threading.Thread):
     self.runMutex.acquire()
     self.runState = False
     self.runMutex.release()
-    return rval
+    
     
   def run(self):
     print("Garden Track:"+self.name)

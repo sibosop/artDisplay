@@ -6,10 +6,12 @@ import gardenPlayer
 import gardenSoundFile
 import sys
 import random
-
+import pygame
 
 import time
 import gardenPlayer
+
+numThreads = 8
 
 if __name__ == '__main__':
   random.seed()
@@ -19,7 +21,7 @@ if __name__ == '__main__':
   print(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))  
   
   gardenTrack.setup()
-  gardenTrack.changeNumGardenThreads(4)
+  gardenTrack.changeNumGardenThreads(numThreads)
   threads = gardenTrack.eventThreads
   pt = gardenPlayer.playerThread(threads)
   pt.setDaemon(True)
@@ -28,5 +30,13 @@ if __name__ == '__main__':
     time.sleep(1)
     if pt.done:
       break
+      
+  print "waiting for channels to be done"
+  while True:
+    n = pygame.mixer.get_busy()
+    print "number busy channels",n
+    if n == 0:
+      break;
+    time.sleep(1)
   print "garden done"
 
