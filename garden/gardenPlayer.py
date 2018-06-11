@@ -33,18 +33,11 @@ class playerThread(threading.Thread):
   def __init__(self,tList):
     super(playerThread,self).__init__()
     self.tList = tList
+    self.done = False
     
   def run(self):
-    first = True
-    while True:
+    while gardenSoundFile.testBumpCollection():
       try:
-        if isEnabled() is False:
-          if first:
-            first = False
-            if debug: print("PLAYER: DISABLING AUTO PLAYER")
-          time.sleep(2)
-          continue
-        first = True
         e = gardenSoundFile.getSoundEntry()
         if debug: print("player choosing "+str(e))
         for t in self.tList:
@@ -57,3 +50,6 @@ class playerThread(threading.Thread):
       except Exception, e:
         print("player error: "+repr(e))
         os._exit(3)
+    for t in self.tList:
+      t.stop()
+    self.done = True

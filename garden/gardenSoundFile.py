@@ -11,29 +11,40 @@ import threading
 import json
 import shutil
 import gardenTrack
+import time
 
 debug=True
 listMutex=threading.Lock()
 maxEvents = 2
 
 
-
+orderFile = "order.txt"
 fileCollections = []
 currentCollection = ""
 rootDir = os.environ['GARDEN_ROOT_DIR']
+collectionOrder = {}
+
+orderPath = rootDir+"/"+orderFile
+if not os.path.exists(orderPath):
+  raise Exception(orderPath+" does not exist")
   
-for root, dirs, files in os.walk(rootDir):
-  for n in dirs:
-    if n == "." or n == "..":
-      continue
-    if debug: print "Found collection:",n
-    fileCollections.append(n)
-      
-for f in fileCollections:
-  if debug: print f
-if len(fileCollections) != 0:
-  currentCollection = fileCollections[0]
+with open(orderPath) as f:
+  collectionOrder = json.load(f)
+    
+if 'dirs' not in collectionOrder:
+  raise Exception("no dirs in order file")
+for d in collectionOrder['dirs']:
+  if 'time' not in d:
+    raise Exception("no time spec in "+d)
+  if 'name' not in d:
+    raise Exception("no name spec in "+d) 
+    
+  
+if debug: print collectionOrder
+currentCollection = collectionOrder['dirs'].pop(0)
 if debug: print "currentCollection:",currentCollection
+
+timeout = time.time() + currentCollection['time']
 
 
 def setMaxEvents(m):
@@ -45,21 +56,19 @@ def setMaxEvents(m):
   status = { 'status' : 'ok' }
   rval = json.dumps(status)
   return rval 
-
-def getCurrentCollection():
-  return currentCollection
-
-def getFileCollections():
-  return fileCollections
       
-def setCurrentCollection(col):
+def testBumpCollection():
+  global timeout
   global currentCollection
-  global fileCollections
-  rval = False
-  if col in fileCollections:
-    currentCollection = col
-    rval = True
-  return rval 
+  if time.time() > timeout:
+    if len(collectionOrder['dirs']) == 0:
+      return False
+    timeout = time.time() + currentCollection['time']
+    currentCollection = collectionOrder['dirs'].pop(0)
+    print "new current collection",currentCollection
+  return True
+    
+  
 
 
 
@@ -68,7 +77,7 @@ def getSoundEntry():
   global currentCollection
   global fileCollections
   
-  colDir = rootDir + "/" + currentCollection
+  colDir = rootDir + "/" + currentCollection['name']
   if debug: print "colDir:",colDir
   keys = glob.glob(colDir+"/*.wav")
   
@@ -86,7 +95,7 @@ def getSoundEntry():
 
 
 if __name__ == '__main__':
-  print getFileCollections()
-  print getCurrentCollection()
-  print getSoundEntry()
+  while testBumpCollection():
+    print "currentCollection:",currentCollection
+    time.sleep(1)
 

@@ -78,10 +78,13 @@ def getFactor(path):
   rval = 1.0
   try:
     pos = path.find("__");
+    if debug: print "pos for __",pos," from path",path
     if pos == -1:
       raise NameError
+    
     epos = path.find(".",pos)
-    if pos == -1:
+    if debug: print "pos for .",epos
+    if epos == -1:
       raise NameError
 
     tuning = path[pos+2:epos]
@@ -153,7 +156,6 @@ class gardenTrack(threading.Thread):
   def run(self):
     print("Garden Track:"+self.name)
     while self.isRunning():
-      path=""
       nt = random.randint(eventMin,eventMax)/1000.0;
       try:
         cs = self.getCurrentSound()
@@ -165,8 +167,7 @@ class gardenTrack(threading.Thread):
           continue
         if debug: print self.name,": playing:",file
         sound = pygame.mixer.Sound(file=file)
-
-        factor = getFactor(path);
+        factor = getFactor(file);
         nsound = speedx(sound,factor)
         if nsound is not None:
           sound = nsound
