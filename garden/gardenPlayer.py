@@ -40,7 +40,7 @@ class playerThread(threading.Thread):
     stime = time.time()
     while gardenSoundFile.testBumpCollection():
       try:
-        print self.name,"time",time.time(),"stime",stime
+        #print self.name,"time",time.time(),"stime",stime
         if time.time() > stime:
           entry = gardenSoundFile.getSoundEntry()
           if debug: print("player choosing "+str(entry))
@@ -52,8 +52,9 @@ class playerThread(threading.Thread):
               count = 0
             if debug: print("sending "+choice+" request to "+t.name)
             t.setCurrentSound({'file' : choice})
-          stime = time.time() + random.randint(5,20)
-          if debug: print"next change:",str(stime)
+          offset = random.randint(5,20)
+          stime = time.time() + offset
+          if debug: print "next change:",offset
         time.sleep(1)
       except Exception as e:
         print("player error: "+repr(e))
