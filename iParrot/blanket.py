@@ -55,7 +55,7 @@ def setCurrentTranscript(trans):
   rval = "ok"
   return transServer.jsonStatus(rval)
 
-def getCurrentTranscript(confThres, timeStamp=0):
+def getCurrentTranscript(confThres=0, timeStamp=0):
   global currentTranscript
   rval = {}
   rval['status'] = "ok"
