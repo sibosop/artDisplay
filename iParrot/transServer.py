@@ -52,13 +52,16 @@ class MyHandler(BaseHTTPRequestHandler):
     if (parse.path == "/data" ) :
       conf = "5"
       syslog.syslog("query = "+parse.query)
-      if parse.query != '':
-        q = parse.query.split('=')
-        if q[0] == 'ct':
-          conf = q[1]
-        else:
-          syslog.syslog("unknown query")
-      status =  blanket.getCurrentTranscript(conf)
+      pqs = urlparse.parse_qs(parse.query)
+      if 'ct' in pqs:
+          conf = pqs['ct'][0]
+      else:
+        conf = 8
+      if 'ts' in pqs:
+        ts = pqs['ts'][0]
+      else:
+        ts = 0
+      status =  blanket.getCurrentTranscript(conf,ts)
 
         
     else:
