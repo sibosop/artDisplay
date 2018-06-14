@@ -34,28 +34,25 @@ def sendToHost(ip,cmd):
 if __name__ == '__main__':
   run=True
   checkDisplay = False
-  if len(sys.argv) > 2:
-    if sys.argv[2] == "-d":
-      checkDisplay = True
   print "getting host list"
   schlubcmd.getHostList()
   schlubcmd.printHostList()
   transServerIp = sys.argv[1]
+  if len(sys.argv) > 2:
+    confidence = sys.argv[2]
+  else:
+    confidence = 5
   print "trans server ip:", transServerIp;
   testIp = transServerIp.split(':')[0]
   #url = "http://"+transServerIp+"/data?ct=5"
-  url = "http://"+transServerIp+"/data?ct=0"
+  url = "http://"+transServerIp+"/data?ct="+str(confidence)
   print "url",url 
   for h in schlubcmd.hosts:
     if h['ip'] == testIp:
       continue
     resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
     fullList.insert(0,h['ip'])
-    if checkDisplay:
-      if resp['displayEnabled']:
-        print "ip:",h['ip'],"display enabled"
-        displayList.insert(0,h['ip'])
-    else:
+    if resp['displayEnabled']:
       print "ip:",h['ip'],"display enabled"
       displayList.insert(0,h['ip'])
   print

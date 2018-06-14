@@ -28,7 +28,7 @@ def mangle(phrase):
     except:
        rv.append(srt['tw'][i][0])
 
-   return ' '.join(rv)
+   return ' '.join(rv).replace(" ' ","'").replace(" .",".")
 
 if __name__ == '__main__':
   print mangle(sys.argv[1])
