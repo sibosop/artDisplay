@@ -12,6 +12,7 @@ sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import slp
 import schlubcmd
+import mangle
 
 dataBufSize = 20
 dataBuf = []
@@ -80,7 +81,7 @@ if __name__ == '__main__':
       if len(dataBuf) > index:
         phrase = dataBuf[index]['trans']
         args = {}
-        args['phrase'] = phrase
+        args['phrase'] = mangle.mangle.py
         resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
       index += 1
       
