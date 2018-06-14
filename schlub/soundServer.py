@@ -157,10 +157,13 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['vol'] = asoundConfig.getVolume()
     state['isMaster'] = master.isMaster()
     state['sound'] = schlubTrack.getCurrentSound()
-    phrase = schlubSpeak.getCurrentPhrase()['phrase']
-    phrase = phrase.replace("-"," ");
+    phrase = ""
+    phraseArg = schlubSpeak.getCurrentPhrase()
+    if 'phrase' in phraseArg:
+      phrase = phraseArg['phrase']
+      phrase = phrase.replace("-"," ");
     state['phrase'] = phrase
-    state['phraseScatter'] = schlubSpeak.phraseScatter
+    state['phraseScatter'] = False
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
@@ -171,7 +174,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
     else:
       state['collection'] = ""
       state['maxEvents'] = 0
-    return json.dumps(state)
+    rval = json.dumps(state)
+    if debug: syslog.syslog("Probe:"+rval)
+    return rval
 
 
   def handleSchlubCmd(self,cmd):
