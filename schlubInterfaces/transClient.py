@@ -79,15 +79,14 @@ if __name__ == '__main__':
 
     index = 0
     for ip in fullList:
-      print len(dataBuf),index
+      print "phrase count:",len(dataBuf),"index:",index
       if len(dataBuf) > index:
         phrase = dataBuf[index]['trans']
         args = {}
         args['phrase'] = mangle.mangle(phrase)
-        if ip in DisplayList:
+        if ip in displayList:
           resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
-        else:
-          resp = sendToHost(ip,{'cmd' : 'Phrase','args' : args})
+        resp = sendToHost(ip,{'cmd' : 'Phrase','args' : args})
         print resp
 
       index += 1
