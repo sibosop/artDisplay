@@ -17,6 +17,7 @@ import mangle
 dataBufSize = 20
 dataBuf = []
 displayList = []
+fullList=[]
 
 def sendToHost(ip,cmd):
   print "send to host:",ip,cmd
@@ -46,6 +47,7 @@ if __name__ == '__main__':
   print "url",url 
   for h in schlubcmd.hosts:
     resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
+    fullList.insert(0,h['ip'])
     if checkDisplay:
       if resp['displayEnabled']:
         print "ip:",h['ip'],"display enabled"
@@ -76,13 +78,18 @@ if __name__ == '__main__':
     print
 
     index = 0
-    for ip in displayList:
+    for ip in fullList:
       print len(dataBuf),index
       if len(dataBuf) > index:
         phrase = dataBuf[index]['trans']
         args = {}
-        args['phrase'] = mangle.mangle.py
-        resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
+        args['phrase'] = mangle.mangle(phrase)
+        if ip in DisplayList:
+          resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
+        else:
+          resp = sendToHost(ip,{'cmd' : 'Phrase','args' : args})
+        print resp
+
       index += 1
       
       
