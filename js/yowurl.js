@@ -1,5 +1,5 @@
 //yowurl.js
 
-console.log("yo, wurl!")
+console.log("Yo, wurl!")
 
 
