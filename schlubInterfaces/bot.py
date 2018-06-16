@@ -26,7 +26,7 @@ from textblob import TextBlob
 parrotUrl = "http://192.168.0.105:8085/data"
 schlubUrl = "http://192.168.0.105:8080"
 
-srt_f = open("../lists/pos_all_srt.json","r")
+srt_f = open("../lists/pos_untitled.json","r")
 srt_json = srt_f.read()
 srt_obj = json.loads(srt_json)
 
@@ -43,7 +43,7 @@ def hitParrot(conf=0, timestamp=0):
   else:
     return r.status_code
  
-def say(phraseIn, langIn='en-aus'):
+def say(phraseIn, langIn='en-au'):
   theData = {"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
 
