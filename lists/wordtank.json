@@ -1,0 +1,13 @@
+{ "version": 0.1,
+  "comment": "This is an object acting as a json db containing words to be used in building bot utterances.
+              At first these are words gleanded from heard user utterances, or found so-called 
+              'related words'. Possibly other texts will be added.
+              It is organized  under the words property as an object keyed by POS tags, each of 
+              which has an array of word objects; word objects have at least the w and ts (timestamp)
+              fields; it may also have a count property and a source property, telling how it got into the system
+              typically ts are unix timestamps; postags are those returned by textblob. The array of words under
+              each tag should be appended at the end, so newest are last. ",
+  "words": { "NNP": [ {"w": "zero", "ts": 0 }],
+             "VBZ": [ {"w": "is", "ts": 1}]
+            }
+}
