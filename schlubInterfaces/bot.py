@@ -24,6 +24,7 @@ import sqlite3
 import atexit
 from shutil import copyfile
 from textblob import TextBlob
+from textblob import Word
 
 parrotUrl      = "http://192.168.0.105:8085/data"
 schlubUrl      = "http://192.168.0.105:8080"
@@ -36,6 +37,9 @@ sqlite_filename    = "../lists/words.db"
 
 sql_conn = sqlite3.connect(sqlite_filename)
 sql_c = sql_conn.cursor()
+
+def nu(s):
+  return s.encode('ascii', 'ignore')
 
 def init_json():
   global srt, stopwords, words
@@ -54,7 +58,10 @@ def init_json():
   print("stopwords length:", len(stopwords), "srt length:", len(srt))
 
 
-def ph2db(phrase, ts=time.time(), src="ip"):
+def ph2db(phrase, ts=-1, src="ip"):
+
+  if ts < 0:
+    ts = time.time()
 
   phrase_tb = TextBlob(phrase)
   print phrase_tb
@@ -62,15 +69,16 @@ def ph2db(phrase, ts=time.time(), src="ip"):
   for w in phrase_tb.tags:
     if not w[0].lower() in stopwords:
       rv = (w[0], w[1], ts, src)
+      print Word(w[0],w[1]).definitions
       print rv
       try:
         sql =  "insert into word (w, pos, ts, src) values ('{}', '{}',{}, '{}'); "\
               .format(w[0], w[1], ts, src)
-        print(sql)
+        # print(sql)
         sql_c.execute(sql)
-      except sqlite3.IntegrityError:
+      except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE instead of INSERTing
         sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, w[0], w[1])
-        print("CONFLICT: " + sql)
+        # print("CONFLICT: " + sql)
         sql_c.execute(sql)
 
       sql_conn.commit()
@@ -99,27 +107,6 @@ def show(phraseIn):
   theData = {"cmd": "Show", "args": { "phrase": phraseIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
 
-
-def mangle(phrase):
-   phrase_tb = TextBlob(phrase)
-   ph_tags = phrase_tb.tags
-   srt = srt_obj[random.randint(0,len(srt_obj))]
-   print srt['tw']
-   print ph_tags
-   # get random srt phrase, and for each word, replace word with word from same position in input phrase
-   #  ONLY if it has the same part of speech
-   rv = []
-
-   for i in range( 0,len(srt['tw'])):
-    try:
-      if ph_tags[i][1] == srt['tw'][i][1]:
-        rv.append(ph_tags[i][0])
-      else:
-        rv.append(srt['tw'][i][0])
-    except:
-       rv.append(srt['tw'][i][0])
-
-   return ' '.join(rv).replace(" ' ","'").replace(" .",".")
 
 def byebye():
   global words
