@@ -126,7 +126,7 @@ def getHostList():
 
 if __name__ == '__main__':
   run=True
-  if len(sys.argv) >= 1:
+  if len(sys.argv) > 1:
     first = True
     for a in sys.argv:
       if first:
