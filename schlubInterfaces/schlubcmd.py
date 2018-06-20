@@ -19,6 +19,7 @@ def printHostList():
   global hosts
   print "Host list:"
   for h in hosts:
+    print "h:",h
     o = h['ip']
     if 'attr' in h:
       if debug: print "attr",h['attr']
@@ -125,8 +126,19 @@ def getHostList():
 
 if __name__ == '__main__':
   run=True
-  print "getting host list"
-  getHostList()
+  if len(sys.argv) >= 1:
+    first = True
+    for a in sys.argv:
+      if first:
+        first = False
+        continue
+      e = {}
+      e['ip'] = a
+      print "adding:",e
+      hosts.append(e)
+  else:
+    print "getting host list from slp"
+    getHostList()
   
   printHostList()
   printCmds()

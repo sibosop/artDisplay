@@ -28,8 +28,10 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl      = "http://192.168.0.103:8085/data"
-schlubUrl      = "http://192.168.0.103:8080"
+default_voice  = 'en-au'
+
+parrotUrl      = "http://192.168.0.110:8085/data"
+schlubUrl      = "http://192.168.0.110:8080"
 words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
@@ -139,7 +141,7 @@ if __name__ == '__main__':
      for x in transcript:
        thePhrase = x['trans'].strip()
        if x['confidence'] > 0.7:
-         say(thePhrase, "de")
+         say(thePhrase, default_voice )
          print(thePhrase)
        show(thePhrase)
     sys.stdout.write('.')
