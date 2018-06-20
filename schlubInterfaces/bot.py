@@ -28,9 +28,10 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
+
 parrotUrl      = "http://192.168.0.103:8085/data"
 schlubUrl      = "http://192.168.0.103:8080"
-words_filename     = "../lists/wordtank.json"
+# words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
@@ -56,35 +57,52 @@ def init_json():
 
   #test -- print out wordtank
   # print("words", words)
-  print(stopwords)
+  # print(stopwords)
   print("stopwords length:", len(stopwords), "srt length:", len(srt))
 
 
-def ph2db(phrase, ts=-1, src="ip"):
+# doesnt do sql COMMIT!!
+def word2db(word, pos="NN", ts=-1, src="ip"):
+  if ts < 0:  ts = time.time()
+  print (word,pos,ts,src)
+  try:
+    sql =  "insert into word (w, pos, ts, src) values ('{}', '{}',{}, '{}'); "\
+          .format(word,pos, ts, src)
+    #print(sql)
+    sql_c.execute(sql)
+  except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE instead of INSERTing
+    sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, word, pos)
+    print("DUPLICATE: "+ word + ' ' + pos)
+    sql_c.execute(sql)
 
-  if ts < 0:
-    ts = time.time()
+def synonyms(theWord, thePOS='NN'):
+  rv = []
+  poscode = thePOS[0].lower()
+  if poscode in ['a','n', 'v']:
+    symsets = Word(theWord).lemmatize().get_synsets(pos=poscode)
+    for ss in symsets:
+      rv.extend(ss.lemma_names())
+    print "synonyms of {} {}".format(theWord, rv)
+  return rv
 
-  phrase_tb = TextBlob(phrase)
-  print phrase_tb
+# load a whole phrase or text into word table of open words.db
+def text2db(theText, ts=-1, src="ip", withSynonyms=False):
 
-  for w in phrase_tb.tags:
+  if ts < 0: ts = time.time()
+
+  text_tb = TextBlob(theText)
+  #print text_tb
+
+  for w in text_tb.tags:
     if not w[0].lower() in stopwords:
-      rv = (w[0], w[1], ts, src)
-      print Word(w[0],w[1]).definitions
-      print rv
-      try:
-        sql =  "insert into word (w, pos, ts, src) values ('{}', '{}',{}, '{}'); "\
-              .format(w[0], w[1], ts, src)
-        # print(sql)
-        sql_c.execute(sql)
-      except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE instead of INSERTing
-        sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, w[0], w[1])
-        # print("CONFLICT: " + sql)
-        sql_c.execute(sql)
+      word2db(w[0], w[1], ts, src)
+      if withSynonyms:
+       syns = synonyms(w[0], w[1])
+       for s in syns:
+         word2db(s, w[1], ts, 'ip-syn')
 
-      sql_conn.commit()
 
+  sql_conn.commit()
 
 
 # conf  0-9 (minimum confidence), timestamp = minimum timestamp
@@ -109,13 +127,23 @@ def show(phraseIn):
   theData = {"cmd": "Show", "args": { "phrase": phraseIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
 
+def utter():
+  # get a srt phrase from the subtitle file
+  srtlen = len(srt)
+  theSRT = srt[random.randint(0, srtlen)]
+  print "utter: srt len = {}".format(srtlen)
+  print "srt = {}".format(theSRT)
+  # get a bunch of recent words from the word db
+  # substitute some words in the srt phrase
+  # say it
+  return
 
 def byebye():
-  global words
   sql_conn.close()
   # save updated json words database file.
   # write a backup of the old file before writing.
 
+  # global words
   # copyfile(words_filename, words_filename + '.bu'+str(int(time.time())))
   # with open(words_filename, 'w') as outfile:  
   #   json.dump(words, outfile, indent=2)
@@ -124,6 +152,9 @@ def byebye():
   print("bot sez byebye")
 
 atexit.register(byebye)
+
+init_json()
+
 
 if __name__ == '__main__':
   pname = sys.argv[0]
@@ -139,7 +170,7 @@ if __name__ == '__main__':
      for x in transcript:
        thePhrase = x['trans'].strip()
        if x['confidence'] > 0.7:
-         say(thePhrase, "de")
+        # say(thePhrase, "de")
          print(thePhrase)
        show(thePhrase)
     sys.stdout.write('.')
