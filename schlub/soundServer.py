@@ -83,7 +83,13 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Collection' : self.doCollection
       ,'PhraseScatter' : self.doPhraseScatter
       ,'MaxEvents' : self.doMaxEvents
+      ,'SoundVol' :  self.doSoundVol
+
     }
+  def doSoundVol(self,cmd):
+    vol = float(cmd['args'][0]) / 100.0
+    schlubTrack.setSoundMaxVolume(vol)
+    return jsonStatus("ok")
 
   def doMaxEvents(self,cmd):
     return soundFile.setMaxEvents(cmd['args'][0])
