@@ -28,8 +28,8 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl      = "http://192.168.0.103:8085/data"
-schlubUrl      = "http://192.168.0.103:8080"
+parrotUrl      = "http://192.168.0.110:8085/data"
+schlubUrl      = "http://192.168.0.110:8080"
 # words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
@@ -58,6 +58,19 @@ def init_json():
   # print("words", words)
   # print(stopwords)
   print("stopwords length:", len(stopwords), "srt length:", len(srt))
+
+
+# get n words from db filtered by given pos tag or tags.
+#  usage: getwords(5, 'NN', 'NP' <etc>)
+def getwords(n=1, *arg): 
+  sql = "select w, pos from word "
+  if len(arg) > 0:
+    sql += "where pos in {} ".format(arg)
+  # sql += "order by ts desc limit {};".format(n)
+  sql += "order by RANDOM() limit {};".format(n) # for now.. eventually use newest
+  # print(sql)
+  sql_c.execute(sql)
+  return sql_c.fetchall()
 
 
 # doesnt do sql COMMIT!!
@@ -126,16 +139,25 @@ def show(phraseIn):
   theData = {"cmd": "Show", "args": { "phrase": phraseIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
 
-def utter():
+def utter(langIn='en-au'):
   # get a srt phrase from the subtitle file
   srtlen = len(srt)
   theSRT = srt[random.randint(0, srtlen)]
   print "utter: srt len = {}".format(srtlen)
   print "srt = {}".format(theSRT)
   # get a bunch of recent words from the word db
+  someNouns =  getwords(20, 'NN', 'NP', 'NS')
   # substitute some words in the srt phrase
-  # say it
-  return
+  rv = []
+  for w in theSRT['tw']:
+    if w[1] in ['NN', 'NNP', 'NNS']:
+      rv.append(someNouns.pop()[0])
+    else:
+     rv.append(w[0])
+  print rv
+  # rvs = ' '.join(rv).strip().replace('.','').replace(" ' ","'")
+  # print(rvs)
+  # say(rvs,langIn)
 
 def byebye():
   sql_conn.close()
