@@ -178,6 +178,15 @@ Here is the current hardware used:
   * `@reboot /home/pi/GitProjects/artDisplay/shared/asoundConfig.py`
   * `@reboot sleep 60; /home/pi/GitProjects/artDisplay/schlub/schlubWrap.sh`
 
+#### Schlub - making the addresses for a pi static:
+  * sudo vi /etc/dhcpcd.conf
+  * addlines:
+    * interface wlan0
+    *   static ip_address=192.168.20.XXX/24
+    *  static routers=192.168.20.1
+    *  static domain_name_servers=192.168.20.1
+
+
 #### AssAi Project
 
 # AssAi
