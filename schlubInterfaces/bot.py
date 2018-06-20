@@ -15,9 +15,11 @@
 
 
 import sys
+import syslog
 import requests
 import json
 import random
+import datetime
 import time
 import math
 import sqlite3
@@ -26,9 +28,8 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl      = "http://192.168.0.105:8085/data"
-schlubUrl      = "http://192.168.0.105:8080"
-
+parrotUrl      = "http://192.168.0.103:8085/data"
+schlubUrl      = "http://192.168.0.103:8080"
 words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
@@ -38,6 +39,7 @@ sqlite_filename    = "../lists/words.db"
 sql_conn = sqlite3.connect(sqlite_filename)
 sql_c = sql_conn.cursor()
 
+# utility convert u'blahblah' strings from unicode to ascii
 def nu(s):
   return s.encode('ascii', 'ignore')
 
@@ -124,27 +126,22 @@ def byebye():
 atexit.register(byebye)
 
 if __name__ == '__main__':
-  last_timestamp = 0
-
-  # test of words writing
-  foo = 'NN'
-  if not ('NN' in words) : words['NN'] = []
-  words['NN'].append({"w": "added", "ts": time.time() })
- 
-
+  pname = sys.argv[0]
+  syslog.syslog(pname+" started at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+  last_timestamp = 0 
+  init_json()
 
   while True:
-    # r = hitParrot(0,last_timestamp)
-    # if len(r) > 0:
-    #  last_timestamp = int(math.ceil(r[0]['timestamp']))
-    # print len(r)
-    # for x in r:
-    #   thePhrase = x['trans'].strip()
-    #   if x['confidence'] > 0.7:
-    #     say(thePhrase, "de")
-    #     print(thePhrase)
-    #   show(thePhrase)
-    print(words)
+    transcript = hitParrot(0,last_timestamp)
+    if len(transcript) > 0:
+     last_timestamp = int(math.ceil(transcript[0]['timestamp']))
+     print len(transcript)
+     for x in transcript:
+       thePhrase = x['trans'].strip()
+       if x['confidence'] > 0.7:
+         say(thePhrase, "de")
+         print(thePhrase)
+       show(thePhrase)
     sys.stdout.write('.')
     sys.stdout.flush()
     time.sleep(2)
