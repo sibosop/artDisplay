@@ -77,7 +77,8 @@ def doShow(cmd):
 def doPhrase(cmd):
   phrase = ""
   reps = int(cmd[1:][0])
-  for c in cmd[2:]:
+  vol = int(cmd[2:][0])
+  for c in cmd[3:]:
     phrase += c + " "
   phrase = phrase[:-1]
   args = {}
@@ -85,6 +86,7 @@ def doPhrase(cmd):
   args['reps'] = reps
   args['scatter'] = False
   args['lang'] = 'en-uk'
+  args['vol'] = vol
 
   sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
@@ -114,6 +116,7 @@ cmds = {
       ,'PhraseScatter' : doPhrase
       ,'MaxEvents' : doNum
       ,'SetLang' : doSetLang
+      ,'SoundVol': doNum
       ,'Quit' : doQuit
     }
 
@@ -126,7 +129,7 @@ def getHostList():
 
 if __name__ == '__main__':
   run=True
-  if len(sys.argv) >= 1:
+  if len(sys.argv) > 1:
     first = True
     for a in sys.argv:
       if first:

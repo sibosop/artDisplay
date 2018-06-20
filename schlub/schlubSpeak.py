@@ -44,12 +44,6 @@ def setCurrentPhrase(args):
   currentPhrase=args
   phraseMutex.release()
   syslog.syslog("current phrase:"+str(currentPhrase))
-  if currentPhrase['phrase'] == "":
-    if debug: syslog.syslog("set sound max volume to 1.0")
-    schlubTrack.setSoundMaxVolume(1.0)
-  else:
-    if debug: syslog.syslog("set sound max volume to 0.5")
-    schlubTrack.setSoundMaxVolume(0.5)
   return soundServer.jsonStatus("ok")
 
 def getCurrentPhrase():
@@ -85,6 +79,7 @@ class schlubSpeakThread(threading.Thread):
     oldPhrase = ""
     sound = None
     reps = 0
+    vol = phraseMaxVol
     phrase = ""
     scatter = False
     lang = ''
@@ -113,6 +108,9 @@ class schlubSpeakThread(threading.Thread):
             lang = phraseArgs['lang']
           else:
             lang = ''
+
+          if 'vol' in phraseArgs:
+            vol = int(phraseArgs['vol']) / 100.0 
           phrase = phraseArgs['phrase']
           oldPhrase = ""
           setFirst(False)
@@ -141,7 +139,8 @@ class schlubSpeakThread(threading.Thread):
           if debug: syslog.syslog(self.name+": playing "+path)
           sound = pygame.mixer.Sound(file=path)
           os.unlink(path)
-        l = random.uniform(phraseMinVol,phraseMaxVol);
+
+        l = vol
         r = l
         if reps != 0:
           soundTrack.playSound(sound,l,r)
