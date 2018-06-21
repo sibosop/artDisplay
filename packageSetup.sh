@@ -31,4 +31,5 @@ sudo pip3 install pyalsaaudio
 sudo apt-get -y install python-pyaudio
 sudo -H pip install textblob
 sudo -H python -m textblob.download_corpora
+sudo -H pip install wikipedia
 

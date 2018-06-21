@@ -18,10 +18,14 @@ soundMaxVol = 1.0
 soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
+volLock = threading.Lock()
 
 def setSoundMaxVolume(vol):
   global soundMaxVol
+  syslog.syslog("setting vol to;"+str(vol))
+  volLock.acquire()
   soundMaxVol = vol
+  volLock.release()
   
 
 def findSoundFile(file):
@@ -135,7 +139,9 @@ class schlubTrack(threading.Thread):
         nsound = soundTrack.speedx(sound,factor)
         if nsound is not None:
           sound = nsound
-        l = random.uniform(soundMinVol,soundMaxVol);
+        volLock.acquire()
+        l = soundMaxVol;
+        volLock.release()
         r = l
         soundTrack.playSound(sound,l,r)
       except Exception as e:
