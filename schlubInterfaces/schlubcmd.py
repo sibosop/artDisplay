@@ -28,15 +28,18 @@ def printHostList():
   print
 
 def sendToHost(ip,cmd):
-  print "send to host:",ip,cmd
-  url = "http://"+ip+":8080"
-  print("url:"+url)
-  print("cmd json:"+json.dumps(cmd))
-  req = urllib2.Request(url
-              ,json.dumps(cmd),{'Content-Type': 'application/json'})
-  f = urllib2.urlopen(req)
-  test = f.read()
-  print("got response:"+test)
+  try:
+    print "send to host:",ip,cmd
+    url = "http://"+ip+":8080"
+    print("url:"+url)
+    print("cmd json:"+json.dumps(cmd))
+    req = urllib2.Request(url
+                ,json.dumps(cmd),{'Content-Type': 'application/json'})
+    f = urllib2.urlopen(req)
+    test = f.read()
+    print("got response:"+test)
+  except Exception as e:
+    print "host send error:",str(e)
 
 def sendToHosts(cmd):
   for h in hosts:
