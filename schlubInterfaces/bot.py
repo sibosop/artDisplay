@@ -1,17 +1,24 @@
 #!/usr/bin/env python
 
 
-# schlubbot.py     perkis june 2018 for Darmstadt
+# bot.py     perkis june 2018 for Darmstadt
 #
-# in a loop:
-#  hitParrot, getting all (ct=0) transcript records since last hit (keep a timestamp variable)
-#     process the records into a wordlist, keyed by POS and sorted by timestamp.
-# every now and then, say something:
-#     get a srt line from the srt_obj
-#     substitute some of the nouns and verbs in the sentence with nouns or verbs from the wordlist
-#     tell schlub to say it
-# 
-# on exit persist the wordlist to a file, and read it in on startup (NIY)
+#     * iParrot.py is listening and queuing up transcripts of google-interpreted voice input, available on a http server
+#     * bot.hitParrot() grabs data from this server.
+#     * bot.text2db()  takes any phrase/short text and ingests the words in it into the word database (sqlite)
+#     * bot.word2db() is called by above to write individual words to db with pos taggin
+#     * bot.file2db() will ingest a given text file into the word database w repeated calls to text2db for each line.
+#     * bot.srt is a dict loaded up with lines of film subtitle utterances
+#     * bot.getwords retrieves word lists from the word database
+#     * bot.synonyms() uses wordnet to get synotnyms of a given (pos-tagged) word
+#     * bot.say(), bot.show(), bot.soundVol() are low level cmd-senders to schlub.py server
+#     * bot.utter() grabs a subtitle line and some words from the word.db, munges them together and speaks the result.
+#     * bot.updateWords() uses hitParrot() and text2db() to load recently said things by users into word db
+#
+#     So basically updateWords() and utter() comprise a full pipeline: reading user utterances, saving the words, and generating
+#     new utterances by our arty bot entity.
+
+# on exit persist the wordlist to a file, and read it in on startup
 
 
 import sys
@@ -107,7 +114,7 @@ def text2db(theText, ts=-1, src="ip", withSynonyms=False):
 
   for w in text_tb.tags:
     if not w[0].lower() in stopwords:
-      word2db(w[0], w[1], ts, src)
+      word2db(w[0].lower(), w[1], ts, src)
       if withSynonyms:
        syns = synonyms(w[0], w[1])
        for s in syns:
@@ -116,6 +123,21 @@ def text2db(theText, ts=-1, src="ip", withSynonyms=False):
 
   sql_conn.commit()
 
+# ingest a text file into open words.db
+def file2db(fname, src):
+  with open(fname) as fp:  
+   line = fp.readline()
+   cnt = 1
+   while line:
+       if len(line) > 5:
+         try:
+          text2db(line.strip(), -1, src)
+          if cnt % 50 == 0:
+            print(" {}".format(cnt))
+         except:
+          print("error reading line ", cnt)
+       line = fp.readline()
+       cnt += 1
 
 # conf  0-9 (minimum confidence), timestamp = minimum timestamp
 def hitParrot(conf=0, timestamp=0):
@@ -130,14 +152,22 @@ def hitParrot(conf=0, timestamp=0):
   else:
     return r.status_code
  
+# for convenience, some schlub commands: 
 # low-level cmd to say a phrase using schlub server 
 def say(phraseIn, langIn='en-au'):
   theData = {"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
+  print r
 
+# show a sentence on screen
 def show(phraseIn):
   theData = {"cmd": "Show", "args": { "phrase": phraseIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
+
+def soundVol(volIn):
+  theData = {"cmd": "SoundVol", "args": [volIn]}
+  r = requests.post(schlubUrl, data=json.dumps(theData))
+  print r
 
 def utter(langIn='en-au'):
   # get a srt phrase from the subtitle file
@@ -147,6 +177,8 @@ def utter(langIn='en-au'):
   print "srt = {}".format(theSRT)
   # get a bunch of recent words from the word db
   someNouns =  getwords(20, 'NN', 'NP', 'NS')
+  print("someNouns: {}".format(someNouns))
+
   # substitute some words in the srt phrase
   rv = []
   for w in theSRT['tw']:
@@ -154,10 +186,10 @@ def utter(langIn='en-au'):
       rv.append(someNouns.pop()[0])
     else:
      rv.append(w[0])
-  print rv
-  # rvs = ' '.join(rv).strip().replace('.','').replace(" ' ","'")
-  # print(rvs)
-  # say(rvs,langIn)
+  # print rv
+  rvs = ' '.join(rv).strip().replace('.','').replace(" ' ","'").replace("_"," ")
+  print(rvs)
+  say(rvs,langIn)
 
 def byebye():
   sql_conn.close()
