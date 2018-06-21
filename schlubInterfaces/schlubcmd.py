@@ -19,7 +19,7 @@ def printHostList():
   global hosts
   print "Host list:"
   for h in hosts:
-    print "h:",h
+    #print "h:",h
     o = h['ip']
     if 'attr' in h:
       if debug: print "attr",h['attr']
@@ -125,11 +125,8 @@ cmds = {
 
 def getHostList():
   global hosts
-  hosts = slp.getHosts("schlub")
-
-if __name__ == '__main__':
-  run=True
   if len(sys.argv) > 1:
+    print "getting lost list from arguments"
     first = True
     for a in sys.argv:
       if first:
@@ -137,12 +134,15 @@ if __name__ == '__main__':
         continue
       e = {}
       e['ip'] = a
-      print "adding:",e
+      #print "adding:",e
       hosts.append(e)
   else:
     print "getting host list from slp"
-    getHostList()
-  
+    hosts = slp.getHosts("schlub")
+
+if __name__ == '__main__':
+  run=True
+  getHostList()
   printHostList()
   printCmds()
   while run:
