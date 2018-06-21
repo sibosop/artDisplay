@@ -5,8 +5,6 @@ home = os.environ['HOME']
 import sys
 import json
 import urllib2
-sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
-sys.path.append(home+"/GitProjects/artDisplay/schlub")
 
 hosts = []
 def getHostList():
