@@ -37,10 +37,12 @@ from textblob import Word
 
 parrotUrl      = "http://192.168.0.110:8085/data"
 schlubUrl      = "http://192.168.0.110:8080"
+
 # words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
+default_lang = 'en-au'
 
 
 sql_conn = sqlite3.connect(sqlite_filename)
@@ -85,11 +87,11 @@ def word2db(word, pos="NN", ts=-1, src="ip"):
   if ts < 0:  ts = time.time()
   print (word,pos,ts,src)
   try:
-    sql =  "insert into word (w, pos, ts, src) values ('{}', '{}',{}, '{}'); "\
+    sql =  "insert into word (w, pos, ts, src) values ('{}', '{}', {},'{}'); "\
           .format(word,pos, ts, src)
     #print(sql)
     sql_c.execute(sql)
-  except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE instead of INSERTing
+  except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE count and ts instead of INSERTing
     sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, word, pos)
     print("DUPLICATE: "+ word + ' ' + pos)
     sql_c.execute(sql)
@@ -154,7 +156,7 @@ def hitParrot(conf=0, timestamp=0):
  
 # for convenience, some schlub commands: 
 # low-level cmd to say a phrase using schlub server 
-def say(phraseIn, langIn='en-au'):
+def say(phraseIn, langIn= default_lang):
   theData = {"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}}
   r = requests.post(schlubUrl, data=json.dumps(theData))
   print r
@@ -169,20 +171,20 @@ def soundVol(volIn):
   r = requests.post(schlubUrl, data=json.dumps(theData))
   print r
 
-def utter(langIn='en-au'):
+def utter(langIn= default_lang):
   # get a srt phrase from the subtitle file
   srtlen = len(srt)
   theSRT = srt[random.randint(0, srtlen)]
   print "utter: srt len = {}".format(srtlen)
   print "srt = {}".format(theSRT)
   # get a bunch of recent words from the word db
-  someNouns =  getwords(20, 'NN', 'NP', 'NS')
-  print("someNouns: {}".format(someNouns))
+  dbWords =  getwords(20, 'NN', 'NNP', 'NNS','JJ')
+  print("dbWords: {}".format(dbWords))
 
   # substitute some words in the srt phrase
   rv = []
   for w in theSRT['tw']:
-    if w[1] in ['NN', 'NNP', 'NNS']:
+    if w[1] in ['NN', 'NNP', 'NNS', 'JJ']:
       rv.append(someNouns.pop()[0])
     else:
      rv.append(w[0])
