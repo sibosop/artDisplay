@@ -1,49 +1,17 @@
 #!/usr/bin/env python
 import subprocess
-import urllib2
+
 import os
 home = os.environ['HOME']
 import sys
-sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/schlub")
-import adGlobal
-import slp
+import host
 import json
 
 debug=True
 
-hosts = []
 
 
-def printHostList():
-  global hosts
-  print "Host list:"
-  for h in hosts:
-    #print "h:",h
-    o = h['ip']
-    if 'attr' in h:
-      if debug: print "attr",h['attr']
-      o += " "+h['attr']
-    print " ",o
-  print
-
-def sendToHost(ip,cmd):
-  try:
-    print "send to host:",ip,cmd
-    url = "http://"+ip+":8080"
-    print("url:"+url)
-    print("cmd json:"+json.dumps(cmd))
-    req = urllib2.Request(url
-                ,json.dumps(cmd),{'Content-Type': 'application/json'})
-    f = urllib2.urlopen(req)
-    test = f.read()
-    print("got response:"+test)
-  except Exception as e:
-    print "host send error:",str(e)
-
-def sendToHosts(cmd):
-  for h in hosts:
-    sendToHost(h['ip'],cmd)
 
 def printCmds():
   print "SchlubCmds:"
@@ -52,16 +20,16 @@ def printCmds():
   print
 
 def doCmd(cmd): 
-  sendToHosts({'cmd' : cmd[0], 'args' : [""] })
+  host.sendToHosts({'cmd' : cmd[0], 'args' : [""] })
   return 0
 
 def doSound(cmd):
   print "doSound"
-  sendToHosts({'cmd' : cmd[0], 'file' : cmd[1]})
+  host.sendToHosts({'cmd' : cmd[0], 'file' : cmd[1]})
   return 0
 
 def doNum(cmd):
-  sendToHosts({'cmd' : cmd[0],'args' : [cmd[1]]})
+  host.sendToHosts({'cmd' : cmd[0],'args' : [cmd[1]]})
   return 0
 
 def doShow(cmd):
@@ -74,7 +42,7 @@ def doShow(cmd):
   args['reps'] = 2
   args['scatter'] = False
 
-  sendToHosts({'cmd' : cmd[0], 'args' : args})
+  host.sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
 
 def doPhrase(cmd):
@@ -91,7 +59,7 @@ def doPhrase(cmd):
   args['lang'] = 'en-uk'
   args['vol'] = vol
 
-  sendToHosts({'cmd' : cmd[0], 'args' : args})
+  host.sendToHosts({'cmd' : cmd[0], 'args' : args})
   return 0
 
 langFile = home+"/GitProjects/artDisplay/lists/lang_codes.json"
@@ -126,27 +94,11 @@ cmds = {
 
   
 
-def getHostList():
-  global hosts
-  if len(sys.argv) > 1:
-    print "getting lost list from arguments"
-    first = True
-    for a in sys.argv:
-      if first:
-        first = False
-        continue
-      e = {}
-      e['ip'] = a
-      #print "adding:",e
-      hosts.append(e)
-  else:
-    print "getting host list from slp"
-    hosts = slp.getHosts("schlub")
 
 if __name__ == '__main__':
   run=True
-  getHostList()
-  printHostList()
+  host.getHostList()
+  host.printHostList()
   printCmds()
   while run:
     inp=raw_input("schlub-> ")
