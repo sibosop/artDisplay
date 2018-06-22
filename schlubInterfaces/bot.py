@@ -35,14 +35,15 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl      = "http://192.168.0.110:8085/data"
-schlubUrl      = "http://192.168.0.110:8080"
+parrotUrl      = "http://192.168.0.110:8085/words"
+schlubUrls      = ["http://192.168.0.110:8080"]
 
 # words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
-default_lang = 'en-au'
+voices = ['en-au', 'en-uk', 'en', 'de']
+default_voice = 'en-au'
 
 
 sql_conn = sqlite3.connect(sqlite_filename)
@@ -52,7 +53,15 @@ sql_c = sql_conn.cursor()
 def nu(s):
   return s.encode('ascii', 'ignore')
 
-def init_json():
+def setSchlubUrls(arrIn):
+  global schlubUrls
+  schlubUrls = arrIn
+
+def setParrotUrl(urlIn):
+  global parrotUrl
+  parrotUrl = urlIn
+
+def init():
   global srt, stopwords, words
 
   # load up 'database' dict objects from json files
@@ -67,19 +76,38 @@ def init_json():
   # print("words", words)
   # print(stopwords)
   print("stopwords length:", len(stopwords), "srt length:", len(srt))
+  sql_c.execute("select count() from word;")
+  print("words in database: {}".format(sql_c.fetchone()[0]))
 
 
 # get n words from db filtered by given pos tag or tags.
-#  usage: getwords(5, 'NN', 'NP' <etc>)
-def getwords(n=1, *arg): 
-  sql = "select w, pos from word "
-  if len(arg) > 0:
-    sql += "where pos in {} ".format(arg)
-  # sql += "order by ts desc limit {};".format(n)
-  sql += "order by RANDOM() limit {};".format(n) # for now.. eventually use newest
-  # print(sql)
-  sql_c.execute(sql)
-  return sql_c.fetchall()
+# used mostly by http word server
+# (a bot analysis app will probably access worddb through transServer /words endpoint)
+# posIn is a space-delimited set of POS tags like 'NN JJ NNS'
+def getWords(nnew= 10, nrand=10, posIn=''):  
+  sqlnew = "select w, pos, ts from word "
+  if len(posIn) > 0:
+   pos =  "'" + posIn.replace(' ', "','") + "'"
+   sqlnew += "where pos in ({}) ".format(pos)
+   sqlnew += "order by ts desc limit {};".format(nnew)
+  print(sqlnew)
+
+  sqlrand = "select w, pos, ts from word "
+  if len(posIn) > 0:
+    pos =  "'" + posIn.replace(' ', "','") + "'"
+    sqlrand += "where pos in ({}) ".format(pos)
+  sqlrand += "order by RANDOM() limit {};".format(nrand) 
+  print(sqlrand)
+
+  sql_c.execute(sqlnew)
+  newWds = list(sql_c.fetchall())
+
+  sql_c.execute(sqlrand)
+  randWds = list(sql_c.fetchall())
+
+  rv = newWds + randWds
+  random.shuffle(rv)
+  return(rv)
 
 
 # doesnt do sql COMMIT!!
@@ -156,22 +184,25 @@ def hitParrot(conf=0, timestamp=0):
  
 # for convenience, some schlub commands: 
 # low-level cmd to say a phrase using schlub server 
-def say(phraseIn, langIn= default_lang):
-  theData = {"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}}
-  r = requests.post(schlubUrl, data=json.dumps(theData))
-  print r
+def say(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
+  theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
+  for u in urls:
+    r = requests.post(schlubUrl, data=theData)
+    print r
 
 # show a sentence on screen
-def show(phraseIn):
-  theData = {"cmd": "Show", "args": { "phrase": phraseIn}}
-  r = requests.post(schlubUrl, data=json.dumps(theData))
+def show(phraseIn, urls=[schlubUrls[0]]):
+  theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
+  for u in urls:
+   r = requests.post(u, data=theData)
 
-def soundVol(volIn):
-  theData = {"cmd": "SoundVol", "args": [volIn]}
-  r = requests.post(schlubUrl, data=json.dumps(theData))
-  print r
+def soundVol(volIn, urls=[schlubUrls[0]]):
+  theData = json.dumps({"cmd": "SoundVol", "args": [volIn]})
+  for u in urls:
+    r = requests.post(schlubUrl, data=theData)
+    print r
 
-def utter(langIn= default_lang):
+def utter(langIn= default_voice):
   # get a srt phrase from the subtitle file
   srtlen = len(srt)
   theSRT = srt[random.randint(0, srtlen)]
@@ -185,7 +216,7 @@ def utter(langIn= default_lang):
   rv = []
   for w in theSRT['tw']:
     if w[1] in ['NN', 'NNP', 'NNS', 'JJ']:
-      rv.append(someNouns.pop()[0])
+      rv.append(dbWords.pop()[0])
     else:
      rv.append(w[0])
   # print rv
@@ -208,14 +239,14 @@ def byebye():
 
 atexit.register(byebye)
 
-init_json()
+init()
 
 
 if __name__ == '__main__':
   pname = sys.argv[0]
   syslog.syslog(pname+" started at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   last_timestamp = 0 
-  init_json()
+  init()
 
   while True:
     transcript = hitParrot(0,last_timestamp)
