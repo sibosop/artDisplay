@@ -1,7 +1,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler
 import urlparse
 import json
-import bot
+import dataio as dio
 
 PORT = 8081
 
@@ -28,10 +28,10 @@ class GetHandler(BaseHTTPRequestHandler):
           pos = ''
         try:
           if(pos == ''):
-            body = bot.getWordsDb(nnew,nrand)
+            body = dio.getWordsDb(nnew,nrand)
             self.send_response(200)
           else:
-            body = bot.getWordsDb(nnew,nrand,pos)
+            body = dio.getWordsDb(nnew,nrand,pos)
             self.send_response(200)
         except:
           body = {"status": "error", "query_str": pqs}
@@ -44,7 +44,7 @@ class GetHandler(BaseHTTPRequestHandler):
 
       if (parse.path == "/phrase") :
         try:
-          body = bot.getPhraseDb()
+          body = dio.getPhraseDb()
        except:
           body = {"status":"error", "path": parse.path}
           self.send_response(400)

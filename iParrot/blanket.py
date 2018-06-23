@@ -18,6 +18,7 @@ import words
 import random
 import json
 import transServer
+import dataio as dio
 
 
 debug = True
@@ -37,6 +38,8 @@ transMutex = threading.Lock()
 bufferSize=1000
 currentTranscript=[]
 
+minHighConfidence = 0.7
+
 def setCurrentTranscript(trans):
   global currentTranscript
   global bufferSize
@@ -46,6 +49,8 @@ def setCurrentTranscript(trans):
   entry['trans'] = trans['trans']
   entry['confidence'] = trans['confidence']
   entry['timestamp'] = time.time()
+  if entry['confidence'] > minHighConfidence:
+    dio.text2WordDB(entry['trans'], entry['timestamp'])
   #currentTranscript.append(entry)
   currentTranscript.insert(0,entry)
   if len(currentTranscript) > bufferSize:

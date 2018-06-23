@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 
 
-# bot.py     perkis june 2018 for Darmstadt
+# dataio.py     perkis june 2018 for Darmstadt
 #
-#     * iParrot.py is listening and queuing up transcripts of google-interpreted voice input, available on a http server
-#     * bot.hitParrot() grabs data from this server.
-#     * bot.text2db()  takes any phrase/short text and ingests the words in it into the word database (sqlite)
-#     * bot.word2db() is called by above to write individual words to db with pos taggin
-#     * bot.file2db() will ingest a given text file into the word database w repeated calls to text2db for each line.
-#     * bot.srt is a dict loaded up with lines of film subtitle utterances
-#     * bot.getwords retrieves word lists from the word database
-#     * bot.synonyms() uses wordnet to get synotnyms of a given (pos-tagged) word
-#     * bot.say(), bot.show(), bot.soundVol() are low level cmd-senders to schlub.py server
-#     * bot.utter() grabs a subtitle line and some words from the word.db, munges them together and speaks the result.
-#     * bot.updateWords() uses hitParrot() and text2db() to load recently said things by users into word db
+#   Set of dataio routines to read/write data to/from various components of the schlubBot universe.
+#     * dataio.hitParrot() grabs data from the iParrot transServer [ DEPRECATED]
+#     * dataio.text2WordDB()  takes any phrase/short text and ingests the words in it into the word database (sqlite)
+#     * dataio.word2db() is called by above to write individual words to db with pos taggin
+#     * dataio.file2db() will ingest a given text file into the word database w repeated calls to text2WordDB for each line.
+#     * dataio.srt is a dict loaded up with lines of film subtitle utterances [DEPRECATED, ingest into sqlite phrase tbl]
+#     * dataio.getwords() retrieves word lists from the words database word table
+#     * dataio.synonyms() uses wordnet to get synotnyms of a given (pos-tagged) word
+#     * dataio.datamuse() uses the datamuse.com api to get related words to a given word.
+#     * dataio.say(), dataio.show(), dataio.soundVol() are low level cmd-senders to schlub.py server
+#     * dataio.utter() grabs a subtitle line and some words from the word.db, munges them together and speaks the result.
+#     * dataio.updateWords() uses hitParrot() and text2WordDB() to load recently said things by users into word db [DEPRECATED, 
+#         iParrot should do this directly itself. ]
 #
 #     So basically updateWords() and utter() comprise a full pipeline: reading user utterances, saving the words, and generating
 #     new utterances by our arty bot entity.
@@ -35,12 +37,13 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl  = "http://192.168.0.110:8085/data"
-schlubUrls = ["http://192.168.0.110:8080"]
-wordsUrl   = "http://127.0.0.1:8081" 
+parrotUrl   = "http://192.168.0.110:8085/data"
+schlubUrls  = ["http://192.168.0.110:8080"]
+wordsUrl    = "http://127.0.0.1:8081" 
+datamuseUrl = "http://api.datamuse.com/words"
 
 # words_filename     = "../lists/wordtank.json"
-srt_filename       = "../lists/pos_untitled.json"
+srt_filename       = "../lists/pos_untitled.json" # DEPRECATED, to be ingested into sqlite phrase table.
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
 voices = ['en-au', 'en-uk', 'en', 'de']
@@ -164,7 +167,7 @@ def synonyms(theWord, thePOS='NN'):
   return rv
 
 # load the words of a whole phrase or text into word table of open words.db
-def text2db(theText, ts=-1, src="ip", withSynonyms=False):
+def text2WordDB(theText, ts=-1, src="ip", withSynonyms=False):
 
   if ts < 0: ts = time.time()
 
@@ -190,7 +193,7 @@ def file2db(fname, src):
    while line:
        if len(line) > 5:
          try:
-          text2db(line.strip(), -1, src)
+          text2WordDB(line.strip(), -1, src)
           if cnt % 50 == 0:
             print(" {}".format(cnt))
          except:
@@ -198,7 +201,7 @@ def file2db(fname, src):
        line = fp.readline()
        cnt += 1
 
-# conf  0-9 (minimum confidence), timestamp = minimum timestamp
+# conf  0-9 (minimum confidence), timestamp = minimum timestamp [DEPRECATED]
 def hitParrot(conf=0, timestamp=0):
   url = parrotUrl+"?ct="+str(conf)
   if timestamp > 0:
@@ -210,48 +213,50 @@ def hitParrot(conf=0, timestamp=0):
     return rv['transcript']
   else:
     return r.status_code
+
  
+def datamuse(word, refcode='rel_trg'):
+  # refcode might be
+  # ml = "meaning like", 
+  # rel_syn = synonym, 
+  # rel_trg = trigger, word appearing often near target word in texts
+  # rel_jjb = return an adjective
+  # rel_ant = antonym
+  # for full list see https://www.datamuse.com/api/
+  url = "{}?{}={}&md=p".format(datamuseUrl,refcode, word)
+  print("datamuse request: url: "+url)
+  r = requests.get(url)
+  rj = r.json()
+  # convert returned data to format used in phrase table: each entry is [<word>,<postag>]
+  # verb form is unknow, just give 'V'.. 'XX' for unknown
+  trans = {'n': 'NN', 'v': 'V', 'adj': 'JJ', 'adv': 'RB', 'u': 'XX'}
+  rv = []
+  for x in rj:
+    xout = []
+    xout.append(x['word'])
+    xout.append(trans[x['tags'][0]])
+    rv.append(xout)
+  return rv 
+  
 # for convenience, some schlub commands: 
 # low-level cmd to say a phrase using schlub server 
-def say(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
+def schlubSay(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
   for u in urls:
     r = requests.post(schlubUrl, data=theData)
     print r
 
 # show a sentence on screen
-def show(phraseIn, urls=[schlubUrls[0]]):
+def schlubShow(phraseIn, urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
   for u in urls:
    r = requests.post(u, data=theData)
 
-def soundVol(volIn, urls=[schlubUrls[0]]):
+def schlubSoundVol(volIn, urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "SoundVol", "args": [volIn]})
   for u in urls:
     r = requests.post(schlubUrl, data=theData)
     print r
-
-def utter(langIn= default_voice):
-  # get a srt phrase from the subtitle file
-  srtlen = len(srt)
-  theSRT = srt[random.randint(0, srtlen)]
-  print "utter: srt len = {}".format(srtlen)
-  print "srt = {}".format(theSRT)
-  # get a bunch of recent words from the word db
-  dbWords =  getwords(20, 'NN', 'NNP', 'NNS','JJ')
-  print("dbWords: {}".format(dbWords))
-
-  # substitute some words in the srt phrase
-  rv = []
-  for w in theSRT['tw']:
-    if w[1] in ['NN', 'NNP', 'NNS', 'JJ']:
-      rv.append(dbWords.pop()[0])
-    else:
-     rv.append(w[0])
-  # print rv
-  rvs = ' '.join(rv).strip().replace('.','').replace(" ' ","'").replace("_"," ")
-  print(rvs)
-  say(rvs,langIn)
 
 def byebye():
   sql_conn.close()
@@ -269,27 +274,5 @@ def byebye():
 atexit.register(byebye)
 
 init()
-
-
-if __name__ == '__main__':
-  pname = sys.argv[0]
-  syslog.syslog(pname+" started at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
-  last_timestamp = 0 
-  init()
-
-  while True:
-    transcript = hitParrot(0,last_timestamp)
-    if len(transcript) > 0:
-     last_timestamp = int(math.ceil(transcript[0]['timestamp']))
-     print len(transcript)
-     for x in transcript:
-       thePhrase = x['trans'].strip()
-       if x['confidence'] > 0.7:
-         say(thePhrase, default_voice )
-         print(thePhrase)
-       show(thePhrase)
-    sys.stdout.write('.')
-    sys.stdout.flush()
-    time.sleep(2)
 
 
