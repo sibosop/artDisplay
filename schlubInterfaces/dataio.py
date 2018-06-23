@@ -35,8 +35,9 @@ from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
 
-parrotUrl      = "http://192.168.0.110:8085/words"
-schlubUrls      = ["http://192.168.0.110:8080"]
+parrotUrl  = "http://192.168.0.110:8085/data"
+schlubUrls = ["http://192.168.0.110:8080"]
+wordsUrl   = "http://127.0.0.1:8081" 
 
 # words_filename     = "../lists/wordtank.json"
 srt_filename       = "../lists/pos_untitled.json"
@@ -84,12 +85,12 @@ def init():
 # used mostly by http word server
 # (a bot analysis app will probably access worddb through transServer /words endpoint)
 # posIn is a space-delimited set of POS tags like 'NN JJ NNS'
-def getWords(nnew= 10, nrand=10, posIn=''):  
+def getWordsDb(nnew= 10, nrand=10, posIn=''):  
   sqlnew = "select w, pos, ts from word "
   if len(posIn) > 0:
-   pos =  "'" + posIn.replace(' ', "','") + "'"
-   sqlnew += "where pos in ({}) ".format(pos)
-   sqlnew += "order by ts desc limit {};".format(nnew)
+    pos =  "'" + posIn.replace(' ', "','") + "'"
+    sqlnew += "where pos in ({}) ".format(pos)
+  sqlnew += "order by ts desc limit {};".format(nnew)
   print(sqlnew)
 
   sqlrand = "select w, pos, ts from word "
@@ -107,7 +108,35 @@ def getWords(nnew= 10, nrand=10, posIn=''):
 
   rv = newWds + randWds
   random.shuffle(rv)
+  print("getWordsDB rv ", rv)
   return(rv)
+
+def getPhraseDb(): # for now just one at random
+  sql = "select * from phrase order by RANDOM() LIMIT 1;"
+  sql_c.execute(sql)
+  return sql_c.fetchone()
+
+def getWordsHTTP(nnew=10, nrand=10, pos=''):
+  if len(pos) > 0:
+    pos = pos.replace(' ', '+')
+    req = wordsUrl+'/words?n='+str(nnew)+'&r='+str(nrand)+'&pos='+pos
+    #print req
+    rv = requests.get(req)
+  else:
+    req = wordsUrl+'/words?n='+str(nnew)+'&r='+str(nrand)
+    #print req
+    rv = requests.get(req)
+
+  return json.loads(rv)
+
+def getPhraseHTTP(): # for now, just pick one at random
+  req = wordsUrl+'/phrase'
+  rv = requests.get(req)
+  return json.loads(rv)
+
+# load a json file with subtitles (and POS tagging added) to db phrase table.
+def posSrt2db(posfilename):
+  return  # NIY
 
 
 # doesnt do sql COMMIT!!
@@ -134,7 +163,7 @@ def synonyms(theWord, thePOS='NN'):
     print "synonyms of {} {}".format(theWord, rv)
   return rv
 
-# load a whole phrase or text into word table of open words.db
+# load the words of a whole phrase or text into word table of open words.db
 def text2db(theText, ts=-1, src="ip", withSynonyms=False):
 
   if ts < 0: ts = time.time()

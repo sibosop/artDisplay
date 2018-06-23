@@ -13,6 +13,7 @@ class GetHandler(BaseHTTPRequestHandler):
       body = ""
       if (parse.path == "/words" ) :
         pqs = urlparse.parse_qs(parse.query)
+        print('pqs', pqs)
         if 'n' in pqs:
             nnew = pqs['n'][0]
         else:
@@ -22,20 +23,17 @@ class GetHandler(BaseHTTPRequestHandler):
         else:
           nrand = 10
         if 'pos' in pqs:
-          pos = pqs['pos']
+          pos = pqs['pos'][0]
         else:
           pos = ''
         try:
           if(pos == ''):
-            body = bot.getWords(nnew,nrand)
+            body = bot.getWordsDb(nnew,nrand)
             self.send_response(200)
           else:
-            body = bot.getWords(nnew,nrand,pos)
+            body = bot.getWordsDb(nnew,nrand,pos)
             self.send_response(200)
         except:
-          body = {"status": "error", "query_str": pqs}
-          self.send_response(400)
-        else:
           body = {"status": "error", "query_str": pqs}
           self.send_response(400)
 
@@ -43,6 +41,26 @@ class GetHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(body))
         return
+
+      if (parse.path == "/phrase") :
+        try:
+          body = bot.getPhraseDb()
+       except:
+          body = {"status":"error", "path": parse.path}
+          self.send_response(400)
+        
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(body))
+
+      else:
+        body = {"status": "error", "path": parse.path}
+        self.send_response(400)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(body))
+        return
+       
 
 if __name__ == '__main__':
     from BaseHTTPServer import HTTPServer
