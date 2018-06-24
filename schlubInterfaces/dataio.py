@@ -24,6 +24,8 @@
 
 
 import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import syslog
 import requests
 import json
@@ -137,11 +139,6 @@ def getPhraseHTTP(): # for now, just pick one at random
   rv = requests.get(req)
   return json.loads(rv)
 
-# load a json file with subtitles (and POS tagging added) to db phrase table.
-def posSrt2db(posfilename):
-  return  # NIY
-
-
 # doesnt do sql COMMIT!!
 def word2db(word, pos="NN", ts=-1, src="ip"):
   if ts < 0:  ts = time.time()
@@ -155,6 +152,29 @@ def word2db(word, pos="NN", ts=-1, src="ip"):
     sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, word, pos)
     print("DUPLICATE: "+ word + ' ' + pos)
     sql_c.execute(sql)
+
+# doesnt do sql COMMIT!!  tw = array of word,pos pairs as textblob .tags
+def phrase2PhraseDB(phraseText, tw, ts=-1, src="ip"):
+  if ts < 0:  ts = time.time()
+  phraseText.replace("'", "''")
+  tw_str = json.dumps(tw)
+  sql =  "insert into phrase (ph, tw, ts, src) values ('{}', '{}', {},'{}'); "\
+          .format(phraseText,tw_str, ts, src)
+  try:
+    # print(sql)
+    sql_c.execute(sql)
+  except:
+    print("ERROR ", sql)
+    # sqlite3.IntegrityError:  # constraint ph, source unique violated: UPDATE count and ts instead of INSERTing
+    # sql = "update word SET ts={} where ph= '{}' and src = '{}';".format(ts, phaseText, tw)
+    # print("DUPLICATE: "+ sql)
+    # sql_c.execute(sql)
+
+# just a plain text phrase. compute postags and stuff into phrase table.
+def text2PhraseDB(text, src="??"):
+  text_tb = TextBlob(text)
+  ts = time.time()
+  phrase2PhraseDB(text, text_tb.tags, ts, src)
 
 def synonyms(theWord, thePOS='NN'):
   rv = []
@@ -185,8 +205,8 @@ def text2WordDB(theText, ts=-1, src="ip", withSynonyms=False):
 
   sql_conn.commit()
 
-# ingest a text file into open words.db
-def file2db(fname, src):
+# ingest a text file into open words.db. not suitable for json files.
+def file2WordDB(fname, src):
   with open(fname) as fp:  
    line = fp.readline()
    cnt = 1
@@ -200,6 +220,22 @@ def file2db(fname, src):
           print("error reading line ", cnt)
        line = fp.readline()
        cnt += 1
+
+# ingest a text file, w one phrase per line, into open words.db phrase table. not suitable for json files.
+def file2PhraseDB(fname, src):
+  with open(fname) as fp:  
+   line = fp.readline()
+   cnt = 1
+   while line:
+    try:
+      text2PhraseDB(line.strip(), src)
+      if cnt % 50 == 0:
+        print(" {}".format(cnt))
+    except:
+      print("error reading line ", cnt)
+    line = fp.readline()
+    cnt += 1
+  sql_conn.commit()
 
 # conf  0-9 (minimum confidence), timestamp = minimum timestamp [DEPRECATED]
 def hitParrot(conf=0, timestamp=0):
