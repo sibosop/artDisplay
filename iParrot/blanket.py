@@ -13,6 +13,7 @@ home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 sys.path.append(home+"/GitProjects/artDisplay/schlub")
+sys.path.append(home+"/GitProjects/artDisplay/bottery")
 import slp
 import words
 import random
@@ -50,7 +51,7 @@ def setCurrentTranscript(trans):
   entry['confidence'] = trans['confidence']
   entry['timestamp'] = time.time()
   if entry['confidence'] > minHighConfidence:
-    dio.text2WordDB(entry['trans'], entry['timestamp'])
+    dio.ingestWords(entry['trans'], entry['timestamp'])
   #currentTranscript.append(entry)
   currentTranscript.insert(0,entry)
   if len(currentTranscript) > bufferSize:
