@@ -1,25 +1,22 @@
 #!/usr/bin/env python
 import sys
 import os
+import argparse
 home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/config")
+sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import sys
 import json
 import urllib2
+import config
 
 hosts = []
-def getHostList():
+def getHostList(specs):
   global hosts
-  if len(sys.argv) > 1:
-    print "getting lost list from arguments"
-    first = True
-    for a in sys.argv:
-      if first:
-        first = False
-        continue
-      e = {}
-      e['ip'] = a
-      #print "adding:",e
-      hosts.append(e)
+  if specs != None:
+    print "getting host from specs"
+    for a in specs['hosts']:
+      hosts.append(a)
   else:
     import slp
     print "getting host list from slp"
@@ -57,5 +54,12 @@ def sendToHosts(cmd):
 
 if __name__ == '__main__':
   run=True
-  getHostList()
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-c', '--config', action='store_true', help='clear the display on exit') 
+  parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
+  args = parser.parse_args()
+  specs = None
+  if args.config:
+    specs = config.load()
+  getHostList(specs)
   printHostList()

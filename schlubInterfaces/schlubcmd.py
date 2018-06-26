@@ -5,8 +5,11 @@ import os
 home = os.environ['HOME']
 import sys
 sys.path.append(home+"/GitProjects/artDisplay/schlub")
+sys.path.append(home+"/GitProjects/artDisplay/config")
 import host
 import json
+import argparse
+import config
 
 debug=True
 
@@ -97,7 +100,14 @@ cmds = {
 
 if __name__ == '__main__':
   run=True
-  host.getHostList()
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
+  parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
+  args = parser.parse_args()
+  specs = None
+  if not args.slp:
+    specs = config.load()
+  host.getHostList(specs)
   host.printHostList()
   printCmds()
   while run:

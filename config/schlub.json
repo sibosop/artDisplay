@@ -1,0 +1,15 @@
+{
+  "hosts" : [
+    {"name" : "pi100", "ip" : "192.168.20.100", "isMaster" : false,  "hasDisplay" : false  }
+    ,{"name" : "pi101", "ip" : "192.168.20.101", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi102", "ip" : "192.168.20.102", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi103", "ip" : "192.168.20.103", "isMaster" : true,  "hasDisplay" : false }
+    ,{"name" : "pi104", "ip" : "192.168.20.104", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi105", "ip" : "192.168.20.105", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi106", "ip" : "192.168.20.106", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi107", "ip" : "192.168.20.107", "isMaster" : false, "hasDisplay" : false }
+    ,{"name" : "pi108", "ip" : "192.168.20.108", "isMaster" : false, "hasDisplay" : true }
+    ,{"name" : "pi109", "ip" : "192.168.20.109", "isMaster" : false, "hasDisplay" : true }
+    ,{"name" : "pi110", "ip" : "192.168.20.110", "isMaster" : false, "hasDisplay" : true }
+  ]
+}
