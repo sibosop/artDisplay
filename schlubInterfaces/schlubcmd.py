@@ -104,8 +104,6 @@ if __name__ == '__main__':
   parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
   parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
   args = parser.parse_args()
-  specs = None
-  config.load()
   host.useSlp = args.slp
   host.getHostList()
   host.printHostList()
