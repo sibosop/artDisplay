@@ -14,13 +14,16 @@ hosts = []
 def getHostList(specs):
   global hosts
   if specs != None:
-    print "getting host from specs"
+    #print "getting host from specs"
+    if len(hosts) != 0:
+      return
     for a in specs['hosts']:
       hosts.append(a)
   else:
     import slp
-    print "getting host list from slp"
+    #print "getting host list from slp"
     hosts = slp.getHosts("schlub")
+
 
 def printHostList():
   global hosts

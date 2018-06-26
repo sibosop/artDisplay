@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+import os
+import sys
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/config")
+sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 
 import threading
 import time
@@ -6,13 +11,14 @@ import syslog
 import subprocess
 import glob
 import adGlobal
-import sys
 import random
 import urllib2
 import soundFile
 import slp
 import json
 import schlubTrack
+import host
+import config
 
 
 debug = True
@@ -47,10 +53,10 @@ class playerThread(threading.Thread):
           time.sleep(2)
           continue
         first = True
-        hosts = slp.getHosts("schlub")
+        host.getHostList(config.specs)
         e = soundFile.getSoundEntry()
         if debug: syslog.syslog("player choosing "+str(e))
-        for h in hosts:
+        for h in host.hosts:
           choice = random.choice(e)
           ip = h['ip']
           if adGlobal.isLocalHost(ip):
