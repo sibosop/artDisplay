@@ -11,6 +11,8 @@ home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/poem")
+sys.path.append(home+"/GitProjects/artDisplay/config")
+sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 import asoundConfig
 import upgrade
 import soundFile
@@ -19,6 +21,8 @@ import player
 import json
 import schlubSpeak
 import displayText
+import config
+import host
 
 debug=True
 
@@ -174,13 +178,23 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
-    state['displayEnabled'] = master.displayEnabled()
     if master.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents
     else:
       state['collection'] = ""
       state['maxEvents'] = 0
+
+    for k in config.specs.keys():
+      if k == "hosts":
+        for h in config.specs[k]:
+          if host.isLocalHost(h['ip']):
+            for hk in h.keys():
+              if hk == 'ip':
+                continue
+              state[hk] = h[hk]
+      else:
+        state[k] = config.specs[k]
     rval = json.dumps(state)
     if debug: syslog.syslog("Probe:"+rval)
     return rval
