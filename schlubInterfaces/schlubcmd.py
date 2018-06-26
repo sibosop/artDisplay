@@ -26,6 +26,15 @@ def doCmd(cmd):
   host.sendToHosts({'cmd' : cmd[0], 'args' : [""] })
   return 0
 
+def doMasterCmd(cmd):
+  host.sendToMaster({'cmd' : cmd[0], 'args' : [""] })
+  return 0
+
+def doMasterArg(cmd):
+  host.sendToMaster({'cmd' : cmd[0], 'args' : [cmd[1]] })
+  return 0
+  
+
 def doSound(cmd):
   print "doSound"
   host.sendToHosts({'cmd' : cmd[0], 'file' : cmd[1]})
@@ -91,6 +100,8 @@ cmds = {
       ,'MaxEvents' : doNum
       ,'SetLang' : doSetLang
       ,'SoundVol': doNum
+      ,'CollectionList' : doMasterCmd
+      ,'Collection' : doMasterArg
       ,'Quit' : doQuit
     }
 
