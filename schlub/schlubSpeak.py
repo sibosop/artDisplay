@@ -2,10 +2,9 @@
 import os
 home = os.environ['HOME']
 import sys
-sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 import soundTrack
 import threading
-import adGlobal
 import pygame
 import textSpeaker
 import syslog
@@ -13,6 +12,7 @@ import time
 import random
 import soundServer
 import schlubTrack
+import config
 
 currentPhrase={}
 phraseMutex=threading.Lock()
@@ -75,7 +75,7 @@ class schlubSpeakThread(threading.Thread):
   def run(self):
     global currentPhrase
     if debug: syslog.syslog(self.name+": starting")
-    dir = adGlobal.eventDir
+    dir = config.specs['eventDir']
     oldPhrase = ""
     sound = None
     reps = 0

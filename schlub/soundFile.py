@@ -4,8 +4,7 @@ import csv
 import os
 import sys
 home = os.environ['HOME']
-sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
-import adGlobal
+sys.path.append(home+"/GitProjects/artDisplay/config")
 import glob
 import soundTrack
 import random
@@ -15,6 +14,7 @@ import threading
 import json
 import soundServer
 import shutil
+import config
 
 debug=True
 listMutex=threading.Lock()
@@ -26,7 +26,7 @@ FileEntry=collections.namedtuple('FileEntry',rows)
 
 fileCollections = {}
 fileList=collections.OrderedDict();
-edir = adGlobal.eventDir
+edir = config.specs['eventDir']
 defaultKey = "EventCtrl.csv"
 eventKey = defaultKey
 eventFile = edir + "/" + eventKey

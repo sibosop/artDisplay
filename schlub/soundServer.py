@@ -9,6 +9,7 @@ import os
 import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/poem")
 import asoundConfig
 import upgrade

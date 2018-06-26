@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 import os
-home = os.environ['HOME']
 import sys
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+sys.path.append(home+"/GitProjects/artDisplay/config")
+import sys
 import soundTrack
 import threading
-import adGlobal
 import pygame
 import syslog
 import random
 import time
 import soundServer
+import config
 
-debug = True
+debug = False
 currentSound = {'file':""}
-soundMaxVol = 1.0
+soundMaxVol = config.specs['soundMaxVol']
 soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
@@ -29,7 +32,7 @@ def setSoundMaxVolume(vol):
   
 
 def findSoundFile(file):
-  dir = adGlobal.eventDir
+  dir = config.specs['eventDir']
   path = dir+"/"+file
   rval = ""
   if os.path.isfile(path):
@@ -118,7 +121,7 @@ class schlubTrack(threading.Thread):
   def run(self):
     global currentSound
     syslog.syslog("Schlub Track:"+self.name)
-    dir = adGlobal.eventDir
+    dir = config.specs['eventDir']
     while self.isRunning():
       path=""
       nt = random.randint(soundTrack.eventMin,soundTrack.eventMax)/1000.0;

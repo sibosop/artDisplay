@@ -10,7 +10,6 @@ import time
 import syslog
 import subprocess
 import glob
-import adGlobal
 import random
 import urllib2
 import soundFile
@@ -42,7 +41,7 @@ def isEnabled():
 
 class playerThread(threading.Thread):
   def run(self):
-    edir = adGlobal.eventDir
+    edir = config.specs['eventDir']
     first = True
     while True:
       try:
@@ -59,7 +58,7 @@ class playerThread(threading.Thread):
         for h in host.hosts:
           choice = random.choice(e)
           ip = h['ip']
-          if adGlobal.isLocalHost(ip):
+          if host.isLocalHost(ip):
             if debug: syslog.syslog("sending "+choice+" request to localhost("+ip+")")
             schlubTrack.setCurrentSound({'file' : choice})
           else:
