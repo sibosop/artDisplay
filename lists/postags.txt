@@ -1,3 +1,5 @@
+POS Tags, as defined by TextBlob
+
 CC Coord Conjuncn           and,but,or
 CD Cardinal number          one,two
 DT Determiner               the,some
