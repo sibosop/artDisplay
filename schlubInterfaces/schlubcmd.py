@@ -106,8 +106,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
   specs = None
   if not args.slp:
-    specs = config.load()
-  host.getHostList(specs)
+    config.load()
+  host.getHostList(config.specs)
   host.printHostList()
   printCmds()
   while run:
