@@ -6,7 +6,7 @@ import syslog
 import soundServer
 import player
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
-sys.path.append(home+"/GitProjects/artDisplay/schlub")
+sys.path.append(home+"/GitProjects/artDisplay/schlubInterface")
 sys.path.append(home+"/GitProjects/artDisplay/config")
 import slp
 import master
@@ -19,6 +19,7 @@ import schlubSpeak
 import adGlobal
 import config
 import argparse
+import host
 
 debug = False
 numSchlubThreads=1
@@ -41,6 +42,8 @@ if __name__ == '__main__':
   parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
   args = parser.parse_args()
   im = master.isMaster()
+  config.load()
+  host.useSlp = args.slp
   if args.slp:
     attr=""
     if im:
@@ -48,8 +51,6 @@ if __name__ == '__main__':
     adGlobal.hasAudio=True
     slp.start()
     slp.register("schlub",attr)
-  else:
-    config.load()
 
   sst = soundServer.soundServerThread(8080)
   sst.setDaemon(True)

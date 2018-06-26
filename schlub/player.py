@@ -53,7 +53,7 @@ class playerThread(threading.Thread):
           time.sleep(2)
           continue
         first = True
-        host.getHostList(config.specs)
+        host.getHostList()
         e = soundFile.getSoundEntry()
         if debug: syslog.syslog("player choosing "+str(e))
         for h in host.hosts:
