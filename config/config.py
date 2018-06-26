@@ -6,8 +6,8 @@ import json
 
 specs = None
 def load():
+  global specs
   with open(specPath) as f:
     specs = json.load(f)
-  return specs
   
   
