@@ -110,7 +110,6 @@ def selectNewWords(n=10, src="ip"):
     print(sql)
   sql_c.execute(sql)
   newWords = list(sql_c.fetchall())
-  random.shuffle(newWords)
   return(newWords)
 
 def selectRandomWords(n=10):
@@ -146,10 +145,11 @@ def getNewWords(n=10,  pos=''):
     rv = requests.get(req)
   else:
     req = wordsUrl+'/nw?n='+str(n)
-    #print req
+    print('req', req)
     rv = requests.get(req)
+    print('rv', rv.text)
 
-  return json.loads(rv)
+  return json.loads(rv.text)
 
 def getRandomWords(n=10, pos=''):
   if len(pos) > 0:
@@ -162,12 +162,12 @@ def getRandomWords(n=10, pos=''):
     #print req
     rv = requests.get(req)
 
-  return json.loads(rv)
+  return json.loads(rv.text)
 
 def getRandomPhrases(n = 1): # for now, just pick one at random
   req = wordsUrl+'/ph?n='+str(n)
   rv = requests.get(req)
-  return rv # json.loads(rv)
+  return json.loads(rv.text)
 
 # =============================================
 #   database data ingestion routines
@@ -188,14 +188,14 @@ def ingestTaggedWord(word, pos="NN", ts=-1, src="ip"):
     sql_c.execute(sql)
 
 # doesnt do sql COMMIT!!  tw = array of word,pos pairs as textblob .tags
-def ingestTaggedPhrase(phraseText, tw, ts=-1, src="ip"):
+def ingestTaggedPhrase(phraseText, tw, ts=-1, src="??"):
   if ts < 0:  ts = time.time()
   phraseText.replace("'", "''")
-  tw_str = json.dumps(tw)
+  tw_str = 'dummy string' #json.dumps(tw)
   sql =  "insert into phrase (ph, tw, ts, src) values ('{}', '{}', {},'{}'); "\
           .format(phraseText,tw_str, ts, src)
   try:
-    # print(sql)
+    print(sql)
     sql_c.execute(sql)
   except:
     print("ERROR ", sql)
@@ -214,7 +214,7 @@ def ingestPhrase(text, src="??"):
 def ingestWords(theText, ts=-1, src="ip"):
 
   if ts < 0: ts = time.time()
-
+  
   text_tb = TextBlob(theText)
   #print text_tb
 

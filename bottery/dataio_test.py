@@ -28,7 +28,9 @@ print("getNewWords", d.getNewWords())
 print("getRandomWords", d.getRandomWords())
 print("getRandomPhrases", d.getRandomPhrases())
 
-
+#ingestion routine
+d.ingestWords("imitation is the sincerest form of flattery")
+print("getNewWords", d.selectNewWords(20))
 
 
 
