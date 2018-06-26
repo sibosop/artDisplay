@@ -105,9 +105,9 @@ if __name__ == '__main__':
   parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
   args = parser.parse_args()
   specs = None
-  if not args.slp:
-    config.load()
-  host.getHostList(config.specs)
+  config.load()
+  host.useSlp = args.slp
+  host.getHostList()
   host.printHostList()
   printCmds()
   while run:

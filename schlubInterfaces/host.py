@@ -10,19 +10,20 @@ import json
 import urllib2
 import config
 
+useSlp = False
 hosts = []
-def getHostList(specs):
+def getHostList():
   global hosts
-  if specs != None:
-    #print "getting host from specs"
-    if len(hosts) != 0:
-      return
-    for a in specs['hosts']:
-      hosts.append(a)
-  else:
+  if useSlp:
     import slp
     #print "getting host list from slp"
     hosts = slp.getHosts("schlub")
+  else:
+    #print "getting host from specs"
+    if len(hosts) != 0:
+      return
+    for a in config.specs['hosts']:
+      hosts.append(a)
 
 
 def printHostList():
