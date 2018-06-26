@@ -45,7 +45,8 @@ def sendToHost(ip,cmd):
     print("cmd json:"+json.dumps(cmd))
     req = urllib2.Request(url
                 ,json.dumps(cmd),{'Content-Type': 'application/json'})
-    f = urllib2.urlopen(req)
+    timeout = 4
+    f = urllib2.urlopen(req,None,timeout)
     test = f.read()
     print("got response:"+test)
   except Exception as e:
