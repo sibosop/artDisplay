@@ -52,10 +52,9 @@ class playerThread(threading.Thread):
           time.sleep(2)
           continue
         first = True
-        host.getHostList()
         e = soundFile.getSoundEntry()
         if debug: syslog.syslog("player choosing "+str(e))
-        for h in host.hosts:
+        for h in host.getHosts():
           choice = random.choice(e)
           ip = h['ip']
           if host.isLocalHost(ip):

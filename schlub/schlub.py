@@ -41,7 +41,10 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
   parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
+  parser.add_argument('-c','--config',nargs=1,type=str,default=[config.defaultSpecPath],help='specify different config file')
+  if debug: syslog.syslog("config path"+args.config[0])
   args = parser.parse_args()
+  config.load(args.config[0])
   im = master.isMaster()
   host.useSlp = args.slp
   if args.slp:

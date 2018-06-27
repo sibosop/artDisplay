@@ -17,11 +17,11 @@ import config
 
 debug = False
 currentSound = {'file':""}
-soundMaxVol = config.specs['soundMaxVol']
 soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
 volLock = threading.Lock()
+soundMaxVol=.5
 
 def setSoundMaxVolume(vol):
   global soundMaxVol
@@ -120,8 +120,10 @@ class schlubTrack(threading.Thread):
     
   def run(self):
     global currentSound
+    global soundMaxVolume
     syslog.syslog("Schlub Track:"+self.name)
     dir = config.specs['eventDir']
+    soundMaxVolume = config.specs['soundMaxVol']
     while self.isRunning():
       path=""
       nt = random.randint(soundTrack.eventMin,soundTrack.eventMax)/1000.0;

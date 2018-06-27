@@ -14,7 +14,7 @@ import config
 
 useSlp = False
 hosts = []
-def getHostList():
+def setHostList():
   global hosts
   if useSlp:
     import slp
@@ -22,11 +22,16 @@ def getHostList():
     hosts = slp.getHosts("schlub")
   else:
     #print "getting host from specs"
-    if len(hosts) != 0:
-      return
-    for a in config.specs['hosts']:
-      hosts.append(a)
+    if len(hosts) == 0:
+      for a in config.specs['hosts']:
+        hosts.append(a)
+  return hosts
 
+def getHosts():
+  global hosts
+  if len(hosts) == 0:
+    setHostList()
+  return hosts
 
 def printHostList():
   global hosts

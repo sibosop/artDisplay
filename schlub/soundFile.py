@@ -26,11 +26,20 @@ FileEntry=collections.namedtuple('FileEntry',rows)
 
 fileCollections = {}
 fileList=collections.OrderedDict();
-edir = config.specs['eventDir']
+
+currentCollection = ""
+Gedir = ""
 defaultKey = "EventCtrl.csv"
 eventKey = defaultKey
-eventFile = edir + "/" + eventKey
-currentCollection = eventKey
+eventFile = ""
+
+def getEdir():
+  global Gedir
+  if Gedir == "":
+    Gedir = config.specs['eventDir']
+  return Gedir
+
+
 
 def setMaxEvents(m):
   global maxEvents
@@ -48,7 +57,7 @@ def getCurrentCollection():
 def getFileCollections():
   global fileCollections
   global fileList
-  csvFiles = glob.glob(edir+"/*.csv")
+  csvFiles = glob.glob(getEdir()+"/*.csv")
   for cf in csvFiles:
     n = cf.split("/")[-1]
     if debug: syslog.syslog("collection file:"+n)
@@ -122,7 +131,7 @@ def refresh():
 def rescan():
   global fileList
   listMutex.acquire()
-  files = glob.glob(edir+"/*.wav")
+  files = glob.glob(getEdir()+"/*.wav")
   newList=collections.OrderedDict();
   for f in files:
     n = f.split("/")[-1]
@@ -171,10 +180,9 @@ def getSoundList():
 def saveFileList():
   global fileList
   global eventFile
-  global edir
   global rows
 
-  tmpFile = edir + "/tmpfile.csv"
+  tmpFile = getEdir() + "/tmpfile.csv"
   try:
     with open(tmpFile,'w') as f:
       w = csv.writer(f)
@@ -206,6 +214,10 @@ def getSoundEntry():
   global defaultKey
   global currentCollection
   global fileCollections
+  edir = getEdir()
+  eventKey = defaultKey
+  eventFile = edir + "/" + eventKey
+  currentCollection = eventKey
   flen = len(fileList)
   if flen == 0:
     createFileList()
