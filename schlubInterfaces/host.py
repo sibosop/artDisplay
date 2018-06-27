@@ -40,6 +40,12 @@ def printHostList():
     print " ",o
   print
 
+def sendToMaster(cmd):
+  for h in hosts:
+    if h['isMaster']:
+      sendToHost(h['ip'],cmd)
+      break
+
 def sendToHost(ip,cmd):
   try:
     print "send to host:",ip,cmd

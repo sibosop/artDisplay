@@ -75,9 +75,9 @@ if __name__ == '__main__':
   cont = True
   while cont:
     #k = wait_key()
-    thePhrase = dio.getPhraseDb()
+    thePhrase = dio.getRandomPhrases()
     theVoice = random.choice(voices)
-    print(theVoice, thePhrase[0], thePhrase[3])
+    print(theVoice, thePhrase)
     dio.schlubSay(thePhrase[0], theVoice)
     delay = random.randint(5,11)
     print("delay {}".format(delay))
