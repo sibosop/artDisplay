@@ -7,6 +7,8 @@ import soundServer
 import player
 sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 sys.path.append(home+"/GitProjects/artDisplay/config")
+sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
+import adGlobal
 import slp
 import master
 import syslog
@@ -31,6 +33,7 @@ def startEventThread(t):
   eventThreads[-1].start()
 
 if __name__ == '__main__':
+  adGlobal.hasAudio = True
   pname = sys.argv[0]
   syslog.syslog(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
   os.environ['DISPLAY']=":0.0"
