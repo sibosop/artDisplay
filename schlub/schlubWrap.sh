@@ -1,7 +1,12 @@
 #!/bin/bash
 
 while true; do
-  /home/pi/GitProjects/artDisplay/schlub/schlub.py
+  args=""
+  for i in $@
+  do
+    args="$args $i "
+  done
+  /home/pi/GitProjects/artDisplay/schlub/schlub.py $args
   rc=$?
   case $rc in
     3) logger doing poweroff; sudo poweroff

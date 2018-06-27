@@ -58,6 +58,7 @@ def getFileCollections():
   global fileCollections
   global fileList
   csvFiles = glob.glob(getEdir()+"/*.csv")
+  if debug: syslog.syslog("csvFiles:"+str(csvFiles))
   for cf in csvFiles:
     n = cf.split("/")[-1]
     if debug: syslog.syslog("collection file:"+n)
@@ -214,6 +215,7 @@ def getSoundEntry():
   global defaultKey
   global currentCollection
   global fileCollections
+  global eventFile
   edir = getEdir()
   eventKey = defaultKey
   eventFile = edir + "/" + eventKey
