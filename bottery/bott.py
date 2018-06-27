@@ -9,6 +9,7 @@ import dataio as dio
 
 # import sys, os
 
+
 default_voice = 'en-au'
 
 def wait_key():
@@ -75,9 +76,14 @@ if __name__ == '__main__':
   cont = True
   while cont:
     #k = wait_key()
-    thePhrase = dio.getRandomPhrases()
+    thePhrase = dio.getPhrase()
+    nwords = dio.getNewWords()
+    rwords = dio.getRandomWords()
+    allwords = dio.mergeWordlists(nwords, rwords)
+    wdict = dio.makePosDict(allwords)
     theVoice = random.choice(voices)
     print(theVoice, thePhrase)
+    dio.get
     dio.schlubSay(thePhrase[0], theVoice)
     delay = random.randint(5,11)
     print("delay {}".format(delay))
