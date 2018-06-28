@@ -27,10 +27,10 @@ FileEntry=collections.namedtuple('FileEntry',rows)
 fileCollections = {}
 fileList=collections.OrderedDict();
 
-currentCollection = ""
 Gedir = ""
 defaultKey = "EventCtrl.csv"
 eventKey = defaultKey
+currentCollection = defaultKey
 eventFile = ""
 
 def getEdir():
@@ -52,6 +52,7 @@ def setMaxEvents(m):
   return rval 
 
 def getCurrentCollection():
+  global currentCollection
   return currentCollection
 
 def getFileCollections():
@@ -217,9 +218,6 @@ def getSoundEntry():
   global fileCollections
   global eventFile
   edir = getEdir()
-  eventKey = defaultKey
-  eventFile = edir + "/" + eventKey
-  currentCollection = eventKey
   flen = len(fileList)
   if flen == 0:
     createFileList()
