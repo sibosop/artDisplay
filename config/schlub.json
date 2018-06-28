@@ -1,6 +1,7 @@
 {
   "soundMaxVol" : 0.5
   ,"eventDir" : "/media/pi/SOUND/events/"
+  ,"subnet" : "192.168.20"
   ,"hosts" : [
     {"name" : "pi100", "ip" : "192.168.20.100", "isMaster" : false,  "displayEnabled" : false  }
     ,{"name" : "pi101", "ip" : "192.168.20.101", "isMaster" : false, "displayEnabled" : false }
