@@ -10,6 +10,7 @@ import host
 import json
 import argparse
 import config
+import readline
 
 debug=True
 
@@ -17,11 +18,6 @@ debug=True
 defParse=None
 
 
-def printCmds():
-  print "SchlubCmds:"
-  for c in cmds:
-    print c
-  print
 
 def sendCargs(p,cargs):
   if len(p.name) + len(p.ip) + len(p.sub) == 0:
@@ -104,6 +100,12 @@ def doQuit(args):
   return -1
 
 
+def printCmds(cmd):
+  print "SchlubCmds:"
+  for c in cmds:
+    print c
+  print
+
 cmds = {
       'Probe'     : doCmd
       ,'Show'     : doShow
@@ -138,7 +140,7 @@ if __name__ == '__main__':
   host.useSlp = args.slp
   host.setHostList()
   host.printHostList()
-  printCmds()
+  printCmds("")
 
     
   cmdParser = argparse.ArgumentParser()

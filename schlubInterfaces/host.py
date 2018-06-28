@@ -15,6 +15,7 @@ import config
 useSlp = False
 hosts = []
 names = []
+timeout = 2
 def setHostList():
   global hosts
   if useSlp:
@@ -75,7 +76,6 @@ def sendToHost(ip,cmd):
     print("cmd json:"+json.dumps(cmd))
     req = urllib2.Request(url
                 ,json.dumps(cmd),{'Content-Type': 'application/json'})
-    timeout = 4
     f = urllib2.urlopen(req,None,timeout)
     test = f.read()
     print("got response:"+test)
