@@ -21,7 +21,7 @@ import config
 import argparse
 import host
 
-debug = False
+debug = True
 numSchlubThreads=1
 schlubExit = 0
 
@@ -33,19 +33,23 @@ def startEventThread(t):
   eventThreads[-1].start()
 
 if __name__ == '__main__':
-  adGlobal.hasAudio = True
-  pname = sys.argv[0]
-  syslog.syslog(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
-  os.environ['DISPLAY']=":0.0"
-  os.chdir(os.path.dirname(sys.argv[0]))
-  parser = argparse.ArgumentParser()
-  parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
-  parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
-  parser.add_argument('-c','--config',nargs=1,type=str,default=[config.defaultSpecPath],help='specify different config file')
-  if debug: syslog.syslog("config path"+args.config[0])
-  args = parser.parse_args()
-  config.load(args.config[0])
-  im = master.isMaster()
+  try:
+    adGlobal.hasAudio = True
+    pname = sys.argv[0]
+    syslog.syslog(pname+" at "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+    os.environ['DISPLAY']=":0.0"
+    os.chdir(os.path.dirname(sys.argv[0]))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
+    parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
+    parser.add_argument('-c','--config',nargs=1,type=str,default=[config.defaultSpecPath],help='specify different config file')
+    args = parser.parse_args()
+    if debug: syslog.syslog("config path"+args.config[0])
+    config.load(args.config[0])
+  except Exception, e:
+    syslog.syslog("config error:"+str(e))
+    exit(5)
+  im =master.isMaster()
   host.useSlp = args.slp
   if args.slp:
     attr=""
@@ -72,6 +76,7 @@ if __name__ == '__main__':
       time.sleep(5)
     except KeyboardInterrupt:
       syslog.syslog(pname+": keyboard interrupt")
+      schlubExit = 5
       break
     except Exception as e:
       syslog.syslog(pname+":"+str(e))
