@@ -1,17 +1,8 @@
 {
   "soundMaxVol" : 0.5
   ,"eventDir" : "/media/pi/SOUND/events/"
+  ,"subnet" : "192.168.20"
   ,"hosts" : [
-    {"name" : "pi100", "ip" : "192.168.20.100", "isMaster" : false,  "displayEnabled" : false  }
-    ,{"name" : "pi101", "ip" : "192.168.20.101", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi102", "ip" : "192.168.20.102", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi103", "ip" : "192.168.20.103", "isMaster" : true,  "displayEnabled" : false }
-    ,{"name" : "pi104", "ip" : "192.168.20.104", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi105", "ip" : "192.168.20.105", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi106", "ip" : "192.168.20.106", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi107", "ip" : "192.168.20.107", "isMaster" : false, "displayEnabled" : false }
-    ,{"name" : "pi108", "ip" : "192.168.20.108", "isMaster" : false, "displayEnabled" : true }
-    ,{"name" : "pi109", "ip" : "192.168.20.109", "isMaster" : false, "displayEnabled" : true }
-    ,{"name" : "pi110", "ip" : "192.168.20.110", "isMaster" : false, "displayEnabled" : true }
+    {"name" : "pi110", "ip" : "192.168.0.110", "isMaster" : false, "displayEnabled" : true }
   ]
 }

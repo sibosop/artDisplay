@@ -169,6 +169,10 @@ def getRandomPhrases(n = 1): # for now, just pick one at random
   rv = requests.get(req)
   return json.loads(rv.text)
 
+def getPhrase(): # just one random phrase
+  rv = getRandomPhrases(1)
+  return rv[0]
+
 # =============================================
 #   database data ingestion routines
 # =============================================
@@ -303,21 +307,71 @@ def schlubSay(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
   for u in urls:
     r = requests.post(u, data=theData)
-    print r
+    print r.text
 
 # show a sentence on screen
 def schlubShow(phraseIn, urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
   for u in urls:
    r = requests.post(u, data=theData)
+   print r.text
 
 def schlubSoundVol(volIn, urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "SoundVol", "args": [volIn]})
   for u in urls:
     r = requests.post(u, data=theData)
-    print r
+    print r.text
 
 
+def schlubVol(volIn, urls=[schlubUrls[0]]):
+  theData = json.dumps({"cmd": "Volume", "args": [volIn]})
+  for u in urls:
+    r = requests.post(u, data=theData)
+    print r.text
+
+
+# ==============================================================================
+
+# make a dictionary keyed by pos of a postagged word list.
+def makePosDict(wordlist):
+  rv = {}
+  for w in wordlist:
+    tag = w[1]
+    wd = w[0]
+    if tag in rv:
+      rv[tag].append(wd)
+    else:
+      rv[tag] = [wd]
+
+  return rv
+
+def munge(phrase, wordlist, prob):
+  random.shuffle(wordlist)
+  posDict = makePosDict(wordlist)
+  print("===============================")
+  print(posDict)
+  print("===============================")
+  rv = []
+  for w in phrase[1]:
+    tag = w[1]
+    prob = random
+    if tag in posDict and random.random < prob and len(posDict[tag]) > 0:
+      rv.append(posDict[tag].pop())
+    else:
+      rv.append(w[0])
+  return rv
+
+def munge_test(prob):
+  ph = getPhrase()
+  wl = getRandomWords(40)
+  x  = munge(ph,wl, prob)
+  print ph
+  print
+  print wl
+  print
+  out = ' '.join(x)
+  print out
+  # schlubSay(out)
 
 # ============================================================================
 def byebye():

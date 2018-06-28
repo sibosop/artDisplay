@@ -14,6 +14,7 @@ import config
 
 useSlp = False
 hosts = []
+names = []
 def setHostList():
   global hosts
   if useSlp:
@@ -25,6 +26,8 @@ def setHostList():
     if len(hosts) == 0:
       for a in config.specs['hosts']:
         hosts.append(a)
+        if 'name' in a:
+          names.append(a['name'])
   return hosts
 
 def getHosts():
@@ -32,6 +35,12 @@ def getHosts():
   if len(hosts) == 0:
     setHostList()
   return hosts
+  
+def getHostIps():
+  rval = []
+  for h in hosts:
+    rval.append(h['ip'])
+  return rval
 
 def printHostList():
   global hosts
@@ -51,6 +60,13 @@ def sendToMaster(cmd):
       sendToHost(h['ip'],cmd)
       break
 
+def sendByName(nameList,cmd):
+  for n in nameList:
+    for h in config.specs['hosts']:
+      if h['name'] == n:
+        sendToHost(h['ip'],cmd)
+        break
+        
 def sendToHost(ip,cmd):
   try:
     print "send to host:",ip,cmd
@@ -65,6 +81,11 @@ def sendToHost(ip,cmd):
     print("got response:"+test)
   except Exception as e:
     print "host send error:",str(e)
+
+def sendWithSubnet(ip,cmd):
+  for i in ip:
+    h = config.specs['subnet']+"."+i
+    sendToHost(h,cmd)
 
 def sendToHosts(cmd):
   for h in hosts:
