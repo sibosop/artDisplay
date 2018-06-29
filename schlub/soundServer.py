@@ -10,7 +10,6 @@ import sys
 home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/shared")
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
-sys.path.append(home+"/GitProjects/artDisplay/poem")
 sys.path.append(home+"/GitProjects/artDisplay/config")
 sys.path.append(home+"/GitProjects/artDisplay/schlubInterfaces")
 import asoundConfig
@@ -20,11 +19,19 @@ import master
 import player
 import json
 import schlubSpeak
-import displayText
 import config
 import host
-
+import pygame
 debug=True
+screen=None
+myFont=None
+lineLen=None
+noLines=6
+lineLen = 25
+choke = 0
+FontFile = "../fonts/Watchword_bold_demo.otf"
+FilterDot = True
+FontSize = 90
 
 def jsonStatus(s):
   d = {}
@@ -91,6 +98,61 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'SoundVol' :  self.doSoundVol
 
     }
+
+  def displayText(self,text):
+    global screen
+    global myFont
+    global lineLen
+    
+    if myFont is None:
+      pygame.init()
+      screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+
+    if debug: syslog.syslog("displayText setting FontSize:"+str(FontSize))
+    myFont = pygame.font.Font(FontFile, FontSize)
+
+    if FilterDot:
+      text=text.replace("."," ")
+    text=text.strip()
+    words=text.split()
+    lines = []
+    r = ""
+    for w in words:
+      if (len(w) + len(r)) < lineLen:
+        r += w + " "
+      else:
+        lines.append(r)
+        r = w + " "
+    lines.append(r)
+    lines = lines[0:noLines]
+    i = 0
+    screen.fill((0,0,0))
+    labels = []
+    maxWidth = 0
+    maxHeight = 0
+    for l in lines:
+      label = myFont.render(l, 1, (255,255,0))
+      w = label.get_width()
+      h = label.get_height()
+      maxWidth = max(w,maxWidth)
+      maxHeight = max(h,maxHeight)
+      labels.append(label)
+        
+    numLabels = len(labels)
+    wordRect = pygame.Surface((maxWidth,(maxHeight*numLabels)-4))
+
+    i = 0
+    for l in labels:
+      h = l.get_height()
+      w = l.get_width()
+      offset = (wordRect.get_width() - w)/2
+      wordRect.blit(l,(offset,i*h))
+      i += 1
+    sx = (screen.get_width() - wordRect.get_width()) / 2
+    sy = (screen.get_height() - wordRect.get_height()) / 2
+    screen.blit(wordRect,(sx,sy))
+    pygame.display.flip() 
+
   def doSoundVol(self,cmd):
     vol = float(cmd['args'][0]) / 100.0
     schlubTrack.setSoundMaxVolume(vol)
@@ -121,7 +183,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return jsonStatus("ok")
 
   def doShow(self,cmd):
-    displayText.displayText(cmd['args']['phrase'])
+    self.displayText(cmd['args']['phrase'])
     return jsonStatus("ok")
 
   def doPhrase(self,cmd):
