@@ -143,21 +143,21 @@ class soundServer(BaseHTTPServer.HTTPServer):
 
   def setPlayMode(self,cmd):
     rval = jsonStatus("not_master")
-    if master.isMaster():
+    if schlub.isMaster():
       player.enable(cmd['cmd'] == "Auto")
       rval = jsonStatus("ok")
     return rval
 
   def doRefresh(self,cmd):
     rval = jsonStatus("not_master")
-    if master.isMaster():
+    if schlub.isMaster():
       soundFile.refresh()
       rval = jsonStatus("ok")
     return rval
 
   def doRescan(self,cmd):
     rval = jsonStatus("not_master")
-    if master.isMaster():
+    if schlub.isMaster():
       soundFile.rescan()
       rval = jsonStatus("ok")
     return rval
@@ -166,7 +166,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state = {}
     state['status'] = "ok"
     state['vol'] = asoundConfig.getVolume()
-    state['isMaster'] = master.isMaster()
+    state['isMaster'] = schlub.isMaster()
     state['sound'] = schlubTrack.getCurrentSound()
     phrase = ""
     phraseArg = schlubSpeak.getCurrentPhrase()
@@ -178,7 +178,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     state['threads'] = len(schlubTrack.eventThreads)
     state['speaker'] = asoundConfig.getHw()['SpeakerBrand']
     state['auto'] = player.isEnabled() 
-    if master.isMaster():
+    if schlub.isMaster():
       state['collection'] = soundFile.getCurrentCollection()
       state['maxEvents'] = soundFile.maxEvents
     else:

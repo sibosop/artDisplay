@@ -105,6 +105,7 @@ def isLocalHost(ip):
   if debug: syslog.syslog("isLocalHost is False:"+ip)
   return False
 
+
 if __name__ == '__main__':
   run=True
   parser = argparse.ArgumentParser()

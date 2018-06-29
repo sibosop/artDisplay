@@ -57,6 +57,9 @@ class playerThread(threading.Thread):
         for h in host.getHosts():
           choice = random.choice(e)
           ip = h['ip']
+          if not h['hasMusic']:
+            if debug: syslog.syslog("skipping :"+ip)
+            continue
           if host.isLocalHost(ip):
             if debug: syslog.syslog("sending "+choice+" request to localhost("+ip+")")
             schlubTrack.setCurrentSound({'file' : choice})

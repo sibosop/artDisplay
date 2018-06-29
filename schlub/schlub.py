@@ -20,11 +20,25 @@ import schlubSpeak
 import config
 import argparse
 import host
+import subprocess
 
 debug = True
 numSchlubThreads=1
 schlubExit = 0
 
+masterFlag = None
+def isMaster():
+  global masterFlag
+  if masterFlag is None:
+    masterFlag = False
+    ip = subprocess.check_output(["hostname","-I"]).strip()
+    for h in config.specs['hosts']:
+      if debug: syslog.syslog("host:"+str(h)+" ip:"+ip)
+      if ip == h['ip']:
+        masterFlag = h['isMaster']
+        break
+  if debug: syslog.syslog("isMaster:"+str(masterFlag)) 
+  return masterFlag 
 eventThreads=[]
 def startEventThread(t):
   global eventThreads
@@ -49,7 +63,7 @@ if __name__ == '__main__':
   except Exception, e:
     syslog.syslog("config error:"+str(e))
     exit(5)
-  im =master.isMaster()
+  im =isMaster()
   host.useSlp = args.slp
   if args.slp:
     attr=""
