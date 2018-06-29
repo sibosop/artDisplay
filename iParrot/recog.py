@@ -6,6 +6,10 @@ import syslog
 import os
 import io
 import grpc
+import sys
+home = os.environ['HOME']
+sys.path.append(home+"/GitProjects/artDisplay/bottery")
+import dataio as dio
 
 from google.cloud import speech
 from google.cloud.speech import enums
@@ -69,6 +73,7 @@ class recogThread(threading.Thread):
               for alternative in alternatives:
                 syslog.syslog('Confidence: {}'.format(alternative.confidence))
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
+                dio.schlubShow(alternative.transcript, [dio.parrotDisplayUrl])
                 out={}
                 out['trans'] = alternative.transcript
                 out['confidence'] = alternative.confidence

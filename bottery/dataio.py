@@ -46,6 +46,7 @@ import atexit
 from shutil import copyfile
 from textblob import TextBlob
 from textblob import Word
+import itertools
 
 import socket
 myIP = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
@@ -53,34 +54,49 @@ print("myIP", myIP)
 
 debug = True
 
-parrotUrl   = "http://{}:8085/data".format(myIP)
-schlubUrls  = ["http://{}:8080".format(myIP)]
-wordsUrl    = "http://{}:8081".format(myIP)
-datamuseUrl = "http://api.datamuse.com/words"
+parrotUrl        = "http://{}:8085/data".format(myIP)
+parrotDisplayUrl = "http://192.168.20.111:8080"
+schlubUrls       = ["http://{}:8080".format(myIP)]
+wordsUrl         = "http://{}:8081".format(myIP)
+datamuseUrl      = "http://api.datamuse.com/words"
 
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
 voices = ['en-au', 'en-uk', 'en', 'de']
 default_voice = 'en-au'
 
-
-sql_conn = sqlite3.connect(sqlite_filename)
-sql_c = sql_conn.cursor()
+config_net = {} # will be overwritten by read of schlub.js in init()
 
 # utility convert u'blahblah' strings from unicode to ascii
 def nu(s):
   return s.encode('ascii', 'ignore')
 
-def setSchlubUrls(arrIn):
-  global schlubUrls
-  schlubUrls = arrIn
+def init_sql():
+  global sql_conn, sql_c
 
-def setParrotUrl(urlIn):
-  global parrotUrl
-  parrotUrl = urlIn
+  sql_conn = sqlite3.connect(sqlite_filename)
+  sql_c = sql_conn.cursor()
+
+def db_report():
+  print "stopwords length: {}".format(len(stopwords))
+  sql_c.execute("select count() from word;")
+  print("words in database: {}".format(sql_c.fetchone()[0]))
+  sql_c.execute("select count() from phrase;")
+  print ("phrases in database: {}".format(sql_c.fetchone()[0]))
+
 
 def init():
-  global stopwords, words
+  global stopwords, words, config_net
+  global schlubUrls, parrotUrl
+
+  # first read schlub.json with ip addresses of all our
+  with open("../config/schlub.json") as jsconfig:
+    config_net  = json.load(jsconfig)
+
+  schlubUrls = list()
+  for h in config_net['hosts']:
+    # print h
+    schlubUrls.append("http://{}:8080".format(h['ip']))
 
   # load up 'database' dict objects from json files
   with open(stopwords_filename) as json_stopwords:   
@@ -91,13 +107,10 @@ def init():
   #test -- print out wordtank
   # print("words", words)
   # print(stopwords)
-  print("====== DATAIO ============")
-  print("stopwords length: {}".format(len(stopwords)))
-  sql_c.execute("select count() from word;")
-  print("words in database: {}".format(sql_c.fetchone()[0]))
-  sql_c.execute("select count() from phrase;")
-  print("phrases in database: {}".format(sql_c.fetchone()[0]))
-  print("====== DATAIO ============")
+  print "====== DATAIO ============"
+  print "schlubUrls: ", schlubUrls
+  print "parrotUrl", parrotUrl
+  print "====== DATAIO ============"
  
 # ================================
 #  sqlite select query routines
@@ -180,16 +193,19 @@ def getPhrase(): # just one random phrase
 # doesnt do sql COMMIT!!
 def ingestTaggedWord(word, pos="NN", ts=-1, src="ip"):
   if ts < 0:  ts = time.time()
-  print (word,pos,ts,src)
+  # print (word,pos,ts,src)
   try:
     sql =  "insert into word (w, pos, ts, src) values ('{}', '{}', {},'{}'); "\
           .format(word,pos, ts, src)
-    #print(sql)
+    print(sql)
     sql_c.execute(sql)
   except sqlite3.IntegrityError:  # constraint w, pos unique violated: UPDATE count and ts instead of INSERTing
     sql = "update word SET cnt = cnt+1, ts={} where w = '{}' and pos = '{}';".format(ts, word, pos)
     print("DUPLICATE: "+ word + ' ' + pos)
+    print sql
     sql_c.execute(sql)
+  except Exception, e:
+    print e
 
 # doesnt do sql COMMIT!!  tw = array of word,pos pairs as textblob .tags
 def ingestTaggedPhrase(phraseText, tw, ts=-1, src="??"):
@@ -229,14 +245,14 @@ def ingestWords(theText, ts=-1, src="ip"):
   sql_conn.commit()
 
 # ingest a text file into open words.db. not suitable for json files.
-def file2WordDb(fname, src):
+def ingestFileWords(fname, src):
   with open(fname) as fp:  
    line = fp.readline()
    cnt = 1
    while line:
        if len(line) > 5:
          try:
-          text2WordDB(line.strip(), -1, src)
+          ingestWords(line.strip(), -1, src)
           if cnt % 50 == 0:
             print(" {}".format(cnt))
          except:
@@ -245,13 +261,13 @@ def file2WordDb(fname, src):
        cnt += 1
 
 # ingest a text file, w one phrase per line, into open words.db phrase table. not suitable for json files.
-def file2PhraseDb(fname, src):
+def ingestFilePhrases(fname, src):
   with open(fname) as fp:  
    line = fp.readline()
    cnt = 1
    while line:
     try:
-      text2PhraseDB(line.strip(), src)
+      ingestPhrase(line.strip(), src)
       if cnt % 50 == 0:
         print(" {}".format(cnt))
     except:
@@ -307,14 +323,15 @@ def schlubSay(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
   for u in urls:
     r = requests.post(u, data=theData)
-    print r.text
+    #print r.text
 
 # show a sentence on screen
 def schlubShow(phraseIn, urls=[schlubUrls[0]]):
+  # print urls
   theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
   for u in urls:
    r = requests.post(u, data=theData)
-   print r.text
+   # print r.text
 
 def schlubSoundVol(volIn, urls=[schlubUrls[0]]):
   theData = json.dumps({"cmd": "SoundVol", "args": [volIn]})
@@ -331,6 +348,10 @@ def schlubVol(volIn, urls=[schlubUrls[0]]):
 
 
 # ==============================================================================
+
+def mergeWordlists(listOfWordlists):
+  x = list(itertools.chain.from_iterable(listOfWordLists))
+  return x
 
 # make a dictionary keyed by pos of a postagged word list.
 def makePosDict(wordlist):
@@ -354,40 +375,70 @@ def munge(phrase, wordlist, prob):
   rv = []
   for w in phrase[1]:
     tag = w[1]
-    prob = random
-    if tag in posDict and random.random < prob and len(posDict[tag]) > 0:
+    if tag in posDict \
+    and (random.random() < prob) \
+    and len(posDict[tag]) > 0 \
+    and w[0] != 'I':
+      print " subst", prob,
       rv.append(posDict[tag].pop())
     else:
+      print " orig", prob,
       rv.append(w[0])
   return rv
 
+def wjoin(x):
+  rv = ''
+  for w in x:
+    # print('|'+rv+'| {'+w+'}')
+    if w in "!.,;?":
+      rv += w
+    else:
+      rv += ' '+w
+  return rv.strip().replace('...','').replace('_', ' ').replace('-', '')
+
 def munge_test(prob):
+  init_sql()
   ph = getPhrase()
   wl = getRandomWords(40)
   x  = munge(ph,wl, prob)
-  print ph
-  print
-  print wl
-  print
-  out = ' '.join(x)
+  out = wjoin(x)
+  if not (out[-1] in "!.,;?"): out += '.'
+  print ph[1]
+  print ph[0]
   print out
-  # schlubSay(out)
+  schlubShow(out)
+  schlubSay(out, random.choice(['en', 'en-uk', 'en-au', 'fr', 'de']))
+  #schlubShow(out)
+
+def munge_new(prob):
+  init_sql()
+  ph = getPhrase()
+  wl = getNewWords(40)
+  x  = munge(ph,wl, prob)
+  out = wjoin(x)
+  if not (out[-1] in "!.,;?"): out += '.'
+  print ph[1]
+  print ph[0]
+  print out
+  schlubShow(out)
+  schlubSay(out, random.choice(['en', 'en-uk', 'en-au', 'fr', 'de']))
+  #schlubShow(out)
+
 
 # ============================================================================
-def byebye():
-  sql_conn.close()
-  # save updated json words database file.
-  # write a backup of the old file before writing.
+# def byebye():
+#   sql_conn.close()
+#   # save updated json words database file.
+#   # write a backup of the old file before writing.
 
-  # global words
-  # copyfile(words_filename, words_filename + '.bu'+str(int(time.time())))
-  # with open(words_filename, 'w') as outfile:  
-  #   json.dump(words, outfile, indent=2)
-  # print('updated wordtank', words)
+#   # global words
+#   # copyfile(words_filename, words_filename + '.bu'+str(int(time.time())))
+#   # with open(words_filename, 'w') as outfile:  
+#   #   json.dump(words, outfile, indent=2)
+#   # print('updated wordtank', words)
 
-  print("dataio sez byebye")
+#   print("dataio sez byebye")
 
-atexit.register(byebye)
 
 init()
 

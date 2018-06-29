@@ -151,6 +151,7 @@ class phraseSender(threading.Thread):
     syslog.syslog("starting: "+self.name)
     list = []
     changed = False
+    dio.init_sql()
     while True:
       #try:
         input = self.source.get()

@@ -11,6 +11,7 @@ PORT = 8081
 
 print("myIP", myIP, "port", PORT)
 
+dio.init_sql()
 
 class GetHandler(BaseHTTPRequestHandler):
     
