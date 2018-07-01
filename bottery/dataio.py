@@ -65,7 +65,11 @@ sqlite_filename    = "../lists/words.db"
 voices = ['en-au', 'en-uk', 'en', 'de']
 default_voice = 'en-au'
 
-config_net = {} # will be overwritten by read of schlub.js in init()
+config = {} # will be overwritten by read of config/schlub.js in init()
+
+# to be init'ed by init()
+sql_conn = ''
+sql_c    = ''
 
 # utility convert u'blahblah' strings from unicode to ascii
 def nu(s):
@@ -86,17 +90,18 @@ def db_report():
 
 
 def init():
-  global stopwords, words, config_net
+  global stopwords, words, config
   global schlubUrls, parrotUrl
 
   # first read schlub.json with ip addresses of all our
-  with open("../config/schlub.json") as jsconfig:
-    config_net  = json.load(jsconfig)
+  with open("../config/schlub.json") as fp:
+    config  = json.load(fp)
 
   schlubUrls = list()
-  for h in config_net['hosts']:
-    # print h
-    schlubUrls.append("http://{}:8080".format(h['ip']))
+  for hd in config['hosts']:
+     schlubUrls.append("http://{}:{}".format(hd['ip'], config['schlubServerPort']))
+
+  parrotUrl = "http://{}:{}".format(config['parrotIp'], config['wordServerPort'])
 
   # load up 'database' dict objects from json files
   with open(stopwords_filename) as json_stopwords:   
@@ -116,8 +121,12 @@ def init():
 #  sqlite select query routines
 # ================================
 
-def selectNewWords(n=10, src="ip"):
-  sql = "select * from word where src = '{}' ".format(src)
+def selectNewWords(n=10, pos=''):
+  if len(pos) > 0:
+    pos = "'"+pos.replace(' ', "','")+"'"
+    sql = "select * from word where pos in ({}) ".format(pos)
+  else:
+    sql = "select * from word "
   sql += "order by ts desc limit {};".format(n)
   if debug:
     print(sql)
@@ -125,8 +134,12 @@ def selectNewWords(n=10, src="ip"):
   newWords = list(sql_c.fetchall())
   return(newWords)
 
-def selectRandomWords(n=10):
-  sql = "select * from word "
+def selectRandomWords(n=10, pos=''):
+  if len(pos) > 0:
+    pos = "'"+pos.replace(' ', "','")+"'"
+    sql = "select * from word where pos in ({}) ".format(pos)
+  else:
+    sql = "select * from word "
   sql += "order by RANDOM() limit {};".format(n)
   if debug:
     print(sql)
@@ -140,11 +153,14 @@ def selectRandomPhrases(n=1, src= "any"):
   if src != "any":
     sql += " where src = '{}' ".format(src)
   sql +=" order by RANDOM() LIMIT {};".format(n)
+  if debug:
+    print(sql)
   sql_c.execute(sql)
   sr = sql_c.fetchall()
+  #return sr
   # tw array is stringified in db; restore it to objecthood
   rv =  [[r[0], json.loads(r[1]), r[2], r[3]] for r in sr]
-  return rv
+  return(rv)
 
 # ================================================
 #  http wordserver client routines
@@ -153,16 +169,16 @@ def selectRandomPhrases(n=1, src= "any"):
 def getNewWords(n=10,  pos=''):
   if len(pos) > 0:
     pos = pos.replace(' ', '+')
-    req = wordsUrl+'/nw?n='+str(n)+'&r='+str(nrand)+'&pos='+pos
+    req = wordsUrl+'/nw?n='+str(n)+'&pos='+pos
     #print req
     rv = requests.get(req)
   else:
     req = wordsUrl+'/nw?n='+str(n)
-    print('req', req)
+    #print('req', req)
     rv = requests.get(req)
-    print('rv', rv.text)
+    # print('rv', rv.text)
 
-  return json.loads(rv.text)
+  return json.loads(rv.text)['data']
 
 def getRandomWords(n=10, pos=''):
   if len(pos) > 0:
@@ -175,12 +191,14 @@ def getRandomWords(n=10, pos=''):
     #print req
     rv = requests.get(req)
 
-  return json.loads(rv.text)
+  return json.loads(rv.text)['data']
 
-def getRandomPhrases(n = 1): # for now, just pick one at random
-  req = wordsUrl+'/ph?n='+str(n)
+def getRandomPhrases(n = 1, src= ''): # for now, just pick one at random
+  req = req = wordsUrl+'/ph?n='+str(n)
+  if len(src) > 0:
+   req += '&src='+src
   rv = requests.get(req)
-  return json.loads(rv.text)
+  return json.loads(rv.text)['data']
 
 def getPhrase(): # just one random phrase
   rv = getRandomPhrases(1)
@@ -211,11 +229,11 @@ def ingestTaggedWord(word, pos="NN", ts=-1, src="ip"):
 def ingestTaggedPhrase(phraseText, tw, ts=-1, src="??"):
   if ts < 0:  ts = time.time()
   phraseText.replace("'", "''")
-  tw_str = 'dummy string' #json.dumps(tw)
+  tw_str = json.dumps(tw)
   sql =  "insert into phrase (ph, tw, ts, src) values ('{}', '{}', {},'{}'); "\
           .format(phraseText,tw_str, ts, src)
   try:
-    print(sql)
+    # print(sql)
     sql_c.execute(sql)
   except:
     print("ERROR ", sql)
@@ -269,12 +287,14 @@ def ingestFilePhrases(fname, src):
     try:
       ingestPhrase(line.strip(), src)
       if cnt % 50 == 0:
-        print(" {}".format(cnt))
+        print " {}".format(cnt),
+        sys.stdout.flush()
     except:
       print("error reading line ", cnt)
     line = fp.readline()
     cnt += 1
   sql_conn.commit()
+  print (cnt - 1)
 
 
 # ===========================================
@@ -441,5 +461,6 @@ def munge_new(prob):
 
 
 init()
+init_sql()
 
 
