@@ -62,6 +62,7 @@ def doShow(cmd):
   phrase = ""
   for c in parms.words:
     phrase += c + " "
+  args={}
   args['phrase'] = phrase
   sendCargs(parms,{'cmd' : cmd[0], 'args' : args })
   return 0

@@ -5,7 +5,7 @@ defaultSpecPath = home+"/GitProjects/artDisplay/config/schlub.json"
 import json
 specs = None
 
-def load(specPath):
+def load(specPath=defaultSpecPath):
   global specs
   with open(specPath) as f:
     specs = json.load(f)

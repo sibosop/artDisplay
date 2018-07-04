@@ -23,7 +23,9 @@ def setHostList():
     #print "getting host list from slp"
     hosts = slp.getHosts("schlub")
   else:
-    #print "getting host from specs"
+    print "getting host from specs"
+    if config.specs == None:
+      config.load()
     if len(hosts) == 0:
       for a in config.specs['hosts']:
         hosts.append(a)
@@ -69,6 +71,7 @@ def sendByName(nameList,cmd):
         break
         
 def sendToHost(ip,cmd):
+  rval = True
   try:
     print "send to host:",ip,cmd
     url = "http://"+ip+":8080"
@@ -81,6 +84,8 @@ def sendToHost(ip,cmd):
     print("got response:"+test)
   except Exception as e:
     print "host send error:",str(e)
+    rval = False
+  return rval
 
 def sendWithSubnet(ip,cmd):
   for i in ip:
