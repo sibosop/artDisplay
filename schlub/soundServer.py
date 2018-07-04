@@ -103,10 +103,18 @@ class soundServer(BaseHTTPServer.HTTPServer):
     global screen
     global myFont
     global lineLen
+    global noLines
     
     if myFont is None:
       pygame.init()
       screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+      if debug: syslog.syslog("screen h:"+str(screen.get_height())
+              + " screen w:" + str(screen.get_width()))
+      if screen.get_width() == 800:
+        lineLen = 16
+        noLines = 4
+      if debug: syslog.syslog("line len:"+str(lineLen)+ " lines:"+str(noLines))
+
 
     if debug: syslog.syslog("displayText setting FontSize:"+str(FontSize))
     myFont = pygame.font.Font(FontFile, FontSize)
