@@ -5,8 +5,8 @@
 
   "hosts" : [
     {
-      "ip" : "192.168.0.109", 
-      "name": "pi109", 
+      "ip" : "192.168.0.106", 
+      "name": "pi106", 
       "isMaster" : true, 
       "hasParrot" : true,
       "hasAudio" : true,

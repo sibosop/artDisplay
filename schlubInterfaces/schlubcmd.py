@@ -66,6 +66,18 @@ def doShow(cmd):
   args['phrase'] = phrase
   sendCargs(parms,{'cmd' : cmd[0], 'args' : args })
   return 0
+  
+def doPlay(cmd):
+  parse=argparse.ArgumentParser(prog=cmd[0],parents=[defParse]) 
+  parse.add_argument('path',nargs='?',default="")
+  parms=parse.parse_args(cmd[1:])
+  print parms
+  args={}
+  args['path'] = parms.path
+  sendCargs(parms,{'cmd' : cmd[0], 'args' : args })
+  return 0
+  
+
 
 langFile = home+"/GitProjects/artDisplay/lists/lang_codes.json"
 langs=[]
@@ -109,6 +121,7 @@ def printCmds(cmd):
 
 cmds = {
       'Probe'     : doCmd
+      ,'Play' : doPlay
       ,'Show'     : doShow
       ,'Volume'   : doNum
       ,'Phrase'   : doPhrase
