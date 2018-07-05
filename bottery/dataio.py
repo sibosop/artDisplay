@@ -321,18 +321,25 @@ def datamuse(word, refcode='rel_trg'):
   # rel_jjb = return an adjective
   # rel_ant = antonym
   # for full list see https://www.datamuse.com/api/
-  url = "{}?{}={}&md=p".format(datamuseUrl,refcode, word)
+  url = "{}?{}={}&md=pf".format(datamuseUrl,refcode, word)
   print("datamuse request: url: "+url)
   r = requests.get(url)
   rj = r.json()
-  # convert returned data to format used in phrase table: each entry is [<word>,<postag>]
+  # convert returned data to format used in phrase table, with addition
+  # if word frequency:  each entry is [<word>,<postag>, <frequency>]
   # verb form is unknow, just give 'V'.. 'XX' for unknown
   trans = {'n': 'NN', 'v': 'V', 'adj': 'JJ', 'adv': 'RB', 'u': 'XX'}
   rv = []
   for x in rj:
     xout = []
     xout.append(x['word'])
-    xout.append(trans[x['tags'][0]])
+    xout.append(trans[x['tags'][0]]) #pos
+    wftag = x['tags'][1]
+    print x['word'],wftag
+    if 'f:' in wftag:
+      xout.append(wftag[2:]) #word frequency
+    else:
+      xout[1] = 'NNP'
     rv.append(xout)
   return rv 
   
@@ -369,8 +376,8 @@ def schlubVol(volIn, urls=[schlubUrls[0]]):
 
 # ==============================================================================
 
-def mergeWordlists(listOfWordlists):
-  x = list(itertools.chain.from_iterable(listOfWordLists))
+def list_merge(*theLists): # each arg should be a word list
+  x = list(itertools.chain.from_iterable(theLists))
   return x
 
 # make a dictionary keyed by pos of a postagged word list.
@@ -385,6 +392,17 @@ def makePosDict(wordlist):
       rv[tag] = [wd]
 
   return rv
+
+# join a list of (untagged) words into a pronouncable phrase.
+def wjoin(x):
+  rv = ''
+  for w in x:
+    # print('|'+rv+'| {'+w+'}')
+    if w in "!.,;?":
+      rv += w
+    else:
+      rv += ' '+w
+  return rv.strip().replace('...','').replace('_', ' ').replace('-', '')
 
 def munge(phrase, wordlist, prob):
   random.shuffle(wordlist)
@@ -406,15 +424,6 @@ def munge(phrase, wordlist, prob):
       rv.append(w[0])
   return rv
 
-def wjoin(x):
-  rv = ''
-  for w in x:
-    # print('|'+rv+'| {'+w+'}')
-    if w in "!.,;?":
-      rv += w
-    else:
-      rv += ' '+w
-  return rv.strip().replace('...','').replace('_', ' ').replace('-', '')
 
 def munge_test(prob):
   init_sql()
@@ -441,7 +450,7 @@ def munge_new(prob):
   print ph[0]
   print out
   schlubShow(out)
-  schlubSay(out, random.choice(['en', 'en-uk', 'en-au', 'fr', 'de']))
+  schlubSay(out, random.choice(['en', 'en-uk', 'en-au', 'de']))
   #schlubShow(out)
 
 
