@@ -54,10 +54,10 @@ print("myIP", myIP)
 
 debug = True
 
-parrotUrl        = "http://{}:8085/data".format(myIP)
-parrotDisplayUrl = "http://192.168.20.111:8080"
-schlubUrls       = ["http://{}:8080".format(myIP)]
-wordsUrl         = "http://{}:8081".format(myIP)
+parrotUrl        = None
+parrotDisplayUrl = None
+schlubUrls       = None
+wordsUrl         = None
 datamuseUrl      = "http://api.datamuse.com/words"
 
 stopwords_filename = "../lists/stopwords.json"
@@ -91,7 +91,7 @@ def db_report():
 
 def init():
   global stopwords, words, config
-  global schlubUrls, parrotUrl
+  global schlubUrls, parrotUrl, parrotDisplayUrl
 
   # first read schlub.json with ip addresses of all our
   with open("../config/schlub.json") as fp:
@@ -102,6 +102,7 @@ def init():
      schlubUrls.append("http://{}:{}".format(hd['ip'], config['schlubServerPort']))
 
   parrotUrl = "http://{}:{}".format(config['parrotIp'], config['wordServerPort'])
+  parrotDisplayUrl = "http://{}:{}".format(config['parrotDisplayIp'], config['schlubServerPort'])
 
   # load up 'database' dict objects from json files
   with open(stopwords_filename) as json_stopwords:   
@@ -115,7 +116,14 @@ def init():
   print "====== DATAIO ============"
   print "schlubUrls: ", schlubUrls
   print "parrotUrl", parrotUrl
+  print "parrotDisplayUrl", parrotDisplayUrl
   print "====== DATAIO ============"
+
+
+init()
+init_sql()
+
+
  
 # ================================
 #  sqlite select query routines
@@ -322,7 +330,7 @@ def datamuse(word, refcode='rel_trg'):
   # rel_ant = antonym
   # for full list see https://www.datamuse.com/api/
   url = "{}?{}={}&md=pf".format(datamuseUrl,refcode, word)
-  print("datamuse request: url: "+url)
+  # print("datamuse request: url: "+url)
   r = requests.get(url)
   rj = r.json()
   # convert returned data to format used in phrase table, with addition
@@ -354,7 +362,7 @@ def schlubSay(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
 
 # show a sentence on screen
 def schlubShow(phraseIn, urls=[schlubUrls[0]]):
-  # print urls
+  #print urls
   theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
   for u in urls:
    r = requests.post(u, data=theData)
@@ -373,10 +381,17 @@ def schlubVol(volIn, urls=[schlubUrls[0]]):
     r = requests.post(u, data=theData)
     print r.text
 
+# play one sound.. path relative to artDisplay/schlub
+def schlubPlay(filepath, urls=[schlubUrls[0]]):
+  theData = json.dumps({"cmd" : "Play", "args": { "path" : filepath}})
+  for u in urls:
+    r = requests.post(u, data=theData)
+    print r.text
+
 
 # ==============================================================================
 
-def list_merge(*theLists): # each arg should be a word list
+def listMerge(*theLists): # each arg should be a word list
   x = list(itertools.chain.from_iterable(theLists))
   return x
 
@@ -468,8 +483,5 @@ def munge_new(prob):
 
 #   print("dataio sez byebye")
 
-
-init()
-init_sql()
 
 

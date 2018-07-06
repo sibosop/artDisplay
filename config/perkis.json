@@ -17,7 +17,8 @@
   ],
 
   "wordServerPort": 8081,
-  "schlubServerPort": 8085,
+  "schlubServerPort": 8080,
 
-  "parrotIp": "192.168.0.109"
+  "parrotIp"         : "192.168.0.106",
+  "parrotDisplayIp" :  "192.168.0.106"
 }

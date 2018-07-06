@@ -37,32 +37,6 @@ def wait_key():
     return result
 
 
-def utter(langIn= default_voice):
-  thePhrase = dio.getPhraseDb()
-
-  words = dio.getwords(20,'NN', 'NNP', 'NNS', 'JJ')
-  print(thePhrase[0], words)
-
-  # # get a phrase from the subtitle file
-  # srtlen = len(dio.srt)
-  # thePhrase = dio.srt[random.randint(0, srtlen)]
-  # print "utter: srt len = {}".format(srtlen)
-  # print "srt = {}".format(theSRT)
-  # # get a bunch of recent words from the word db
-  # dbWords =  dio.getwords(20, 'NN', 'NNP', 'NNS','JJ')
-  # print("dbWords: {}".format(dbWords))
-
-  # # substitute some words in the srt phrase
-  # rv = []
-  # for w in thePhrase['tw']:
-  #   if w[1] in ['NN', 'NNP', 'NNS', 'JJ']:
-  #     rv.append(dio.dbWords.pop()[0])
-  #   else:
-  #    rv.append(w[0])
-  # # print rv
-  # rvs = ' '.join(rv).strip().replace('.','').replace(" ' ","'").replace("_"," ")
-  # print(rvs)
-  dio.schlubSay(thePhrase[0],default_voice)
 
 if __name__ == '__main__':
 # pname = sys.argv[0]
@@ -70,7 +44,7 @@ if __name__ == '__main__':
 # last_timestamp = 0 
 # init()
 
-  voices = ['en', 'en-uk', 'en-au', 'fr', 'de']
+  voices = ['en', 'en-uk', 'en-au']
 
   dio.schlubSoundVol(30)
   cont = True
@@ -78,14 +52,15 @@ if __name__ == '__main__':
     #k = wait_key()
     thePhrase = dio.getPhrase()
     nwords = dio.getNewWords()
-    rwords = dio.getRandomWords()
-    allwords = dio.mergeWordlists(nwords, rwords)
-    wdict = dio.makePosDict(allwords)
+    dmu_word =  (random.choice(nwords))[0]
+    rwords = dio.datamuse(dmu_word)
+    allwords = dio.listMerge(nwords, rwords)
+    x  = dio.munge(thePhrase,allwords, 0.4)
+    out = dio.wjoin(x)
     theVoice = random.choice(voices)
-    print(theVoice, thePhrase)
-    dio.get
-    dio.schlubSay(thePhrase[0], theVoice)
-    delay = random.randint(5,11)
+    print(theVoice, thePhrase[0], out)
+    dio.schlubSay(out, theVoice)
+    delay = random.randint(7,8)
     print("delay {}".format(delay))
     time.sleep(delay)
     # if k == 'q':

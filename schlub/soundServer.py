@@ -96,7 +96,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'PhraseScatter' : self.doPhraseScatter
       ,'MaxEvents' : self.doMaxEvents
       ,'SoundVol' :  self.doSoundVol
-
+      ,'Play' : self.doPlay
     }
 
   def displayText(self,text):
@@ -160,6 +160,9 @@ class soundServer(BaseHTTPServer.HTTPServer):
     sy = (screen.get_height() - wordRect.get_height()) / 2
     screen.blit(wordRect,(sx,sy))
     pygame.display.flip() 
+
+  def doPlay(self,cmd):
+    return jsonStatus(schlubTrack.play(cmd))
 
   def doSoundVol(self,cmd):
     vol = float(cmd['args'][0]) / 100.0

@@ -23,6 +23,21 @@ speedChangeMin = .25
 volLock = threading.Lock()
 soundMaxVol=.5
 
+def play(cmd):
+  rval = "ok"
+  try:
+    path=cmd['args']['path']
+    if debug: syslog.syslog("Path Play: playing:"+path);
+    sound = pygame.mixer.Sound(file=path)
+    l = soundMaxVol;
+    r = l
+    soundTrack.playSound(sound,l,r)
+  except Exception as e:
+    syslog.syslog(self.name+": error on "+path+":"+str(e))
+    rval = "Fail"
+  return "rval"
+
+
 def setSoundMaxVolume(vol):
   global soundMaxVol
   syslog.syslog("setting vol to;"+str(vol))
