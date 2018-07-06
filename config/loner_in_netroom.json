@@ -1,0 +1,24 @@
+{
+  "soundMaxVol" : 0.5,
+  "eventDir" : "/media/pi/SOUND/events/",
+  "subnet" : "192.168.0",
+
+  "hosts" : [
+    {
+      "ip" : "192.168.20.111", 
+      "name": "pi106", 
+      "isMaster" : true, 
+      "hasParrot" : true,
+      "hasAudio" : true,
+      "hasScreen" : true,
+      "hasMusic" : true,
+      "displayEnabled" : true 
+    }
+  ],
+
+  "wordServerPort": 8081,
+  "schlubServerPort": 8080,
+
+  "parrotIp"         : "192.168.20.111",
+  "parrotDisplayIp" :  "192.168.20.111"
+}
