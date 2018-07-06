@@ -110,6 +110,7 @@ def doPhrase(cmd):
 
 def doQuit(args):
   print "bye"
+  readline.write_history_file()
   return -1
 
 
@@ -139,11 +140,27 @@ cmds = {
     }
 
 
+def completer(text, state):
+  options = [i for i in cmds.keys() if i.upper().startswith(text.upper())]
+  if state < len(options):
+      return options[state]
+  else:
+      return None
+    
+
+
   
 
 
 if __name__ == '__main__':
   run=True
+  try:
+    readline.read_history_file()
+  except:
+    pass
+  readline.parse_and_bind("bind ^I rl_complete")
+  #readline.parse_and_bind("tab: complete")
+  readline.set_completer(completer)
   parser = argparse.ArgumentParser()
   parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
   parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
@@ -171,7 +188,7 @@ if __name__ == '__main__':
       if cmds[cmdargs.cmd[0]](inp) == -1:
         break
     except KeyboardInterrupt:
-      print "bye"
+      doQuit("")
       break
     except Exception, e:
       print "got exception"
