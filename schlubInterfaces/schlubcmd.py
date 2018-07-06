@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import subprocess
+import platform
 
 import os
 home = os.environ['HOME']
@@ -14,6 +15,7 @@ import readline
 
 debug=True
 
+isRaspberry=platform.uname()[1] == 'raspberrypi'
 
 defParse=None
 
@@ -158,8 +160,10 @@ if __name__ == '__main__':
     readline.read_history_file()
   except:
     pass
-  readline.parse_and_bind("bind ^I rl_complete")
-  #readline.parse_and_bind("tab: complete")
+  if isRaspberry:
+    readline.parse_and_bind("tab: complete")
+  else:
+    readline.parse_and_bind("bind ^I rl_complete")
   readline.set_completer(completer)
   parser = argparse.ArgumentParser()
   parser.add_argument('-s', '--slp', action='store_true', help='use slp instead of config') 
