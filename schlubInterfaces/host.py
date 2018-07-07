@@ -23,7 +23,7 @@ def setHostList():
     #print "getting host list from slp"
     hosts = slp.getHosts("schlub")
   else:
-    print "getting host from specs"
+    if debug: print "getting host from specs"
     if config.specs == None:
       config.load()
     if len(hosts) == 0:
@@ -73,17 +73,17 @@ def sendByName(nameList,cmd):
 def sendToHost(ip,cmd):
   rval = True
   try:
-    print "send to host:",ip,cmd
+    if debug: print "send to host:",ip,cmd
     url = "http://"+ip+":8080"
-    print("url:"+url)
-    print("cmd json:"+json.dumps(cmd))
+    if debug: print("url:"+url)
+    if debug: print("cmd json:"+json.dumps(cmd))
     req = urllib2.Request(url
                 ,json.dumps(cmd),{'Content-Type': 'application/json'})
     f = urllib2.urlopen(req,None,timeout)
     test = f.read()
-    print("got response:"+test)
+    if debug: print("got response:"+test)
   except Exception as e:
-    print "host send error:",str(e)
+    if debug: print "host send error:",str(e)
     rval = False
   return rval
 

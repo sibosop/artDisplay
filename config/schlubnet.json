@@ -104,16 +104,6 @@
     {
       "hasParrot": true,
       "isMaster": false,
-      "name": "pi111",
-      "ip": "192.168.20.111",
-      "hasAudio": true,
-      "hasMusic": false,
-      "hasScreen": true,
-      "parrotDisplayIp": "192.168.20.111"
-    },
-    {
-      "hasParrot": true,
-      "isMaster": false,
       "name": "pi112",
       "ip": "192.168.20.112",
       "hasAudio": true,
@@ -121,5 +111,10 @@
       "hasScreen": true
     }
   ],
-  "eventDir": "/media/pi/SOUND/events/"
+  "eventDir": "/media/pi/SOUND/events/",
+  "wordServerPort": 8081,
+  "schlubServerPort": 8080,
+
+  "parrotIp"         : "192.168.20.112",
+  "parrotDisplayIp" :  "192.168.20.112"
 }
