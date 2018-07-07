@@ -5,8 +5,8 @@
 
   "hosts" : [
     {
-      "ip" : "192.168.0.106", 
-      "name": "pi106", 
+      "ip" : "192.168.0.103", 
+      "name": "pi103", 
       "isMaster" : true, 
       "hasParrot" : true,
       "hasAudio" : true,
@@ -19,6 +19,6 @@
   "wordServerPort": 8081,
   "schlubServerPort": 8080,
 
-  "parrotIp"         : "192.168.0.106",
-  "parrotDisplayIp" :  "192.168.0.106"
+  "parrotIp"         : "192.168.0.103",
+  "parrotDisplayIp" :  "192.168.0.103"
 }

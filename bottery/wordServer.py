@@ -4,7 +4,8 @@ from datetime import datetime
 from flask import Flask, request,jsonify
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 import dataio as dio
-
+import sys
+import os
 # import pygame
 
 # pygame.mixer.init()
@@ -73,5 +74,6 @@ def page_gone(e):
 
 
 if __name__ == '__main__':
+    os.chdir(os.path.dirname(sys.argv[0]))
     dio.init_sql()
     app.run(myIP, PORT)

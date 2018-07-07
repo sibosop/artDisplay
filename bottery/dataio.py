@@ -91,7 +91,7 @@ def db_report():
 
 def init():
   global stopwords, words, config
-  global schlubUrls, parrotUrl, parrotDisplayUrl
+  global schlubUrls, parrotUrl, parrotDisplayUrl, wordsUrl
 
   # first read schlub.json with ip addresses of all our
   with open("../config/schlub.json") as fp:
@@ -102,6 +102,7 @@ def init():
      schlubUrls.append("http://{}:{}".format(hd['ip'], config['schlubServerPort']))
 
   parrotUrl = "http://{}:{}".format(config['parrotIp'], config['wordServerPort'])
+  wordsUrl = parrotUrl
   parrotDisplayUrl = "http://{}:{}".format(config['parrotDisplayIp'], config['schlubServerPort'])
 
   # load up 'database' dict objects from json files
@@ -202,7 +203,7 @@ def getRandomWords(n=10, pos=''):
   return json.loads(rv.text)['data']
 
 def getRandomPhrases(n = 1, src= ''): # for now, just pick one at random
-  req = req = wordsUrl+'/ph?n='+str(n)
+  req = wordsUrl+'/ph?n='+str(n)
   if len(src) > 0:
    req += '&src='+src
   rv = requests.get(req)
