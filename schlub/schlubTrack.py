@@ -21,7 +21,7 @@ soundMinVol = 0.1
 speedChangeMax = 4.0
 speedChangeMin = .25
 volLock = threading.Lock()
-soundMaxVol=.5
+soundMaxVolume=.4
 
 def play(cmd):
   rval = "ok"
@@ -29,7 +29,7 @@ def play(cmd):
     path=cmd['args']['path']
     if debug: syslog.syslog("Path Play: playing:"+path);
     sound = pygame.mixer.Sound(file=path)
-    l = soundMaxVol;
+    l = soundMaxVolume;
     r = l
     soundTrack.playSound(sound,l,r)
   except Exception as e:
@@ -39,10 +39,10 @@ def play(cmd):
 
 
 def setSoundMaxVolume(vol):
-  global soundMaxVol
+  global soundMaxVolume
   syslog.syslog("setting vol to;"+str(vol))
   volLock.acquire()
-  soundMaxVol = vol
+  soundMaxVolume = vol
   volLock.release()
   
 
@@ -160,7 +160,7 @@ class schlubTrack(threading.Thread):
         if nsound is not None:
           sound = nsound
         volLock.acquire()
-        l = soundMaxVol;
+        l = soundMaxVolume;
         volLock.release()
         r = l
         soundTrack.playSound(sound,l,r)

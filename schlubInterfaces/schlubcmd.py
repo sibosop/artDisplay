@@ -155,6 +155,7 @@ def completer(text, state):
 
 
 if __name__ == '__main__':
+  host.debug = True
   run=True
   try:
     readline.read_history_file()
