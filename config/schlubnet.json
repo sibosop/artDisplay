@@ -1,6 +1,6 @@
 {
   "subnet": "192.168.20",
-  "soundMaxVol": 0.4,
+  "soundMaxVol": 0.3,
   "hosts": [
     {
       "hasParrot": false,
@@ -107,7 +107,7 @@
       "name": "pi112",
       "ip": "192.168.20.112",
       "hasAudio": true,
-      "hasMusic": false,
+      "hasMusic": true,
       "hasScreen": true
     }
   ],
