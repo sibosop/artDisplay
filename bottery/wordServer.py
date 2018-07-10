@@ -6,6 +6,7 @@ from flask_json import FlaskJSON, JsonError, json_response, as_json
 import dataio as dio
 import sys
 import os
+import random
 # import pygame
 
 # pygame.mixer.init()
@@ -55,6 +56,29 @@ def get_phrases():
         body = dio.selectRandomPhrases(n)
     return json_response(data=body)
 
+@app.route('/cc')
+def get_corncob():
+    n = request.args.get('n')
+    n = 2 if n == None else int(n)
+    body = []
+    for i in range(n):
+        x = random.choice(linelist).strip()
+        body.append(x)
+    print body
+    return json_response(data=body)
+
+@app.route('/ggl')
+def get_ggl_haircut():
+    dio.schlubPlay("../bottery/ggl_haircut.wav")
+    body = "playing ggl_haircut.wav"
+    return json_response(data=body)
+
+
+@app.route('/col')
+def get_colossus():
+    dio.schlubPlay("../bottery/colossus.wav")
+    body = "playing colossus.wav"
+    return json_response(data=body)
 
 
 # ========= handle errors giving JSON responses
@@ -76,4 +100,15 @@ def page_gone(e):
 if __name__ == '__main__':
     os.chdir(os.path.dirname(sys.argv[0]))
     dio.init_sql()
+
+    # load cc list for ccl database.
+    choicefile=open("../lists/corncob_lowercase.txt","r")
+    linelist=[]
+    for line in choicefile:
+        linelist.append(line)
+
+
+    choice=random.choice(linelist)
+    print(choice)
+
     app.run(myIP, PORT)
