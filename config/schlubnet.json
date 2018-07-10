@@ -104,6 +104,15 @@
     {
       "hasParrot": true,
       "isMaster": false,
+      "name": "pi111",
+      "ip": "192.168.20.111",
+      "hasAudio": true,
+      "hasMusic": false,
+      "hasScreen": true
+    },
+    {
+      "hasParrot": true,
+      "isMaster": false,
       "name": "pi112",
       "ip": "192.168.20.112",
       "hasAudio": true,
