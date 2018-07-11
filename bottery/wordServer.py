@@ -23,7 +23,8 @@ FlaskJSON(app)
 
 @app.route('/nw')
 def get_new_words():
-    n = int(request.args.get('n'))
+    n = request.args.get('n')
+    n = 10 if n is None else int(n)
     posar = request.args.get('pos')
     print n, posar
     if (isinstance(posar,str) or isinstance(posar,unicode)) \
@@ -35,7 +36,8 @@ def get_new_words():
 
 @app.route('/rw')
 def get_random_words():
-    n = int(request.args.get('n'))
+    n = request.args.get('n')
+    n = 10 if n is None else int(n)
     posar = request.args.get('pos')
     print n, posar
     if (isinstance(posar,str) or isinstance(posar,unicode)) \
@@ -47,7 +49,8 @@ def get_random_words():
 
 @app.route('/ph')
 def get_phrases():
-    n = int(request.args.get('n'))
+    n = request.args.get('n')
+    n = 1 if n is None else int(n)
     src = request.args.get('src')
     print n, src
     if(isinstance(src,str) or isinstance(src,unicode)):
@@ -59,7 +62,7 @@ def get_phrases():
 @app.route('/cc')
 def get_corncob():
     n = request.args.get('n')
-    n = 2 if n == None else int(n)
+    n = 2 if n is None else int(n)
     body = []
     for i in range(n):
         x = random.choice(linelist).strip()

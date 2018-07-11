@@ -52,11 +52,12 @@ import socket
 myIP = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
 print("myIP", myIP)
 
-debug = True
+debug = False
 
-parrotUrl        = None
-parrotDisplayUrl = None
-schlubUrls       = None
+# parrotUrl        = None
+# parrotDisplayUrl = None
+schlubSayers     = None
+schlubShowers    = None
 wordsUrl         = None
 datamuseUrl      = "http://api.datamuse.com/words"
 
@@ -91,19 +92,33 @@ def db_report():
 
 def init():
   global stopwords, words, config
-  global schlubUrls, parrotUrl, parrotDisplayUrl, wordsUrl
+  global parrotName, wordsUrl
+  global myName, schlubSayers, schlubShowers
 
   # first read schlub.json with ip addresses of all our
   with open("../config/schlub.json") as fp:
     config  = json.load(fp)
 
-  schlubUrls = list()
-  for hd in config['hosts']:
-     schlubUrls.append("http://{}:{}".format(hd['ip'], config['schlubServerPort']))
+  # set myName by lookup from myIP in config.
+  # build schlubShowers and schlubSayers lists.
+  schlubSayers = list()
+  schlubShowers = list()
 
-  parrotUrl = "http://{}:{}".format(config['parrotIp'], config['wordServerPort'])
-  wordsUrl = parrotUrl
-  parrotDisplayUrl = "http://{}:{}".format(config['parrotDisplayIp'], config['schlubServerPort'])
+  for h in config['hosts']:
+    if h['ip'] == myIP:
+      myName = h['name']
+    if h['hasAudio'] == True:
+      schlubSayers.append(h['name'])
+    if h['hasScreen'] == True:
+      schlubShowers.append(h['name'])
+    if h['name'] == config['parrotName']:
+      wordsUrl = "http://{}:{}".format(h['ip'], config['wordServerPort'])
+
+
+
+  parrotName = config['parrotName']
+  # wordsUrl = parrotUrl
+  # parrotDisplayUrl = "http://{}:{}".format(config['parrotDisplayIp'], config['schlubServerPort'])
 
   # load up 'database' dict objects from json files
   with open(stopwords_filename) as json_stopwords:   
@@ -115,9 +130,10 @@ def init():
   # print("words", words)
   # print(stopwords)
   print "====== DATAIO ============"
-  print "schlubUrls: ", schlubUrls
-  print "parrotUrl", parrotUrl
-  print "parrotDisplayUrl", parrotDisplayUrl
+  print "schlubSayers: ", schlubSayers
+  print "schlubShowers: ", schlubShowers
+  print "parrotName", parrotName
+  print "wordsUrl", wordsUrl
   print "====== DATAIO ============"
 
 
@@ -193,11 +209,11 @@ def getRandomWords(n=10, pos=''):
   if len(pos) > 0:
     pos = pos.replace(' ', '+')
     req = wordsUrl+'/rw?n='+str(n)+'&pos='+pos
-    #print req
+    print req
     rv = requests.get(req)
   else:
     req = wordsUrl+'/rw?n='+str(n)
-    #print req
+    print req
     rv = requests.get(req)
 
   return json.loads(rv.text)['data']
@@ -212,6 +228,12 @@ def getRandomPhrases(n = 1, src= ''): # for now, just pick one at random
 def getPhrase(): # just one random phrase
   rv = getRandomPhrases(1)
   return rv[0]
+
+def getCornCob(n=2):
+  req = wordsUrl+'/cc?n='+str(n)
+  rv = requests.get(req)
+  return json.loads(rv.text)['data']
+
 
 # =============================================
 #   database data ingestion routines
@@ -341,53 +363,78 @@ def datamuse(word, refcode='rel_trg'):
   rv = []
   for x in rj:
     xout = []
-    xout.append(x['word'])
-    xout.append(trans[x['tags'][0]]) #pos
-    wftag = x['tags'][1]
-    print x['word'],wftag
-    if 'f:' in wftag:
-      xout.append(wftag[2:]) #word frequency
-    else:
-      xout[1] = 'NNP'
-    rv.append(xout)
+    try:
+      xout.append(x['word'])
+      xout.append(trans[x['tags'][0]]) #pos
+      wftag = x['tags'][1]
+  #   print x['word'],wftag
+      if 'f:' in wftag:
+        xout.append(wftag[2:]) #word frequency
+      else:
+        xout[1] = 'NNP'
+      rv.append(xout)
+    except: pass
   return rv 
   
 # =====================================
 #    schlub output commands
 # =====================================
-def schlubSay(phraseIn, langIn= default_voice,urls=[schlubUrls[0]]):
+def schlubUrl(name):
+  for h in config['hosts']:
+    if nu(h['name']) == name:
+      return "http://{}:{}".format(h['ip'], config['schlubServerPort'])
+
+  return "ERROR: NO PORT OF NAME " + name + " FOUND"
+
+def schlubSay(phraseIn, langIn= default_voice,sayers=[schlubSayers[0]]):
+  if (isinstance(sayers,str) or isinstance(sayers,unicode)):
+    sayers = [sayers]
   theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
-  for u in urls:
+  for s in sayers:
+    u =  schlubUrl(s)
     r = requests.post(u, data=theData)
     #print r.text
 
 # show a sentence on screen
-def schlubShow(phraseIn, urls=[schlubUrls[0]]):
-  #print urls
+def schlubShow(phraseIn, showers=[schlubShowers[0]]):
+  if (isinstance(showers,str) or isinstance(showers,unicode)):
+    showers = [showers]
   theData = json.dumps({"cmd": "Show", "args": { "phrase": phraseIn}})
-  for u in urls:
+  for s in showers:
+   u = schlubUrl(s)
    r = requests.post(u, data=theData)
    # print r.text
 
-def schlubSoundVol(volIn, urls=[schlubUrls[0]]):
+def schlubSoundVol(volIn, sayers=[schlubSayers[0]]):
+  if (isinstance(sayers,str) or isinstance(sayers,unicode)):
+    sayers = [sayers]
   theData = json.dumps({"cmd": "SoundVol", "args": [volIn]})
-  for u in urls:
+  for s in sayers:
+    u = schlubUrl(s)
     r = requests.post(u, data=theData)
     print r.text
 
 
-def schlubVol(volIn, urls=[schlubUrls[0]]):
+def schlubVol(volIn, sayers=[schlubSayers[0]]):
+  if (isinstance(sayers,str) or isinstance(sayers,unicode)):
+    sayers = [sayers]
   theData = json.dumps({"cmd": "Volume", "args": [volIn]})
-  for u in urls:
+  for s in sayers:
+    u = schlubUrl(s)
     r = requests.post(u, data=theData)
     print r.text
 
 # play one sound.. path relative to artDisplay/schlub
-def schlubPlay(filepath, urls=[schlubUrls[0]]):
+def schlubPlay(filepath, sayers=[schlubSayers[0]]):
   theData = json.dumps({"cmd" : "Play", "args": { "path" : filepath}})
-  for u in urls:
-    r = requests.post(u, data=theData)
-    print r.text
+  for s in sayers:
+    u = schlubUrl(s)
+    try:
+      r = requests.post(u, data=theData, timeout=2.0)
+      print r.text
+    except Exception as e:
+      print str(e)
+
 
 
 # ==============================================================================
@@ -423,9 +470,9 @@ def wjoin(x):
 def munge(phrase, wordlist, prob):
   random.shuffle(wordlist)
   posDict = makePosDict(wordlist)
-  print("===============================")
-  print(posDict)
-  print("===============================")
+  # print("===============================")
+  # print(posDict)
+  # print("===============================")
   rv = []
   for w in phrase[1]:
     tag = w[1]
@@ -433,10 +480,10 @@ def munge(phrase, wordlist, prob):
     and (random.random() < prob) \
     and len(posDict[tag]) > 0 \
     and w[0] != 'I':
-      print " subst", prob,
+#      print " subst", prob,
       rv.append(posDict[tag].pop())
     else:
-      print " orig", prob,
+#      print " orig", prob,
       rv.append(w[0])
   return rv
 
