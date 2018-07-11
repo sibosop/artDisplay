@@ -16,6 +16,7 @@ useSlp = False
 hosts = []
 names = []
 timeout = 2
+debug=False
 def setHostList():
   global hosts
   if useSlp:
@@ -95,8 +96,28 @@ def sendWithSubnet(ip,cmd):
 def sendToHosts(cmd):
   for h in hosts:
     sendToHost(h['ip'],cmd)
-
-debug = False
+    
+def jsonStatus(s):
+  d = {}
+  d['status'] = s
+  return json.dumps(d) 
+     
+def sendToWordServer(ip,cmd): 
+  if debug: print "send to word server"
+  rval = True
+  port = config.specs['wordServerPort']
+  try:
+    url = "http://"+ip + ":" + str(port) + "/"+cmd
+    if debug: print "send to word server:",url
+    req = urllib2.Request(url)
+    f = urllib2.urlopen(req,None,timeout)
+    rval = f.read()
+    if debug: print("got response:"+rval)  
+  except Exception as e:
+    if debug: print "host send error:",str(e)
+    rval = jsonStatus("408")
+  return rval
+      
 def isLocalHost(ip):
   plats=platform.platform().split('-');
   if plats[0] == 'Darwin':

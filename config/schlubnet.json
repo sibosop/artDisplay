@@ -79,7 +79,7 @@
       "isMaster": false,
       "name": "pi108",
       "ip": "192.168.20.108",
-      "hasAudio": false,
+    "hasAudio": false,
       "hasMusic": false,
       "hasScreen": true
     },
@@ -123,7 +123,5 @@
   "eventDir": "/media/pi/SOUND/events/",
   "wordServerPort": 8081,
   "schlubServerPort": 8080,
-
-  "parrotIp"         : "192.168.20.112",
-  "parrotDisplayIp" :  "192.168.20.112"
+  "parrotName": "pi111"
 }
