@@ -19,6 +19,6 @@
   "wordServerPort": 8081,
   "schlubServerPort": 8080,
 
-  "parrotIp"         : "192.168.0.103",
-  "parrotDisplayIp" :  "192.168.0.103"
+  "parrotName" : "pi103",
+
 }

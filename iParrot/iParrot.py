@@ -10,16 +10,16 @@ import recorder
 import anal
 import blanket
 import transServer
+import argparse
 
 defaultPort = 8085
 
 
 if __name__ == '__main__':
   pname = sys.argv[0]
-  displayEnabled = False
-  if len(sys.argv) > 1:
-    if sys.argv[1] == '-d':
-      displayEnabled = True
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-d','--displayEnable', action = 'store_true',help='set displayEnable')
+  args = parser.parse_args()
       
   os.environ['DISPLAY']=":0.0"
   os.chdir(os.path.dirname(sys.argv[0]))
@@ -28,13 +28,13 @@ if __name__ == '__main__':
   it = recorder.inputThread()
   it.setDaemon(True)
 
-  rt = recog.recogThread(it)
+  rt = recog.recogThread(it,args.displayEnable)
   rt.setDaemon(True)
 
 #  analt = anal.analThread(rt)
 #  analt.setDaemon(True)
   
-  pst = blanket.phraseSender(rt,displayEnabled)
+  pst = blanket.phraseSender(rt,False) # ALWAYS OFF for now
   pst.setDaemon(True)
 
   it.start()

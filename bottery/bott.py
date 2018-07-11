@@ -4,6 +4,7 @@ import sys
 import os
 import random
 import time
+import argparse
 
 import dataio as dio
 
@@ -44,24 +45,42 @@ if __name__ == '__main__':
 # last_timestamp = 0 
 # init()
 
-  voices = ['en', 'en-uk', 'en-au']
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-d','--debug', action = 'store_true',help='set debug')
+  parser.add_argument('-e','--eatme',help='eat me')
+  args = parser.parse_args()
+  debug = args.debug
+  print "args = ", args
+
+  voices = ['en', 'en-uk', 'en-au', 'de', 'fr']
 
   dio.schlubSoundVol(30)
   cont = True
   while cont:
-    #k = wait_key()
-    thePhrase = dio.getPhrase()
-    nwords = dio.getNewWords()
-    dmu_word =  (random.choice(nwords))[0]
-    rwords = dio.datamuse(dmu_word)
-    allwords = dio.listMerge(nwords, rwords)
-    x  = dio.munge(thePhrase,allwords, 0.4)
-    out = dio.wjoin(x)
-    theVoice = random.choice(voices)
-    print(theVoice, thePhrase[0], out)
-    dio.schlubSay(out, theVoice)
+    if random.choice([0,1]) == 1:
+
+        thePhrase = dio.getPhrase()
+        nwords = dio.getNewWords()
+        dmu_word =  (random.choice(nwords))[0]
+        rwords = dio.datamuse(dmu_word)
+    #    print len(rwords)
+        allwords = dio.listMerge(nwords, rwords)
+        x  = dio.munge(thePhrase,allwords, 0.6)
+        out = dio.wjoin(x)
+        theVoice = random.choice(voices)
+        print("\n{};{}\n{}\n{}".format(theVoice, dio.myName, thePhrase[0], out ))
+        dio.schlubSay(out, theVoice, dio.myName)
+
+    else:
+        ccwords = dio.getCornCob(3)
+        theVoice = random.choice(voices)
+        print "******* ", ccwords
+        out = dio.wjoin(ccwords)
+        dio.schlubSay(out,theVoice, dio.myName)
+        dio.schlubShow(out, dio.schlubShowers)
+
     delay = random.randint(7,8)
-    print("delay {}".format(delay))
+#    print("delay {}".format(delay))
     time.sleep(delay)
     # if k == 'q':
     #   cont = False

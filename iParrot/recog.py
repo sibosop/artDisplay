@@ -18,12 +18,13 @@ from google.cloud.speech import types
 debug=False
 
 class recogThread(threading.Thread):
-  def __init__(self,i):
+  def __init__(self,i, displayEnable):
     super(recogThread,self).__init__()
     self.name = "Recog Thread"
     self.queue = queue.Queue()
     self.source = i
     self.interim = True
+    self.displayEnable = displayEnable
 
   class dataStream(object):
     def __init__(self,r):
@@ -73,7 +74,8 @@ class recogThread(threading.Thread):
               for alternative in alternatives:
                 syslog.syslog('Confidence: {}'.format(alternative.confidence))
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
-                dio.schlubShow(alternative.transcript, [dio.parrotDisplayUrl])
+                if self.displayEnable: 
+                  dio.schlubShow(alternative.transcript, dio.myName)
                 out={}
                 out['trans'] = alternative.transcript
                 out['confidence'] = alternative.confidence
