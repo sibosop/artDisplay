@@ -257,8 +257,11 @@ class soundServer(BaseHTTPServer.HTTPServer):
     else:
       state['collection'] = ""
       state['maxEvents'] = 0
+    state['soundMaxVolume'] = schlubTrack.soundMaxVolume
 
     for k in config.specs.keys():
+      if k == 'soundMaxVol':
+          continue
       if k == "hosts":
         for h in config.specs[k]:
           if host.isLocalHost(h['ip']):
