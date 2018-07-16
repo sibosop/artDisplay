@@ -389,6 +389,7 @@ def schlubUrl(name):
 def schlubSay(phraseIn, langIn= default_voice,sayers=[schlubSayers[0]]):
   if (isinstance(sayers,str) or isinstance(sayers,unicode)):
     sayers = [sayers]
+  phraseIn = phraseIn.replace('I ', 'eye ')
   theData = json.dumps({"cmd": "Phrase", "args": { "phrase": phraseIn, "reps": 1, "lang": langIn}})
   for s in sayers:
     u =  schlubUrl(s)

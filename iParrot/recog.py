@@ -83,7 +83,8 @@ class recogThread(threading.Thread):
 
       except grpc.RpcError, e:
         if e.code() not in (grpc.StatusCode.INVALID_ARGUMENT,
-                              grpc.StatusCode.OUT_OF_RANGE):
+                              grpc.StatusCode.OUT_OF_RANGE,
+                              grpc.StatusCode.DEADLINE_EXCEEDED):
           raise
         details = e.details()
         if e.code() == grpc.StatusCode.INVALID_ARGUMENT:
