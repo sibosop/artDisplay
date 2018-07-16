@@ -72,33 +72,6 @@
       "ip": "192.168.20.107",
       "hasAudio": true,
       "hasMusic": true,
-      "hasScreen": false
-    },
-    {
-      "hasParrot": false,
-      "isMaster": false,
-      "name": "pi108",
-      "ip": "192.168.20.108",
-    "hasAudio": false,
-      "hasMusic": false,
-      "hasScreen": true
-    },
-    {
-      "hasParrot": false,
-      "isMaster": false,
-      "name": "pi109",
-      "ip": "192.168.20.109",
-      "hasAudio": false,
-      "hasMusic": false,
-      "hasScreen": true
-    },
-    {
-      "hasParrot": false,
-      "isMaster": false,
-      "name": "pi110",
-      "ip": "192.168.20.110",
-      "hasAudio": false,
-      "hasMusic": false,
       "hasScreen": true
     },
     {

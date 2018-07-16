@@ -9,6 +9,7 @@ home = os.environ['HOME']
 sys.path.append(home+"/GitProjects/artDisplay/config")
 sys.path.append(home+"/GitProjects/artDisplay/bottery")
 import config
+import dataio
 
 
 home = os.environ['HOME']
@@ -71,7 +72,17 @@ def getWordServerCommand():
 def defaultPhrase():
   return getPhrase()
 
+rel_codes = ['ml','rel_syn','rel_ant','rel_trg','rel_jjb'] 
 
+def doDataMuse(w):
+  rval = w + " "
+  dcmd = random.choice(rel_codes)
+  t = dataio.datamuse(w,dcmd)
+  if debug: print "w:",w,"datamuse:",t,"dcmd:",dcmd
+  if len(t) != 0:
+    s = random.choice(t)
+    rval += s[0] + " "
+  return rval
 
 if __name__ == '__main__':
   if config.specs == None:
@@ -110,11 +121,19 @@ if __name__ == '__main__':
       if rval['status'] == 200:
         phrase = ""
         if cmd == "nw" or cmd == "rw":
-          for w in rval['data']:
-            phrase += w[0] + " " 
+          if random.randint(0,1):
+            for w in rval['data']:
+              phrase += w[0] + " " 
+          else:
+            for w in rval['data']:
+              phrase += doDataMuse(w[0])
         elif cmd=="cc":
-          for w in rval['data']:
-            phrase += w + " "
+          if random.randint(0,1):
+            for w in rval['data']:
+              phrase += doDataMuse(w)
+          else:
+            for w in rval['data']:
+              phrase += w + " "
         elif cmd == "ph":
           phrase = rval['data'][0][0]
         else:
