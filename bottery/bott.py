@@ -107,8 +107,8 @@ def randIPWord():
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}::{}\n{}\n{}".format(randIPWord, dmwo, thePhrase[0], out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
+        dio.schlubSay(out, theVoice, dio.schlubSayers)
+        dio.schlubShow(out, dio.schlubShowers)
         delay = random.randint(7,9)
         time.sleep(delay)
 
@@ -119,18 +119,21 @@ def rawMuse():
     while cont:
         # get a list of n new ip words and find the longest one
         newWords =  dio.getNewWords(10)
-        theWord = newWords[random.randint(0,10)][0]
+        theWord = newWords[random.randint(0,9)][0]
         print theWord
         dmw = dio.datamuse(theWord)
         dmwo = list(map((lambda x: x[0]), dmw))
         x = list()
-        for i in range(5):
-            x.append(random.choice(dmwo))
+        if len(dmwo) > 0:
+            for i in range(5):
+                x.append(random.choice(dmwo))
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}::{}\n{}".format(theWord, dmwo,  out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
+        #  theSayers = [random.choice(dio.schlubSayers)]
+        # theSayers.append(random.choice(dio.schlubSayers))
+        dio.schlubSay(out, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(out, dio.schlubShowers)
         delay = random.randint(7,9)
         time.sleep(delay)
 
@@ -146,9 +149,21 @@ def picasso():
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}\n{}\n{}".format(dm_wordsonly, thePhrase[0], out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
+        dio.schlubSay(out, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(out, dio.schlubShowers)
         delay = random.randint(7,9)
+        time.sleep(delay)
+
+
+def trans():
+    cont = True
+    while cont:
+        theTrans = random.choice(dio.getTrans(3))['trans']
+        theVoice = random.choice(voices)
+        print "\n{}".format(theTrans)
+        dio.schlubSay(theTrans, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(theTrans, dio.schlubShowers)
+        delay = random.randint(0,8)
         time.sleep(delay)
 
 
@@ -165,6 +180,7 @@ if __name__ == '__main__':
          , 'picasso'  : picasso
          , 'randword' : randIPWord
          , 'rawmuse'  : rawMuse
+         , 'trans'    : trans
         }
 
 
@@ -178,7 +194,7 @@ if __name__ == '__main__':
 
   voices = ['en', 'en-uk', 'en-au', 'de']
 
-  dio.schlubSoundVol(30)
+  # dio.schlubSoundVol(30)
 
   cmd[args.cmd]()
 

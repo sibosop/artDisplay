@@ -61,16 +61,20 @@ def setCurrentTranscript(trans):
   rval = "ok"
   return transServer.jsonStatus(rval)
 
-def getCurrentTranscript(confThres=0, timeStamp=0):
+def getCurrentTranscript(confThres=0, timeStamp=0,number=20):
   global currentTranscript
   rval = {}
   rval['status'] = "ok"
   #transMutex.acquire()
   transcript = []
+  count = 0
   for e in currentTranscript:
     if e['confidence'] >= int(confThres)/10.0 and \
        e['timestamp'] > int(timeStamp):
       transcript.append(e)
+    count += 1
+    if count > number:
+      break;
   rval['transcript'] = transcript
   #transMutex.release()
   return json.dumps(rval)
