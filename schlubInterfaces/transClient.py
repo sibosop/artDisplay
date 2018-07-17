@@ -8,11 +8,10 @@ import time
 import urllib2
 import json
 import os
+import host
 sys.path.append(home+"/GitProjects/artDisplay/imageLookup")
 sys.path.append(home+"/GitProjects/artDisplay/schlub")
 import slp
-import schlubcmd
-import mangle
 
 dataBufSize = 20
 dataBuf = []
@@ -35,8 +34,8 @@ if __name__ == '__main__':
   run=True
   checkDisplay = False
   print "getting host list"
-  schlubcmd.getHostList()
-  schlubcmd.printHostList()
+  hosts = host.getHosts()
+  print hosts
   transServerIp = sys.argv[1]
   if len(sys.argv) > 2:
     confidence = sys.argv[2]
@@ -47,20 +46,18 @@ if __name__ == '__main__':
   #url = "http://"+transServerIp+"/data?ct=5"
   url = "http://"+transServerIp+"/data?ct="+str(confidence)
   print "url",url 
-  for h in schlubcmd.hosts:
+  for h in hosts:
     if h['ip'] == testIp:
       continue
     resp = sendToHost(h['ip'],{'cmd' : 'Probe', 'args' : [""] })
     fullList.insert(0,h['ip'])
-    if resp['displayEnabled']:
+    if resp['hasScreen']:
       print "ip:",h['ip'],"display enabled"
       displayList.insert(0,h['ip'])
   print
   for d in displayList:
     print d
-  print
-
-  while run:
+  while True:
     print "url:",url
     response = urllib2.urlopen(url)
     html = response.read()
@@ -78,23 +75,22 @@ if __name__ == '__main__':
     print
 
     index = 0
-    for ip in fullList:
-      print "phrase count:",len(dataBuf),"index:",index
-      if len(dataBuf) > index:
-        phrase = dataBuf[index]['trans']
-        args = {}
-        args['phrase'] = mangle.mangle(phrase)
-        if ip == testIp:
-          continue
-        if ip in displayList:
-          resp = sendToHost(ip,{'cmd' : 'Show', 'args' : args })
-        args['reps'] = 1
-        resp = sendToHost(ip,{'cmd' : 'Phrase','args' : args})
-        print resp
+    print "phrase count:",len(dataBuf),"index:",index
+    if len(dataBuf) < 2:
+      continue
+    f = random.choose(fullList)
+    d = random.choose(displayList)
+    args = {}
+    args['phrase'] = dataBuf[index]['trans']
+    resp = sendToHost(d['ip'],{'cmd' : 'Show', 'args' : args })
+    print resp
+    index += 1
+    args['phrase'] = dataBuf[index]['trans']
+    args['reps'] = 1
+    resp = sendToHost(f['ip'],{'cmd' : 'Phrase','args' : args})
+    print resp
 
-      index += 1
-      
-      
+    index += 1
     time.sleep(1)
 
 
