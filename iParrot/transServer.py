@@ -61,11 +61,7 @@ class MyHandler(BaseHTTPRequestHandler):
         ts = pqs['ts'][0]
       else:
         ts = 0
-      if 'n' in pqs:
-        n = pqs['n'][0]
-      else:
-        n = 20
-      status =  blanket.getCurrentTranscript(conf,ts,n)
+      status =  blanket.getCurrentTranscript(conf,ts)
 
         
     else:

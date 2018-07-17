@@ -158,7 +158,10 @@ def picasso():
 def trans():
     cont = True
     while cont:
-        theTrans = random.choice(dio.getTrans(3))['trans']
+        ts = dio.getTrans(3)
+        print "ts:",ts
+        theTrans = random.choice(ts)['trans']
+
         theVoice = random.choice(voices)
         print "\n{}".format(theTrans)
         dio.schlubSay(theTrans, theVoice, random.choice(dio.schlubSayers))

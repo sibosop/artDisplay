@@ -97,5 +97,5 @@
   "wordServerPort": 8081,
   "schlubServerPort": 8080,
   "transServerPort" : 8085,
-  "parrotName": "pi111"
+  "parrotName": "pi112"
 }
