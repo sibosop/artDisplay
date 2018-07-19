@@ -13,3 +13,10 @@ CREATE TABLE IF NOT EXISTS "phrase" (
   `src` TEXT,
   CONSTRAINT phsrc UNIQUE (ph,src)
 );
+CREATE TABLE IF NOT EXISTS "iParrot" (
+  `trans` TEXT,
+  'conf' REAL,
+  `tw` TEXT, /* json array of tagged words in phrase: [[word, postag], ...] */
+  `ts`  REAL
+ );
+

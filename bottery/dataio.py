@@ -78,10 +78,11 @@ def nu(s):
   return s.encode('ascii', 'ignore')
 
 def init_sql():
-  global sql_conn, sql_c
+  global sql_conn, sql_c, last_iParrot_time
 
-  sql_conn = sqlite3.connect(sqlite_filename)
+  sql_conn = sqlite3.connect(sqlite_filename, check_same_thread = False)
   sql_c = sql_conn.cursor()
+  last_iParrot_time = time.time()
 
 def db_report():
   print "stopwords length: {}".format(len(stopwords))
@@ -143,7 +144,6 @@ def init():
 init()
 init_sql()
 
-
  
 # ================================
 #  sqlite select query routines
@@ -162,6 +162,13 @@ def selectNewWords(n=10, pos=''):
   newWords = list(sql_c.fetchall())
   return(newWords)
 
+def selectNewIparrot(n=1):
+  sql = "select * from iParrot order by ts DESC limit {};".format(n)
+  if debug:
+    print(sql)
+  sql_c.execute(sql);
+  return list(sql_c.fetchall())
+ 
 def selectRandomWords(n=10, pos=''):
   if len(pos) > 0:
     pos = "'"+pos.replace(' ', "','")+"'"
@@ -273,7 +280,7 @@ def ingestTaggedWord(word, pos="NN", ts=-1, src="ip"):
 # doesnt do sql COMMIT!!  tw = array of word,pos pairs as textblob .tags
 def ingestTaggedPhrase(phraseText, tw, ts=-1, src="??"):
   if ts < 0:  ts = time.time()
-  phraseText.replace("'", "''")
+  phraseText.replace("'", "\'")
   tw_str = json.dumps(tw)
   sql =  "insert into phrase (ph, tw, ts, src) values ('{}', '{}', {},'{}'); "\
           .format(phraseText,tw_str, ts, src)
@@ -287,11 +294,35 @@ def ingestTaggedPhrase(phraseText, tw, ts=-1, src="??"):
     # print("DUPLICATE: "+ sql)
     # sql_c.execute(sql)
 
+# tw = array of word,pos pairs as textblob .tags
+def ingestTaggedIparrot(txt, confidence, tw, ts=-1):
+  if ts < 0:  ts = time.time()
+  # txt = txt.replace("'", "''")
+  tw_str = json.dumps(tw)
+  # sql =  "insert into iParrot (trans, conf, tw, ts) values ('{}', {}, '{}',{}); "\
+  #         .format(txt,confidence, tw_str, ts)
+  try:
+    # print(sql)
+    sql_c.execute("insert into iParrot (trans,conf,tw,ts) values ( ?,?,?,?)", (txt,confidence,tw_str,ts))
+  except:
+    print("ERROR ", sql)
+    # sqlite3.IntegrityError:  # constraint ph, source unique violated: UPDATE count and ts instead of INSERTing
+    # sql = "update word SET ts={} where ph= '{}' and src = '{}';".format(ts, phaseText, tw)
+    # print("DUPLICATE: "+ sql)
+    # sql_c.execute(sql)
+  sql_conn.commit()
+
 # given just a plain untagged text phrase, compute postags and stuff into phrase table.
 def ingestPhrase(text, src="??"):
   text_tb = TextBlob(text)
   ts = time.time()
   ingestTaggedPhrase(text, text_tb.tags, ts, src)
+
+# given just a plain untagged text phrase from iParrot, compute postags and stuff into iParrot table.
+def ingestIparrot(text, confidence):
+  text_tb = TextBlob(text)
+  ts = time.time()
+  ingestTaggedIparrot(text, confidence, text_tb.tags, ts)
 
 # load the words of a whole phrase or text into word table of open words.db
 def ingestWords(theText, ts=-1, src="ip"):
