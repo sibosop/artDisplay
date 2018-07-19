@@ -99,11 +99,16 @@ class soundServer(BaseHTTPServer.HTTPServer):
       ,'Play' : self.doPlay
     }
 
-  def displayText(self,text):
+  def displayText(self,cmd):
     global screen
     global myFont
     global lineLen
     global noLines
+    text = cmd['phrase']
+    color = "FFFF00"
+    if 'color' in cmd.keys():
+      color = cmd['color']
+    if debug: syslog.syslog("color:"+str(color))
     
     if myFont is None:
       pygame.init()
@@ -139,7 +144,11 @@ class soundServer(BaseHTTPServer.HTTPServer):
     maxWidth = 0
     maxHeight = 0
     for l in lines:
-      label = myFont.render(l, 1, (255,255,0))
+      r = int(color[0:2],16)
+      g = int(color[2:4],16)
+      b = int(color[4:6],16)
+      if debug: syslog.syslog("r:"+str(r)+" g:"+str(g)+" b:"+str(b))
+      label = myFont.render(l, 1, (r,g,b))
       w = label.get_width()
       h = label.get_height()
       maxWidth = max(w,maxWidth)
@@ -194,7 +203,7 @@ class soundServer(BaseHTTPServer.HTTPServer):
     return jsonStatus("ok")
 
   def doShow(self,cmd):
-    self.displayText(cmd['args']['phrase'])
+    self.displayText(cmd['args'])
     return jsonStatus("ok")
 
   def doPhrase(self,cmd):
