@@ -60,6 +60,7 @@ schlubSayers     = None
 schlubShowers    = None
 wordsUrl         = None
 datamuseUrl      = "http://api.datamuse.com/words"
+transUrl         = None
 
 stopwords_filename = "../lists/stopwords.json"
 sqlite_filename    = "../lists/words.db"
@@ -92,7 +93,7 @@ def db_report():
 
 def init():
   global stopwords, words, config
-  global parrotName, wordsUrl
+  global parrotName, wordsUrl, transUrl
   global myName, schlubSayers, schlubShowers
 
   # first read schlub.json with ip addresses of all our
@@ -113,6 +114,7 @@ def init():
       schlubShowers.append(h['name'])
     if h['name'] == config['parrotName']:
       wordsUrl = "http://{}:{}".format(h['ip'], config['wordServerPort'])
+      transUrl = "http://{}:{}".format(h['ip'], config['transServerPort'])
 
 
 
@@ -134,6 +136,7 @@ def init():
   print "schlubShowers: ", schlubShowers
   print "parrotName", parrotName
   print "wordsUrl", wordsUrl
+  print "transUrl", transUrl
   print "====== DATAIO ============"
 
 
@@ -232,7 +235,18 @@ def getPhrase(): # just one random phrase
 def getCornCob(n=2):
   req = wordsUrl+'/cc?n='+str(n)
   rv = requests.get(req)
-  return json.loads(rv.text)['data']
+  return json.loads(rv.text)['transcript']
+
+
+# =============================================
+#   iParrot transcript server routines
+# =============================================
+def getTrans(ct = 0):
+  req = transUrl+'/data?ct='+str(ct)
+  rv = requests.get(req)
+  return json.loads(rv.text)['transcript']
+
+
 
 
 # =============================================
