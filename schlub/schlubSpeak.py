@@ -83,6 +83,7 @@ class schlubSpeakThread(threading.Thread):
     phrase = ""
     scatter = False
     lang = ''
+    factor = 1.0
     while self.isRunning():
       try:
         phraseArgs = getCurrentPhrase();
@@ -108,6 +109,11 @@ class schlubSpeakThread(threading.Thread):
             lang = phraseArgs['lang']
           else:
             lang = ''
+
+          if 'factor' in phraseArgs:
+            factor = phraseArgs['factor']
+          else:
+            factor = ''
 
           if 'vol' in phraseArgs:
             vol = int(phraseArgs['vol']) / 100.0 
@@ -138,6 +144,10 @@ class schlubSpeakThread(threading.Thread):
             continue
           if debug: syslog.syslog(self.name+": playing "+path)
           sound = pygame.mixer.Sound(file=path)
+          if debug: syslog.syslog("factor:"+str(factor))
+          nsound = soundTrack.speedx(sound,factor)
+          if nsound is not None:
+                sound = nsound
           os.unlink(path)
 
         l = vol
