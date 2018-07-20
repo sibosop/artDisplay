@@ -228,6 +228,29 @@ def transwireRIW():
                       lastSaid = rec[0]
         time.sleep(sleeptime)
 
+def affirmations():
+    yeahs = ["yeah", "yeah yeah", "uh-huh", "oh yes", 'mm hmm', 'so true', 'I agree', 'thats good', 'yes yes', 'oh baby yeah']
+    cont = True
+    while cont:
+        theYeah = random.choice(yeahs)
+        print theYeah
+        dio.schlubSay(theYeah, random.choice(voices), random.choice(dio.schlubSayers))
+        sleeptime = random.randint(7, 15)
+        time.sleep(sleeptime)
+
+
+def daccord():
+    ouis = ["oui", "bien sur", "mais oui", "oui oui", "d'accord", "okay", 'voila', "c'est vrai", "formidable", "c'est bon bebe"]
+    cont = True
+    while cont:
+        theYeah = random.choice(ouis)
+        print theYeah
+        dio.schlubSay(theYeah, 'fr', random.choice(dio.schlubSayers))
+        sleeptime = random.randint(7, 15)
+        time.sleep(sleeptime)
+
+
+
 
 if __name__ == '__main__':
 # pname = sys.argv[0]
@@ -245,6 +268,8 @@ if __name__ == '__main__':
          , 'transwire': transwire
          , 'rips'     : recentIparrots
          , 'triw'     : transwireRIW
+         , 'affirm'   : affirmations
+         , 'daccord'  : daccord
         }
 
 
