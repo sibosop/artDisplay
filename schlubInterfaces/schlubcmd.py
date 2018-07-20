@@ -99,6 +99,7 @@ def doPhrase(cmd):
   parse.add_argument('-v','--vol',type=int,nargs=1,default=[100],help='set volume [default 100]')
   parse.add_argument('-l','--lang',type=str,nargs=1,default=["en"],help='set language',choices=getLangs())
   parse.add_argument('-d','--scat',action='store_true',help='set scatter')
+  parse.add_argument('-f','--factor',nargs=1,type=float,default=[1.0],help='pitch factor x.x')
   parms=parse.parse_args(cmd[1:])
   phrase = ""
   for c in parms.words:
@@ -109,6 +110,7 @@ def doPhrase(cmd):
   args['scatter'] = parms.scat
   args['lang'] = parms.lang[0]
   args['vol'] = parms.vol[0]
+  args['factor'] = parms.factor[0]
   sendCargs(parms,{'cmd' : cmd[0], 'args' : args })
   return 0
 
