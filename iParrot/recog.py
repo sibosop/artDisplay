@@ -16,9 +16,11 @@ from google.cloud.speech import enums
 from google.cloud.speech import types
 
 debug=False
+iParrotDB_ConfidenceThreshold = 0.5
 
 class recogThread(threading.Thread):
   def __init__(self,i, displayEnable):
+    global dio
     super(recogThread,self).__init__()
     self.name = "Recog Thread"
     self.queue = queue.Queue()
@@ -74,6 +76,8 @@ class recogThread(threading.Thread):
               for alternative in alternatives:
                 syslog.syslog('Confidence: {}'.format(alternative.confidence))
                 syslog.syslog('Transcript: {}'.format(alternative.transcript))
+                if alternative.confidence >= iParrotDB_ConfidenceThreshold:
+                  dio.ingestIparrot(alternative.transcript, alternative.confidence)
                 if self.displayEnable: 
                   dio.schlubShow(alternative.transcript, dio.myName)
                 out={}

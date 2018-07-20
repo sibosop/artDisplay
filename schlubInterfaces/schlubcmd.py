@@ -60,12 +60,14 @@ def doNum(cmd):
 def doShow(cmd):
   parse=argparse.ArgumentParser(prog=cmd[0],parents=[defParse]) 
   parse.add_argument('words',nargs='*',default=[])
+  parse.add_argument('-c','--color',nargs=1,default=["FFFF00"])
   parms=parse.parse_args(cmd[1:])
   phrase = ""
   for c in parms.words:
     phrase += c + " "
   args={}
   args['phrase'] = phrase
+  args['color'] = parms.color[0]
   sendCargs(parms,{'cmd' : cmd[0], 'args' : args })
   return 0
   

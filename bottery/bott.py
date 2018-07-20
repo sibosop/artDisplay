@@ -107,8 +107,8 @@ def randIPWord():
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}::{}\n{}\n{}".format(randIPWord, dmwo, thePhrase[0], out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
+        dio.schlubSay(out, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(out, dio.schlubShowers)
         delay = random.randint(7,9)
         time.sleep(delay)
 
@@ -119,18 +119,21 @@ def rawMuse():
     while cont:
         # get a list of n new ip words and find the longest one
         newWords =  dio.getNewWords(10)
-        theWord = newWords[random.randint(0,10)][0]
+        theWord = newWords[random.randint(0,9)][0]
         print theWord
         dmw = dio.datamuse(theWord)
         dmwo = list(map((lambda x: x[0]), dmw))
         x = list()
-        for i in range(5):
-            x.append(random.choice(dmwo))
+        if len(dmwo) > 0:
+            for i in range(5):
+                x.append(random.choice(dmwo))
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}::{}\n{}".format(theWord, dmwo,  out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
+        #  theSayers = [random.choice(dio.schlubSayers)]
+        # theSayers.append(random.choice(dio.schlubSayers))
+        dio.schlubSay(out, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(out, dio.schlubShowers)
         delay = random.randint(7,9)
         time.sleep(delay)
 
@@ -146,11 +149,84 @@ def picasso():
         out = dio.wjoin(x)
         theVoice = random.choice(voices)
         print "\n{}\n{}\n{}".format(dm_wordsonly, thePhrase[0], out)
-        dio.schlubSay(out, theVoice, dio.myName)
-        dio.schlubShow(out, dio.myName)
-        delay = random.randint(7,9)
+        dio.schlubSay(out, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(out, dio.schlubShowers)
+        delay = random.randint(7,17)
         time.sleep(delay)
 
+
+def trans():
+    cont = True
+    while cont:
+        ts = dio.getTrans(7)
+        print "ts:",ts
+        theTrans = random.choice(ts)['trans']
+
+        theVoice = random.choice(voices)
+        print "\n{}".format(theTrans)
+        dio.schlubSay(theTrans, theVoice, random.choice(dio.schlubSayers))
+        dio.schlubShow(theTrans, dio.schlubShowers)
+        delay = random.randint(0,8)
+        time.sleep(delay)
+
+
+def recentIparrots():
+    cont = True
+    while cont:
+        rv = dio.selectNewIparrot(30, 0)
+        if rv != None:
+            rec = random.choice(rv)
+            if len(rv) > 0:
+                i = random.randint(0,len(rv))
+                print time.ctime(int(rec[3])), rec[1]
+                print rec[0]
+                dio.schlubSay(rec[0], random.choice(voices), random.choice(dio.schlubSayers))
+        time.sleep(random.randint(5, 10))
+
+
+lastSaid = ''
+def transwire():
+    global lastSaid
+    cont = True
+    while cont:
+        rv = dio.selectNewIparrot(5)
+        if rv != None:
+            if len(rv) > 0:
+                rec = rv[0]
+                #if random.randint(0,10) == 0:
+                #    rec = rv[4]
+                if rec[0] != lastSaid:
+                  print time.ctime(int(rec[3])), rec[1]
+                  print rec[0]
+                  dio.schlubSay(rec[0], random.choice(voices), random.choice(dio.schlubSayers))
+                  lastSaid = rec[0]
+        time.sleep(0.3)
+
+
+def transwireRIW():
+    global lastSaid
+    cont = True
+    while cont:
+        rv = dio.selectNewIparrot(5)
+        if rv != None:
+            if len(rv) > 0:
+                rec = rv[0]
+                if random.randint(0,10) == 0:
+                    sleeptime = random.randint(7,15)
+                    thePhrase = dio.getPhrase()
+                    # out = dio.wjoin(thePhrase[1])
+                    print thePhrase, sleeptime
+                    theVoice = random.choice(voices)
+                    # dio.schlubSay(out, random.choice(voices), random.choice(dio.schlubSayers))
+                else:
+                    # transwire
+                    if rec[0] != lastSaid:
+                      sleeptime = 0.3
+                      print time.ctime(int(rec[3])), rec[1]
+                      print rec[0]
+                      dio.schlubSay(rec[0], random.choice(voices), random.choice(dio.schlubSayers))
+                      lastSaid = rec[0]
+        time.sleep(sleeptime)
 
 
 if __name__ == '__main__':
@@ -165,6 +241,10 @@ if __name__ == '__main__':
          , 'picasso'  : picasso
          , 'randword' : randIPWord
          , 'rawmuse'  : rawMuse
+         , 'trans'    : trans
+         , 'transwire': transwire
+         , 'rips'     : recentIparrots
+         , 'triw'     : transwireRIW
         }
 
 
@@ -176,9 +256,9 @@ if __name__ == '__main__':
   print "args = ", args # , args['debug'], args['cmd']
   print args.debug, args.cmd
 
-  voices = ['en', 'en-uk', 'en-au', 'de']
+  voices = ['en', 'en-uk', 'en-au', 'de', 'da']
 
-  dio.schlubSoundVol(30)
+  # dio.schlubSoundVol(30)
 
   cmd[args.cmd]()
 
