@@ -229,23 +229,40 @@ def transwireRIW():
         time.sleep(sleeptime)
 
 def affirmations():
-    yeahs = ["yeah", "yeah yeah", "uh-huh", "oh yes", 'mm hmm', 'so true', 'I agree', 'thats good', 'yes yes', 'oh baby yeah']
+    yeahs = ["yeah", "yeah yeah", "your right", "uh-huh", "oh yes", "brilliant", "it cannot be denied", 'so true', 'I agree', 'thats good', 'right on', 'yes yes', 'oh baby yeah']
     cont = True
     while cont:
         theYeah = random.choice(yeahs)
-        print theYeah
-        dio.schlubSay(theYeah, random.choice(voices), random.choice(dio.schlubSayers))
+        theSayer = random.choice(dio.schlubSayers)
+        print theYeah, theSayer
+        dio.schlubSay(theYeah, random.choice(voices), theSayer)
+        dio.schlubShow(theYeah, random.choice(dio.schlubShowers))
+        sleeptime = random.randint(7, 15)
+        time.sleep(sleeptime)
+
+
+def roboyeah():
+    yeahs = ["yeah", "yeah yeah", "your right", "uh-huh", "oh yes", "brilliant", "it cannot be denied", 'so true', 'I agree', 'thats good', 'right on', 'yes yes', 'oh baby yeah']
+    cont = True
+    while cont:
+        theYeah = random.choice(yeahs)
+        theSayer = random.choice(dio.schlubSayers)
+        print theYeah, theSayer
+        dio.schlubSay(theYeah, 'es', theSayer)
+        dio.schlubShow(theYeah, random.choice(dio.schlubShowers))
         sleeptime = random.randint(7, 15)
         time.sleep(sleeptime)
 
 
 def daccord():
-    ouis = ["oui", "bien sur", "mais oui", "oui oui", "d'accord", "okay", 'voila', "c'est vrai", "formidable", "c'est bon bebe"]
+    ouis = ["oui", "tu as raison", "bien sur", "mais oui", "oui oui", "genial", "d'accord", "okay", 'voila', "c'est vrai", "formidable", "c'est bon"]
     cont = True
     while cont:
         theYeah = random.choice(ouis)
-        print theYeah
-        dio.schlubSay(theYeah, 'fr', random.choice(dio.schlubSayers))
+        theSayer = random.choice(dio.schlubSayers)
+        print theYeah, theSayer
+        dio.schlubSay(theYeah, 'fr', theSayer)
+        dio.schlubShow(theYeah, random.choice(dio.schlubShowers))
         sleeptime = random.randint(7, 15)
         time.sleep(sleeptime)
 
@@ -270,6 +287,7 @@ if __name__ == '__main__':
          , 'triw'     : transwireRIW
          , 'affirm'   : affirmations
          , 'daccord'  : daccord
+         , 'roboyeah' : roboyeah
         }
 
 
@@ -281,7 +299,7 @@ if __name__ == '__main__':
   print "args = ", args # , args['debug'], args['cmd']
   print args.debug, args.cmd
 
-  voices = ['en', 'en-uk', 'en-au', 'de', 'da']
+  voices = ['en', 'en-uk', 'en-au', 'de', 'da', 'es'] # es = our local robo voice
 
   # dio.schlubSoundVol(30)
 
